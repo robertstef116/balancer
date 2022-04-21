@@ -1,0 +1,74 @@
+$body-bg: #D6EEFF;
+$primary: #FC7F03;
+$secondary: #6264A7;
+
+$input-bg: transparent;
+$form-label-font-weight: bold;
+
+// Import Bootstrap and its default variables
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~bootstrap-icons/font/bootstrap-icons.scss';
+
+@media only screen and (min-height: 500px) {
+  .login {
+    margin-top: 30vh !important;
+  }
+}
+
+.spinner-overlay{
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba($light, 0.8);
+}
+
+.logo {
+  border-width: medium !important;
+  letter-spacing: 1px;
+}
+
+.widget {
+  border-width: medium !important;
+}
+
+.widget-header {
+  margin-bottom: -5px;
+}
+
+.widget-action {
+  font-size: 30px;
+  line-height: 0;
+  color: $primary;
+  margin-right: -8px;
+  padding-bottom: 5px;
+}
+
+.widget-action:hover {
+  color: $secondary;
+  text-shadow: 0 0 3px;
+}
+
+.nav-link.active {
+  font-weight: bolder;
+}
+
+.username-header a.nav-link {
+  color: $primary !important;
+}
+
+.username-header .dropdown-menu {
+  background-color: $dark;
+}
+
+.username-header .dropdown-item {
+  color: $light;
+}
+
+.username-header .dropdown-item:hover {
+  background-color: $gray-800;
+}
