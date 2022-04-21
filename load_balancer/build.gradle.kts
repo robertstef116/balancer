@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":model"))
     implementation(kotlin("stdlib"))
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
