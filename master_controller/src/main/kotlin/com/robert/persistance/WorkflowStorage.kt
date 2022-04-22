@@ -1,7 +1,7 @@
 package com.robert.persistance
 
 import com.robert.DBConnector
-import com.robert.Deployment
+import com.robert.Workflow
 import com.robert.Storage
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ServerException
@@ -9,16 +9,16 @@ import java.sql.Types
 import java.util.*
 import kotlin.collections.ArrayList
 
-class DeploymentStorage {
-    fun get(id: String): Deployment {
+class WorkflowStorage {
+    fun get(id: String): Workflow {
         val st = DBConnector.getConnection()
-            .prepareStatement("SELECT id, path, image, memory_limit, ports FROM deployments WHERE id = ?")
+            .prepareStatement("SELECT id, path, image, memory_limit, ports FROM workflows WHERE id = ?")
 
         st.use {
             st.setString(1, id)
             val rs = st.executeQuery()
             if (rs.next()) {
-                return Deployment(
+                return Workflow(
                     rs.getString("id"),
                     rs.getString("path"),
                     rs.getString("image"),
@@ -31,17 +31,17 @@ class DeploymentStorage {
         throw NotFoundException()
     }
 
-    fun getAll(): List<Deployment> {
-        val query = "SELECT id, path, image, memory_limit, ports FROM deployments order by image"
+    fun getAll(): List<Workflow> {
+        val query = "SELECT id, path, image, memory_limit, ports FROM workflows order by image"
         val st = DBConnector.getConnection().createStatement()
-        val deployments = ArrayList<Deployment>()
+        val workflows = ArrayList<Workflow>()
 
         st.use {
             val rs = st.executeQuery(query)
             rs.use {
                 while (rs.next()) {
-                    deployments.add(
-                        Deployment(
+                    workflows.add(
+                        Workflow(
                             rs.getString("id"),
                             rs.getString("path"),
                             rs.getString("image"),
@@ -53,15 +53,15 @@ class DeploymentStorage {
             }
         }
 
-        return deployments
+        return workflows
     }
 
-    fun add(path: String, image: String, memoryLimit: Long?, ports: List<Int>?): Deployment {
+    fun add(path: String, image: String, memoryLimit: Long?, ports: List<Int>?): Workflow {
         val id = UUID.randomUUID().toString()
 
         val conn = DBConnector.getConnection()
 
-        val st = conn.prepareStatement("INSERT INTO deployments(id, path, image, memory_limit, ports) VALUES (?, ?, ?, ?)")
+        val st = conn.prepareStatement("INSERT INTO workflows(id, path, image, memory_limit, ports) VALUES (?, ?, ?, ?)")
 
         st.use {
             st.setString(1, id)
@@ -80,7 +80,7 @@ class DeploymentStorage {
             val res = st.executeUpdate()
 
             if (res > 0) {
-                return Deployment(id, path, image, memoryLimit, ports?: emptyList())
+                return Workflow(id, path, image, memoryLimit, ports?: emptyList())
             }
         }
 
@@ -88,34 +88,34 @@ class DeploymentStorage {
     }
 
     fun update(id: String, path: String?, image: String?, memoryLimit: Long?, ports: List<Int>?) {
-        var deployment: Deployment? = null
+        var workflow: Workflow? = null
         if (image == null || memoryLimit == null || ports == null) {
-            deployment = get(id)
+            workflow = get(id)
         }
 
         val conn = DBConnector.getConnection()
-        val st = conn.prepareStatement("UPDATE deployments SET path = ?, image = ?, memory_limit = ?, ports = ? WHERE id = ?")
+        val st = conn.prepareStatement("UPDATE workflows SET path = ?, image = ?, memory_limit = ?, ports = ? WHERE id = ?")
 
         st.use {
             st.setString(5, id)
-            st.setString(1, path?:deployment!!.path)
-            st.setString(2, image?:deployment!!.image)
+            st.setString(1, path?:workflow!!.path)
+            st.setString(2, image?:workflow!!.image)
 
-            val memoryLimitValue = memoryLimit?:deployment!!.memoryLimit
+            val memoryLimitValue = memoryLimit?:workflow!!.memoryLimit
             if (memoryLimitValue != null) {
                 st.setLong(3, memoryLimitValue)
             } else {
                 st.setNull(3, Types.NUMERIC)
             }
 
-            val portsValue = ports?: deployment!!.ports
+            val portsValue = ports?: workflow!!.ports
             st.setArray(4, conn.createArrayOf("INTEGER", portsValue.toTypedArray()))
             Storage.executeUpdate(st)
         }
     }
 
     fun delete(id: String) {
-        val st = DBConnector.getConnection().prepareStatement("DELETE FROM deployments WHERE id = ?")
+        val st = DBConnector.getConnection().prepareStatement("DELETE FROM workflows WHERE id = ?")
 
         st.use {
             st.setString(1, id)

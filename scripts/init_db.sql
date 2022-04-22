@@ -18,11 +18,17 @@ CREATE TABLE IF NOT EXISTS workers
     in_use boolean NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS deployments
+INSERT INTO workers(id, alias, ip, in_use)
+VALUES ('a1511050-b7b3-4d9c-b634-7988ad79ab4b', 'localhost', '127.0.0.1', true)
+ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS workflows
 (
     id varchar(36) PRIMARY KEY,
     path varchar(50) NOT NULL ,
     image varchar(100) NOT NULL,
     memory_limit numeric,
     ports integer[]
-)
+);
+
+

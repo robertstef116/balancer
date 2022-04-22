@@ -1,6 +1,6 @@
 package com.robert
 
-data class DeploymentUpdateRequest(
+data class WorkflowUpdateRequest(
     val path: String?,
     val image: String?,
     val memoryLimit: Long?,

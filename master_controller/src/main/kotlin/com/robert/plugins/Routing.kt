@@ -2,7 +2,7 @@ package com.robert.plugins
 
 import com.robert.exceptions.*
 import com.robert.exceptions.NotFoundException
-import com.robert.routes.deployment
+import com.robert.routes.workflow
 import com.robert.routes.login
 import com.robert.routes.worker
 import io.ktor.routing.*
@@ -18,7 +18,7 @@ fun Application.configureRouting() {
 
 //        authenticate("auth-jwt") {
         worker("/worker")
-        deployment("/deployment")
+        workflow("/workflow")
 //        }
 
         // Static plugin. Try to access `/static/index.html`

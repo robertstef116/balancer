@@ -1,53 +1,53 @@
 package com.robert.services
 
-import com.robert.Deployment
+import com.robert.Workflow
 import com.robert.UpdateAwareService
 import com.robert.exceptions.ValidationException
-import com.robert.persistance.DeploymentStorage
+import com.robert.persistance.WorkflowStorage
 
-class DeploymentService: UpdateAwareService() {
+class WorkflowService: UpdateAwareService() {
     companion object {
         fun validateImage(image: String) = Regex("[a-z][a-z0-9]+:[a-z0-9]+").matches(image)
         fun validatePath(path: String) = Regex("/[a-zA-Z0-9_-]+").matches(path)
     }
 
-    private val deploymentStorage = DeploymentStorage()
+    private val workflowStorage = WorkflowStorage()
 
-    fun get(id: String): Deployment {
-        return deploymentStorage.get(id)
+    fun get(id: String): Workflow {
+        return workflowStorage.get(id)
     }
 
-    fun getAll(): List<Deployment> {
-        return deploymentStorage.getAll()
+    fun getAll(): List<Workflow> {
+        return workflowStorage.getAll()
     }
 
-    fun add(path: String, image: String, memoryLimit: Long?, ports: List<Int>?): Deployment {
+    fun add(path: String, image: String, memoryLimit: Long?, ports: List<Int>?): Workflow {
         if (!validatePath(path)) {
-            throw ValidationException("Invalid deployment path")
+            throw ValidationException("Invalid workflow path")
         }
         if (!validateImage(image)) {
-            throw ValidationException("Invalid deployment image")
+            throw ValidationException("Invalid workflow image")
         }
 
-        val res = deploymentStorage.add(path, image, memoryLimit, ports)
+        val res = workflowStorage.add(path, image, memoryLimit, ports)
         markChange()
         return res
     }
 
     fun update(id: String, path: String?, image: String?, memoryLimit: Long?, ports: List<Int>?) {
         if (path != null && !validatePath(path)) {
-            throw ValidationException("Invalid deployment path")
+            throw ValidationException("Invalid workflow path")
         }
         if (image != null && !validateImage(image)) {
             throw ValidationException("Invalid alias")
         }
 
-        deploymentStorage.update(id, path, image, memoryLimit, ports)
+        workflowStorage.update(id, path, image, memoryLimit, ports)
         markChange()
     }
 
     fun delete(id: String) {
-        deploymentStorage.delete(id)
+        workflowStorage.delete(id)
         markChange()
     }
 }
