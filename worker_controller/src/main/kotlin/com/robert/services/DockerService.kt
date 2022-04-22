@@ -44,6 +44,7 @@ class DockerService {
         log.debug("pulling image", createContainerRequest.image)
         docker.pull(createContainerRequest.image)
 
+        // TO DO: set docker registry
         val hostConfig = HostConfig.builder()
             .restartPolicy(HostConfig.RestartPolicy.unlessStopped())
             .portBindings(portBindings)

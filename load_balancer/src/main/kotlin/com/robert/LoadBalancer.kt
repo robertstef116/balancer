@@ -11,8 +11,9 @@ import java.net.Socket
 
 private data class HeaderProcessingResult(
     val route: String,
-    val begin: Int,
+    val routeBegin: Int,
     val bytesRead: Int,
+    val protocol: String,
     @Suppress("ArrayInDataClass")
     val bufferRead: ByteArray
 )
@@ -26,22 +27,22 @@ class LoadBalancer {
     companion object {
         private val log = LoggerFactory.getLogger(LoadBalancer::class.java)
         private const val SPACE_CHAR = ' '.code.toByte()
-        private const val NEW_LINE_CHAR = '\n'.code.toByte()
-
-        private val prefixes = listOf("/test")
+        private const val LF_CHAR = '\n'.code.toByte()
+        private const val CR_CHAR = '\r'.code.toByte()
 
         private fun redirectProcessedHeader(
             output: OutputStream,
             prefixLength: Int,
             headerProcessingResult: HeaderProcessingResult
         ) {
-            val prefixEnd = headerProcessingResult.begin + prefixLength
-            output.write(headerProcessingResult.bufferRead, 0, headerProcessingResult.begin);
+            val prefixEnd = headerProcessingResult.routeBegin + prefixLength
+            output.write(headerProcessingResult.bufferRead, 0, headerProcessingResult.routeBegin);
             output.write(headerProcessingResult.bufferRead, prefixEnd, headerProcessingResult.bytesRead - prefixEnd)
         }
 
         private fun processHeader(input: InputStream, buffer: ByteArray): HeaderProcessingResult {
             val route = StringBuilder()
+            val protocol = StringBuilder()
             var totalBytesRead = 0
             var spacesRead = 0
             var globalIdx = 0
@@ -63,29 +64,30 @@ class LoadBalancer {
                 i = 0
                 while (i < bytesRead) {
                     byte = buffer[i]
-                    when (byte) {
-                        NEW_LINE_CHAR -> break@processingLoop
-                        SPACE_CHAR -> {
-                            spacesRead++ // skip space separator
-                            i++
-                            if (spacesRead == 1) {
-                                begin = globalIdx + i + 1
-                                continue
-                            } else {
-                                break@processingLoop
-                            }
+
+                    if (byte == LF_CHAR || byte == CR_CHAR) {
+                        break@processingLoop
+                    } else if (byte == SPACE_CHAR) {
+                        spacesRead++ // skip space separator
+                        if (spacesRead == 1) {
+                            begin = globalIdx + i + 1
                         }
+                        i++
+                        continue
                     }
 
                     if (spacesRead == 1) {
                         route.append(byte.toInt().toChar())
+                    } else if (spacesRead == 2) {
+                        protocol.append(byte.toInt().toChar())
                     }
+
                     i++
                 }
                 globalIdx += i
             } while (input.available() > 0)
 
-            return HeaderProcessingResult(route.toString(), begin!!, totalBytesRead, tmpBuffer!!)
+            return HeaderProcessingResult(route.toString(), begin!!, totalBytesRead, protocol.toString(), tmpBuffer!!)
         }
 
         private fun redirect(input: InputStream, output: OutputStream, buffer: ByteArray) {
@@ -99,12 +101,39 @@ class LoadBalancer {
             output.flush()
         }
 
-        private fun getWorkerSocket(route: String): WorkerSocketInfo {
-            val routePrefix = prefixes.find { route.startsWith(it) } ?: throw NotFoundException()
-            val socket = Socket("localhost", 8444)
-            return WorkerSocketInfo(routePrefix, socket)
+        private fun getWorkerSocket(
+            route: String,
+            pathsMapping: Map<WorkflowPath, List<PathTargetResource>>
+        ): WorkerSocketInfo {
+            val pathData = pathsMapping.entries.find { route.startsWith(it.key.path) } ?: throw NotFoundException()
+            // TO DO: select deployment by some rule
+            val deployment = pathData.key.deploymentSelectionAlgorithm.selectTargetDeployment(pathData.value)
+            val socket = Socket(deployment.host, deployment.port)
+            return WorkerSocketInfo(pathData.key.path, socket)
+        }
+
+        private fun sendNotFound(stream: OutputStream, protocol: String) {
+            stream.write(
+                """
+                $protocol 404 Not Found
+                Server: load-balancer/1.0.0
+                Content-Type: text/html
+                Content-Length: 166
+                
+                <html>
+                <head><title>Not found</title></head>
+                <body>
+                <center><h1>Oops, request not found</h1></center>
+                <hr><center>load-balancer/1.0.0</center>
+                </body>
+                </html>
+            """.trimIndent().toByteArray()
+            )
+            log.debug("not found sent")
         }
     }
+
+    private val resourcesManager = ResourcesManager()
 
     fun init() {
         log.debug("initializing load balancer")
@@ -134,7 +163,8 @@ class LoadBalancer {
                             streamFromClient = clientSocket.getInputStream()
 
                             headerProcessingResult = processHeader(streamFromClient, buffer)
-                            val workerSocketInfo = getWorkerSocket(headerProcessingResult.route)
+                            val workerSocketInfo =
+                                getWorkerSocket(headerProcessingResult.route, resourcesManager.pathsMapping)
                             workerSocket = workerSocketInfo.socket
                             val routePrefixLength = workerSocketInfo.routePrefix.length
 
@@ -152,6 +182,8 @@ class LoadBalancer {
                             log.debug("Received an invalid request")
                         } catch (e: NotFoundException) {
                             log.debug("No registered worker found for {}", headerProcessingResult?.route)
+                            streamToClient = streamToClient ?: clientSocket.getOutputStream()
+                            sendNotFound(streamToClient!!, headerProcessingResult?.protocol ?: "HTTP/1.1")
                         } catch (e: Exception) {
                             e.printStackTrace()
                         } finally {

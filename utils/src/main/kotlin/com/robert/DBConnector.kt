@@ -12,24 +12,31 @@ object DBConnector {
     private val dbUsername = ConfigProperties.getString("postgres.username")
     private val dbPassword = ConfigProperties.getString("postgres.password")
 
-    private lateinit var connection: Connection
+    private var connection: Connection
 
     init {
-        connect()
+        connection = connect()
     }
 
-    private fun connect() {
+    private fun connect(): Connection {
         val props = Properties()
         props.setProperty("user", dbUsername)
         props.setProperty("password", dbPassword)
-        connection = DriverManager.getConnection(dbUrl, props)
+        val connection = DriverManager.getConnection(dbUrl, props)
         log.debug("connected to database successfully")
+        return connection
     }
 
     fun getConnection(): Connection {
         if (connection.isClosed) {
             connect()
         }
+        return connection
+    }
+
+    fun getTransactionConnection(): Connection {
+        val connection = connect()
+        connection.autoCommit = false
         return connection
     }
 }

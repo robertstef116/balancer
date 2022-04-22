@@ -2,7 +2,7 @@ package com.robert.persistance
 
 import com.robert.DBConnector
 import com.robert.Workflow
-import com.robert.Storage
+import com.robert.StorageUtils
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ServerException
 import java.sql.Types
@@ -61,7 +61,7 @@ class WorkflowStorage {
 
         val conn = DBConnector.getConnection()
 
-        val st = conn.prepareStatement("INSERT INTO workflows(id, path, image, memory_limit, ports) VALUES (?, ?, ?, ?)")
+        val st = DBConnector.getConnection().prepareStatement("INSERT INTO workflows(id, path, image, memory_limit, ports) VALUES (?, ?, ?, ?)")
 
         st.use {
             st.setString(1, id)
@@ -110,7 +110,7 @@ class WorkflowStorage {
 
             val portsValue = ports?: workflow!!.ports
             st.setArray(4, conn.createArrayOf("INTEGER", portsValue.toTypedArray()))
-            Storage.executeUpdate(st)
+            StorageUtils.executeUpdate(st)
         }
     }
 
@@ -119,7 +119,7 @@ class WorkflowStorage {
 
         st.use {
             st.setString(1, id)
-            Storage.executeUpdate(st)
+            StorageUtils.executeUpdate(st)
         }
     }
 }

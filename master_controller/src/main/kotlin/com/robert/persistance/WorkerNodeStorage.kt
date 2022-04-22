@@ -1,7 +1,7 @@
 package com.robert.persistance
 
 import com.robert.DBConnector
-import com.robert.Storage
+import com.robert.StorageUtils
 import com.robert.WorkerNode
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ServerException
@@ -84,7 +84,7 @@ class WorkerNodeStorage {
             st.setString(3, id)
             st.setString(1, alias?:workerNode!!.alias)
             st.setBoolean(2, inUse?:workerNode!!.inUse)
-            Storage.executeUpdate(st)
+            StorageUtils.executeUpdate(st)
         }
     }
 
@@ -93,7 +93,7 @@ class WorkerNodeStorage {
 
         st.use {
             st.setString(1, id)
-            Storage.executeUpdate(st)
+            StorageUtils.executeUpdate(st)
         }
     }
 }
