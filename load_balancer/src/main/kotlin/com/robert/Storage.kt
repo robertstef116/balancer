@@ -8,7 +8,7 @@ import kotlin.collections.HashMap
 
 class Storage {
     fun getWorkers(): List<WorkerNode> {
-        val query = "SELECT id, alias, host, in_use FROM workers"
+        val query = "SELECT id, alias, host FROM workers where in_use = true"
         val st = DBConnector.getConnection().createStatement()
         val workerNodes = ArrayList<WorkerNode>()
 
@@ -21,7 +21,7 @@ class Storage {
                             rs.getString("id"),
                             rs.getString("alias"),
                             rs.getString("host"),
-                            rs.getBoolean("in_use")
+                            true
                         )
                     )
                 }
@@ -98,6 +98,9 @@ class Storage {
                             id = currentId
                             image = rs.getString("image")
                             memoryLimit = rs.getLong("memory_limit")
+                            if (memoryLimit == 0L) {
+                                memoryLimit = null
+                            }
                             algorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
                             pathMapping = HashMap()
                         }
@@ -114,7 +117,7 @@ class Storage {
 
     fun getDeployments(): List<Deployment> {
         val query = """
-            SELECT id, worker_id, workflow_id, timestamp, dm.worker_port, dm.deployment_port FROM deployments 
+            SELECT id, worker_id, workflow_id, container_id, timestamp, dm.worker_port, dm.deployment_port FROM deployments 
             INNER JOIN deployment_mappings dm on deployments.id = dm.deployment_id order by id
        """.trimIndent()
         val deployments = ArrayList<Deployment>()
@@ -125,6 +128,7 @@ class Storage {
                     var id: String? = null
                     var workerId: String? = null
                     var workflowId: String? = null
+                    var containerId: String? = null
                     var timestamp: Long? = null
                     var portsMapping: MutableMap<Int, Int>? = null
                     var currentId: String?
@@ -133,18 +137,37 @@ class Storage {
                         currentId = rs.getString("id")
                         if (currentId != id) {
                             if (id != null) {
-                                deployments.add(Deployment(id, workerId!!, workflowId!!, timestamp!!, portsMapping!!))
+                                deployments.add(
+                                    Deployment(
+                                        id,
+                                        workerId!!,
+                                        workflowId!!,
+                                        containerId!!,
+                                        timestamp!!,
+                                        portsMapping!!
+                                    )
+                                )
                             }
                             id = currentId
                             workerId = rs.getString("worker_id")
                             workflowId = rs.getString("workflow_id")
+                            containerId = rs.getString("container_id")
                             timestamp = rs.getLong("timestamp")
                             portsMapping = HashMap()
                         }
                         portsMapping!![rs.getInt("worker_port")] = rs.getInt("deployment_port")
                     }
                     if (id != null) {
-                        deployments.add(Deployment(id, workerId!!, workflowId!!, timestamp!!, portsMapping!!))
+                        deployments.add(
+                            Deployment(
+                                id,
+                                workerId!!,
+                                workflowId!!,
+                                containerId!!,
+                                timestamp!!,
+                                portsMapping!!
+                            )
+                        )
                     }
                 }
         }
@@ -152,18 +175,24 @@ class Storage {
         return deployments
     }
 
-    fun addDeployment(workerId: String, workflowId: String, portsMapping: Map<Int, Int>): Deployment {
+    fun addDeployment(
+        workerId: String,
+        workflowId: String,
+        containerId: String,
+        portsMapping: Map<Int, Int>
+    ): Deployment {
         val id = UUID.randomUUID().toString()
         val timestamp = Instant.now().epochSecond
 
         DBConnector.getTransactionConnection().use { conn ->
             try {
-                conn.prepareStatement("INSERT INTO deployments(id, worker_id, workflow_id, timestamp) VALUES (?, ?, ?, ?)")
+                conn.prepareStatement("INSERT INTO deployments(id, worker_id, workflow_id, container_id, timestamp) VALUES (?, ?, ?, ?, ?)")
                     .use { st ->
                         st.setString(1, id)
                         st.setString(2, workerId)
                         st.setString(3, workflowId)
-                        st.setLong(4, timestamp)
+                        st.setString(4, containerId)
+                        st.setLong(5, timestamp)
                         StorageUtils.executeInsert(st)
                     }
                 for (mapping in portsMapping.entries) {
@@ -181,7 +210,7 @@ class Storage {
             }
         }
 
-        return Deployment(id, workerId, workflowId, timestamp, portsMapping)
+        return Deployment(id, workerId, workflowId, containerId, timestamp, portsMapping)
     }
 
     fun deleteDeployment(id: String) {
@@ -190,5 +219,22 @@ class Storage {
                 st.setString(1, id)
                 StorageUtils.executeUpdate(st)
             }
+    }
+
+    fun getConfigs(): Map<String, String> {
+        val query = "SELECT key, value FROM config"
+        val configs = HashMap<String, String>()
+
+        DBConnector.getConnection().createStatement()
+            .use { st ->
+                st.executeQuery(query)
+                    .use { rs ->
+                        while (rs.next()) {
+                            configs[rs.getString("key")] = rs.getString("value")
+                        }
+                    }
+            }
+
+        return configs
     }
 }

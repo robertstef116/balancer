@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS workflows
     id           varchar(36) PRIMARY KEY,
     image        varchar(100) NOT NULL,
     memory_limit numeric,
-    algorithm    varchar(20) NOT NULL
+    algorithm    varchar(20)  NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS workflow_mappings
@@ -40,10 +40,11 @@ CREATE TABLE IF NOT EXISTS workflow_mappings
 
 CREATE TABLE IF NOT EXISTS deployments
 (
-    id          varchar(36) PRIMARY KEY,
-    worker_id   varchar(36) NOT NULL,
-    workflow_id varchar(36) NOT NULL,
-    timestamp   numeric     NOT NULL,
+    id           varchar(36) PRIMARY KEY,
+    worker_id    varchar(36) NOT NULL,
+    workflow_id  varchar(36) NOT NULL,
+    container_id varchar(64) NOT NULL,
+    timestamp    numeric     NOT NULL,
 
     FOREIGN KEY (worker_id)
         REFERENCES workers (id)
@@ -65,6 +66,15 @@ CREATE TABLE IF NOT EXISTS deployment_mappings
         ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS config
+(
+    key   varchar(50) PRIMARY KEY,
+    value varchar(50) NOT NULL
+);
+
+INSERT INTO config(key, value)
+VALUES ('PROCESSING_SOCKET_BUFFER_LENGTH', '2048');
+
 -- ADD TEST DATA
 
 INSERT INTO workers(id, alias, host, in_use)
@@ -80,9 +90,9 @@ VALUES ('/test-flow', '2307b2af-dc14-4737-b26b-3f68a9c5667g', 80),
        ('/test-flow2', '2307b2af-dc14-4737-b26b-3f68a9c5667g', 81)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO deployments(id, worker_id, workflow_id, timestamp)
+INSERT INTO deployments(id, worker_id, workflow_id, container_id, timestamp)
 VALUES ('aaa143cc-b6f4-4dbc-b402-0fdc2415634c', 'a1511050-b7b3-4d9c-b634-7988ad79ab4b',
-        '2307b2af-dc14-4737-b26b-3f68a9c5667g', 1650612801919)
+        '2307b2af-dc14-4737-b26b-3f68a9c5667g', '33793ad97478', 1650612801919)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO deployment_mappings(deployment_id, worker_port, deployment_port)

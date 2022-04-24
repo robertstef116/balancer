@@ -22,6 +22,9 @@ fun Application.configureRouting() {
         }
 
         install(StatusPages) {
+            exception<NotFoundException> {
+                call.respond(HttpStatusCode.NotFound)
+            }
             exception<AuthenticationException> {
                 call.respond(HttpStatusCode.Unauthorized)
             }

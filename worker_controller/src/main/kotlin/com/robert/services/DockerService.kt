@@ -1,6 +1,7 @@
 package com.robert.services
 
 import com.robert.*
+import com.robert.exceptions.NotFoundException
 import com.spotify.docker.client.DefaultDockerClient
 import com.spotify.docker.client.DockerClient
 import com.spotify.docker.client.DockerClient.ListContainersFilterParam
@@ -12,7 +13,10 @@ class DockerService {
     companion object {
         private val log = LoggerFactory.getLogger(DockerService::class.java)
         private val managedContainersFilter = ListContainersFilterParam.withLabel(Constants.MANAGED_CONTAINER_LABEL)
-        private val docker: DefaultDockerClient = DefaultDockerClient.fromEnv().build();
+        private val docker: DefaultDockerClient = DefaultDockerClient.fromEnv().build()
+        private val registry = RegistryAuth.builder()
+            .serverAddress(ConfigProperties.getString("docker.registry") ?: "hub.docker.com")
+            .build()
     }
 
     fun getManagedContainers(): List<DockerContainer> {
@@ -35,6 +39,8 @@ class DockerService {
     }
 
     fun startContainer(createContainerRequest: DockerCreateContainerRequest): DockerCreateContainerResponse {
+        // TO DO: test image has tag, e.g. latest
+
         val portBindings = HashMap<String, List<PortBinding>>()
         createContainerRequest.ports.forEach {
             val portBinding = PortBinding.randomPort("0.0.0.0")
@@ -42,7 +48,7 @@ class DockerService {
         }
 
         log.debug("pulling image", createContainerRequest.image)
-        docker.pull(createContainerRequest.image)
+        docker.pull(createContainerRequest.image, registry)
 
         // TO DO: set docker registry
         val hostConfig = HostConfig.builder()
@@ -76,16 +82,15 @@ class DockerService {
         return DockerCreateContainerResponse(id, ports ?: emptyList())
     }
 
-    fun removeContainer(id: String): Boolean {
+    fun removeContainer(id: String) {
         log.debug("removing container", id)
 
-        return try {
+        try {
             docker.removeContainer(id, DockerClient.RemoveContainerParam.forceKill())
             log.debug("container removed")
-            true
         } catch (e: ContainerNotFoundException) {
             log.debug("container not found", id)
-            false
+            throw NotFoundException()
         }
     }
 

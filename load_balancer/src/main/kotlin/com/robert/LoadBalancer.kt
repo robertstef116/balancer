@@ -1,5 +1,6 @@
 package com.robert
 
+import com.robert.algorithms.LoadBalancingAlgorithm
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ValidationException
 import kotlinx.coroutines.*
@@ -20,10 +21,12 @@ private data class HeaderProcessingResult(
 
 private data class WorkerSocketInfo(
     val routePrefix: String,
-    val socket: Socket
+    val socket: Socket,
+    val requestReference: String,
+    val algorithm: LoadBalancingAlgorithm
 )
 
-class LoadBalancer {
+class LoadBalancer(resourcesManager: ResourcesManager) {
     companion object {
         private val log = LoggerFactory.getLogger(LoadBalancer::class.java)
         private const val SPACE_CHAR = ' '.code.toByte()
@@ -106,10 +109,14 @@ class LoadBalancer {
             pathsMapping: Map<WorkflowPath, List<PathTargetResource>>
         ): WorkerSocketInfo {
             val pathData = pathsMapping.entries.find { route.startsWith(it.key.path) } ?: throw NotFoundException()
-            // TO DO: select deployment by some rule
             val deployment = pathData.key.deploymentSelectionAlgorithm.selectTargetDeployment(pathData.value)
             val socket = Socket(deployment.host, deployment.port)
-            return WorkerSocketInfo(pathData.key.path, socket)
+            return WorkerSocketInfo(
+                pathData.key.path,
+                socket,
+                deployment.referenceId,
+                pathData.key.deploymentSelectionAlgorithm
+            )
         }
 
         private fun sendNotFound(stream: OutputStream, protocol: String) {
@@ -133,9 +140,7 @@ class LoadBalancer {
         }
     }
 
-    private val resourcesManager = ResourcesManager()
-
-    fun init() {
+    init {
         log.debug("initializing load balancer")
         runBlocking {
             coroutineScope {
@@ -157,7 +162,8 @@ class LoadBalancer {
                         var streamToClient: OutputStream? = null
                         var streamToWorker: OutputStream? = null
 
-                        val buffer = ByteArray(2048)
+                        val buffer =
+                            ByteArray(DynamicConfigProperties.getIntProperty(Constants.PROCESSING_SOCKET_BUFFER_LENGTH)!!)
 
                         try {
                             streamFromClient = clientSocket.getInputStream()
@@ -177,6 +183,7 @@ class LoadBalancer {
                             if (streamFromClient.available() > 0) {
                                 redirect(streamFromClient, streamToWorker, buffer)
                             }
+                            workerSocketInfo.algorithm.registerProcessingFinished(workerSocketInfo.requestReference)
                             redirect(streamFromWorker, streamToClient, buffer)
                         } catch (e: ValidationException) {
                             log.debug("Received an invalid request")

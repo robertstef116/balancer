@@ -17,7 +17,6 @@ fun Route.docker() {
         }
 
         post {
-            // TO DO: test image has tag, e.g. latest
             val createContainerRequest = call.receive(DockerCreateContainerRequest::class)
             call.respond(dockerService.startContainer(createContainerRequest))
         }
@@ -25,11 +24,8 @@ fun Route.docker() {
         delete("/{id}") {
             val id = call.parameters["id"].toString()
 
-            if (dockerService.removeContainer(id)) {
-                call.respond(HttpStatusCode.OK)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
+            dockerService.removeContainer(id)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

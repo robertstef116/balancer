@@ -18,6 +18,7 @@ plugins {
 
 dependencies {
     implementation(project(":model"))
+    implementation(project(":utils"))
     implementation("com.github.oshi:oshi-core:6.1.5")
     implementation("com.spotify:docker-client:8.16.0")
     implementation("io.ktor:ktor-server-core:$ktor_version")

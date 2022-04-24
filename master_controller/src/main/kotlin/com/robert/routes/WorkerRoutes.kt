@@ -27,7 +27,7 @@ fun Route.worker(path: String) {
 
         post {
             val request = call.receive<WorkerCreateRequest>()
-            call.respond(workerService.add(request.alias.trim(), request.ip.trim(), request.inUse))
+            call.respond(workerService.add(request.alias.trim(), request.host.trim(), request.inUse))
         }
 
         put("/{id}") {

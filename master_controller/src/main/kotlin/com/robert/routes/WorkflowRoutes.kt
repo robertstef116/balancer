@@ -1,6 +1,7 @@
 package com.robert.routes
 
 import com.robert.WorkflowCreateRequest
+import com.robert.WorkflowUpdateRequest
 import com.robert.services.WorkflowService
 import io.ktor.application.*
 import io.ktor.request.*
@@ -26,13 +27,13 @@ fun Route.workflow(path: String) {
 
         post {
             val request = call.receive<WorkflowCreateRequest>()
-            call.respond(workflowService.add(request.path.trim(), request.image.trim(), request.memoryLimit, request.ports))
+            call.respond(workflowService.add(request.image.trim(), request.memoryLimit, request.algorithm, request.pathMapping))
         }
 
         put("/{id}") {
             val id = call.parameters["id"].toString()
-            val request = call.receive<WorkflowCreateRequest>()
-            call.respond(workflowService.update(id, request.path.trim(), request.image.trim(), request.memoryLimit, request.ports))
+            val request = call.receive<WorkflowUpdateRequest>()
+            call.respond(workflowService.update(id, request.memoryLimit, request.algorithm))
         }
 
         delete("/{id}") {

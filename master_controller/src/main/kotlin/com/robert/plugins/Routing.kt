@@ -2,6 +2,7 @@ package com.robert.plugins
 
 import com.robert.exceptions.*
 import com.robert.exceptions.NotFoundException
+import com.robert.routes.config
 import com.robert.routes.workflow
 import com.robert.routes.login
 import com.robert.routes.worker
@@ -17,6 +18,7 @@ fun Application.configureRouting() {
         login()
 
 //        authenticate("auth-jwt") {
+        config("/config")
         worker("/worker")
         workflow("/workflow")
 //        }

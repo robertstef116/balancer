@@ -1,8 +1,8 @@
 package com.robert
 
 fun main() {
-    val loadBalancer = LoadBalancer()
-    loadBalancer.init()
+    val resourcesManager = ResourcesManager()
+    val loadBalancer = LoadBalancer(resourcesManager)
 }
 
 //fun main() = runBlocking { // this: CoroutineScope

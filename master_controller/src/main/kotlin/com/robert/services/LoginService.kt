@@ -12,7 +12,7 @@ class LoginService {
     private val audience = ConfigProperties.getString("jwt.audience")
     private val issuer = ConfigProperties.getString("jwt.issuer")
     private val secret = ConfigProperties.getString("jwt.secret")
-    private val expirationTime = ConfigProperties.getInteger("jwt.expirationTime")
+    private val expirationTime = ConfigProperties.getInteger("jwt.expirationTime") ?: 600
 
     fun login(username: String, password: String): String {
         userStorage.findUser(username, password) ?: throw AuthenticationException()

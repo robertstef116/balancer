@@ -1,6 +1,7 @@
 package com.robert.persistance
 
 import com.robert.DBConnector
+import com.robert.LBAlgorithms
 import com.robert.Workflow
 import com.robert.StorageUtils
 import com.robert.exceptions.NotFoundException
@@ -8,118 +9,152 @@ import com.robert.exceptions.ServerException
 import java.sql.Types
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class WorkflowStorage {
     fun get(id: String): Workflow {
-        val st = DBConnector.getConnection()
-            .prepareStatement("SELECT id, path, image, memory_limit, ports FROM workflows WHERE id = ?")
+        val query = """
+            SELECT id, image, memory_limit, algorithm, wm.path, wm.port FROM workflows 
+            INNER JOIN workflow_mappings wm on workflows.id = wm.workflow_id where id = ?
+        """.trimIndent()
 
-        st.use {
-            st.setString(1, id)
-            val rs = st.executeQuery()
-            if (rs.next()) {
-                return Workflow(
-                    rs.getString("id"),
-                    rs.getString("path"),
-                    rs.getString("image"),
-                    rs.getLong("memory_limit"),
-                    (rs.getArray("ports") as? Array<Int>)?.toList() ?: emptyList()
-                )
+        DBConnector.getConnection()
+            .prepareStatement(query)
+            .use { st ->
+                st.setString(1, id)
+                st.executeQuery().use { rs ->
+                    if (rs.next()) {
+                        val image = rs.getString("image")
+                        val memoryLimit = rs.getLong("memory_limit")
+                        val algorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
+                        val pathMapping = HashMap<String, Int>()
+                        pathMapping[rs.getString("path")] = rs.getInt("port")
+                        while (rs.next()) {
+                            pathMapping[rs.getString("path")] = rs.getInt("port")
+                        }
+                        return Workflow(id, image, memoryLimit, algorithm, pathMapping)
+                    }
+                }
             }
-        }
 
         throw NotFoundException()
     }
 
     fun getAll(): List<Workflow> {
-        val query = "SELECT id, path, image, memory_limit, ports FROM workflows order by image"
-        val st = DBConnector.getConnection().createStatement()
+        val query = """
+            SELECT id, image, memory_limit, algorithm, wm.path, wm.port FROM workflows 
+            INNER JOIN workflow_mappings wm on workflows.id = wm.workflow_id order by id
+        """.trimIndent()
         val workflows = ArrayList<Workflow>()
 
-        st.use {
-            val rs = st.executeQuery(query)
-            rs.use {
-                while (rs.next()) {
-                    workflows.add(
-                        Workflow(
-                            rs.getString("id"),
-                            rs.getString("path"),
-                            rs.getString("image"),
-                            rs.getLong("memory_limit"),
-                            (rs.getArray("ports") as? Array<Int>)?.toList() ?: emptyList()
-                        )
-                    )
+        DBConnector.getConnection().createStatement().use { st ->
+            st.executeQuery(query)
+                .use { rs ->
+                    var id: String? = null
+                    var image: String? = null
+                    var memoryLimit: Long? = null
+                    var algorithm: LBAlgorithms? = null
+                    var pathMapping: MutableMap<String, Int>? = null
+                    var currentId: String?
+
+                    while (rs.next()) {
+                        currentId = rs.getString("id")
+                        if (currentId != id) {
+                            if (id != null) {
+                                workflows.add(Workflow(id, image!!, memoryLimit, algorithm!!, pathMapping!!))
+                            }
+                            id = currentId
+                            image = rs.getString("image")
+                            memoryLimit = rs.getLong("memory_limit")
+                            algorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
+                            pathMapping = HashMap()
+                        }
+                        pathMapping!![rs.getString("path")] = rs.getInt("port")
+                    }
+                    if (id != null) {
+                        workflows.add(Workflow(id, image!!, memoryLimit, algorithm!!, pathMapping!!))
+                    }
                 }
-            }
         }
 
         return workflows
     }
 
-    fun add(path: String, image: String, memoryLimit: Long?, ports: List<Int>?): Workflow {
+    fun add(image: String, memoryLimit: Long?, algorithm: LBAlgorithms, pathMapping: Map<String, Int>): Workflow {
         val id = UUID.randomUUID().toString()
 
-        val conn = DBConnector.getConnection()
-
-        val st = DBConnector.getConnection().prepareStatement("INSERT INTO workflows(id, path, image, memory_limit, ports) VALUES (?, ?, ?, ?)")
-
-        st.use {
-            st.setString(1, id)
-            st.setString(2, path)
-            st.setString(3, image)
-            if (memoryLimit != null) {
-                st.setLong(4, memoryLimit)
-            } else {
-                st.setNull(4, Types.NUMERIC)
-            }
-            if (ports != null) {
-                st.setArray(5, conn.createArrayOf("INTEGER", ports.toTypedArray()))
-            } else {
-                st.setNull(5, Types.ARRAY)
-            }
-            val res = st.executeUpdate()
-
-            if (res > 0) {
-                return Workflow(id, path, image, memoryLimit, ports?: emptyList())
+        DBConnector.getTransactionConnection().use { conn ->
+            try {
+                conn.prepareStatement("INSERT INTO workflows(id, image, memory_limit, algorithm) VALUES (?, ?, ?, ?)")
+                    .use { st ->
+                        st.setString(1, id)
+                        st.setString(2, image)
+                        if (memoryLimit != null) {
+                            st.setLong(3, memoryLimit)
+                        } else {
+                            st.setNull(3, Types.NUMERIC)
+                        }
+                        st.setString(4, algorithm.value)
+                        StorageUtils.executeInsert(st)
+                    }
+                for (mapping in pathMapping.entries) {
+                    conn.prepareStatement("INSERT INTO workflow_mappings(path, workflow_id, port) VALUES (?, ?, ?)")
+                        .use { st ->
+                            st.setString(1, mapping.key)
+                            st.setString(2, id)
+                            st.setInt(3, mapping.value)
+                            StorageUtils.executeInsert(st)
+                        }
+                }
+            } catch (_: Exception) {
+                conn.rollback()
+                throw ServerException()
             }
         }
 
-        throw ServerException()
+        return Workflow(id, image, memoryLimit, algorithm, pathMapping)
     }
 
-    fun update(id: String, path: String?, image: String?, memoryLimit: Long?, ports: List<Int>?) {
-        var workflow: Workflow? = null
-        if (image == null || memoryLimit == null || ports == null) {
-            workflow = get(id)
+    fun update(id: String, memoryLimit: Long?, algorithm: LBAlgorithms?) {
+        var currentMemoryLimit: Long? = null
+        lateinit var currentAlgorithm: LBAlgorithms
+
+        if (memoryLimit == null || algorithm == null) {
+            DBConnector.getConnection()
+                .prepareStatement("SELECT memory_limit, algorithm FROM workflows WHERE id = ?")
+                .use { st ->
+                    st.executeQuery()
+                        .use { rs ->
+                            currentMemoryLimit = rs.getLong("memory_limit")
+                            if (currentMemoryLimit == 0L) {
+                                currentMemoryLimit = null
+                            }
+                            currentAlgorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
+                        }
+                }
         }
 
-        val conn = DBConnector.getConnection()
-        val st = conn.prepareStatement("UPDATE workflows SET path = ?, image = ?, memory_limit = ?, ports = ? WHERE id = ?")
+        DBConnector.getConnection()
+            .prepareStatement("UPDATE workflows SET memory_limit = ?, algorithm = ? WHERE id = ?")
+            .use { st ->
+                st.setString(3, id)
 
-        st.use {
-            st.setString(5, id)
-            st.setString(1, path?:workflow!!.path)
-            st.setString(2, image?:workflow!!.image)
+                when {
+                    memoryLimit != null -> st.setLong(2, memoryLimit)
+                    currentMemoryLimit != null -> st.setLong(2, currentMemoryLimit!!)
+                    else -> st.setNull(2, Types.NUMERIC)
+                }
 
-            val memoryLimitValue = memoryLimit?:workflow!!.memoryLimit
-            if (memoryLimitValue != null) {
-                st.setLong(3, memoryLimitValue)
-            } else {
-                st.setNull(3, Types.NUMERIC)
+                st.setString(2, algorithm?.value ?: currentAlgorithm.value)
+                StorageUtils.executeUpdate(st)
             }
-
-            val portsValue = ports?: workflow!!.ports
-            st.setArray(4, conn.createArrayOf("INTEGER", portsValue.toTypedArray()))
-            StorageUtils.executeUpdate(st)
-        }
     }
 
     fun delete(id: String) {
-        val st = DBConnector.getConnection().prepareStatement("DELETE FROM workflows WHERE id = ?")
-
-        st.use {
-            st.setString(1, id)
-            StorageUtils.executeUpdate(st)
-        }
+        DBConnector.getConnection().prepareStatement("DELETE FROM workflows WHERE id = ?")
+            .use { st ->
+                st.setString(1, id)
+                StorageUtils.executeUpdate(st)
+            }
     }
 }

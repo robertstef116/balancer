@@ -10,6 +10,7 @@ class ResourcesManager {
     var pathsMapping: Map<WorkflowPath, List<PathTargetResource>> private set
 
     init {
+        DynamicConfigProperties.setPropertiesData(storage.getConfigs())
         workers = storage.getWorkers()
         workflows = storage.getWorkflows()
         deployments = storage.getDeployments()
