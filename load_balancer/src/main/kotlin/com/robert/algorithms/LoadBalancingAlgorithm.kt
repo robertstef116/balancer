@@ -6,6 +6,6 @@ import com.robert.SelectedDeploymentInfo
 
 interface LoadBalancingAlgorithm {
     val algorithm: LBAlgorithms
-    fun selectTargetDeployment(availableTargets: List<PathTargetResource>): SelectedDeploymentInfo
-    fun registerProcessingFinished(requestReference: String)
+    fun selectTargetDeployment(): SelectedDeploymentInfo
+    fun registerProcessingFinished(deploymentInfo: SelectedDeploymentInfo)
 }

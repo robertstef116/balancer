@@ -22,7 +22,7 @@ private data class HeaderProcessingResult(
 private data class WorkerSocketInfo(
     val routePrefix: String,
     val socket: Socket,
-    val requestReference: String,
+    val deploymentInfo: SelectedDeploymentInfo,
     val algorithm: LoadBalancingAlgorithm
 )
 
@@ -104,18 +104,15 @@ class LoadBalancer(resourcesManager: ResourcesManager) {
             output.flush()
         }
 
-        private fun getWorkerSocket(
-            route: String,
-            pathsMapping: Map<WorkflowPath, List<PathTargetResource>>
-        ): WorkerSocketInfo {
-            val pathData = pathsMapping.entries.find { route.startsWith(it.key.path) } ?: throw NotFoundException()
-            val deployment = pathData.key.deploymentSelectionAlgorithm.selectTargetDeployment(pathData.value)
+        private fun getWorkerSocket(route: String, pathsMapping: Set<WorkflowPath>): WorkerSocketInfo {
+            val pathData = pathsMapping.find { route.startsWith(it.path) } ?: throw NotFoundException()
+            val deployment = pathData.deploymentSelectionAlgorithm.selectTargetDeployment()
             val socket = Socket(deployment.host, deployment.port)
             return WorkerSocketInfo(
-                pathData.key.path,
+                pathData.path,
                 socket,
-                deployment.referenceId,
-                pathData.key.deploymentSelectionAlgorithm
+                deployment,
+                pathData.deploymentSelectionAlgorithm
             )
         }
 
@@ -161,6 +158,7 @@ class LoadBalancer(resourcesManager: ResourcesManager) {
                         var streamFromWorker: InputStream? = null
                         var streamToClient: OutputStream? = null
                         var streamToWorker: OutputStream? = null
+                        var workerSocketInfo: WorkerSocketInfo? = null
 
                         val buffer =
                             ByteArray(DynamicConfigProperties.getIntProperty(Constants.PROCESSING_SOCKET_BUFFER_LENGTH)!!)
@@ -169,8 +167,8 @@ class LoadBalancer(resourcesManager: ResourcesManager) {
                             streamFromClient = clientSocket.getInputStream()
 
                             headerProcessingResult = processHeader(streamFromClient, buffer)
-                            val workerSocketInfo =
-                                getWorkerSocket(headerProcessingResult.route, resourcesManager.pathsMapping)
+                            workerSocketInfo =
+                                getWorkerSocket(headerProcessingResult.route, resourcesManager.pathsMapping.keys)
                             workerSocket = workerSocketInfo.socket
                             val routePrefixLength = workerSocketInfo.routePrefix.length
 
@@ -183,7 +181,6 @@ class LoadBalancer(resourcesManager: ResourcesManager) {
                             if (streamFromClient.available() > 0) {
                                 redirect(streamFromClient, streamToWorker, buffer)
                             }
-                            workerSocketInfo.algorithm.registerProcessingFinished(workerSocketInfo.requestReference)
                             redirect(streamFromWorker, streamToClient, buffer)
                         } catch (e: ValidationException) {
                             log.debug("Received an invalid request")
@@ -192,6 +189,7 @@ class LoadBalancer(resourcesManager: ResourcesManager) {
                             streamToClient = streamToClient ?: clientSocket.getOutputStream()
                             sendNotFound(streamToClient!!, headerProcessingResult?.protocol ?: "HTTP/1.1")
                         } catch (e: Exception) {
+                            // TO DO: send Internal Server Error
                             e.printStackTrace()
                         } finally {
                             streamToWorker?.close()
@@ -200,6 +198,7 @@ class LoadBalancer(resourcesManager: ResourcesManager) {
                             streamFromWorker?.close()
                             clientSocket.close()
                             workerSocket?.close()
+                            workerSocketInfo?.algorithm?.registerProcessingFinished(workerSocketInfo.deploymentInfo)
                         }
                     }
                 }

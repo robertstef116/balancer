@@ -11,6 +11,7 @@ object Constants {
 
     // Dynamic config properties keys
     const val PROCESSING_SOCKET_BUFFER_LENGTH = "PROCESSING_SOCKET_BUFFER_LENGTH"
+    const val COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL = "COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL"
 
     // Update aware services keys
     const val CONFIG_SERVICE_KEY = "CONFIG_SERVICE"

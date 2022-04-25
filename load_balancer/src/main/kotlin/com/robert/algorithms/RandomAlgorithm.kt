@@ -4,10 +4,10 @@ import com.robert.LBAlgorithms
 import com.robert.PathTargetResource
 import com.robert.SelectedDeploymentInfo
 
-class RandomAlgorithm: LoadBalancingAlgorithm {
+class RandomAlgorithm(private val availableTargets: List<PathTargetResource>): LoadBalancingAlgorithm {
     override val algorithm = LBAlgorithms.RANDOM
 
-    override fun selectTargetDeployment(availableTargets: List<PathTargetResource>): SelectedDeploymentInfo {
+    override fun selectTargetDeployment(): SelectedDeploymentInfo {
         val targetIdx = (availableTargets.indices).random()
         val target = availableTargets[targetIdx]
 
@@ -18,7 +18,7 @@ class RandomAlgorithm: LoadBalancingAlgorithm {
         )
     }
 
-    override fun registerProcessingFinished(requestReference: String) {
+    override fun registerProcessingFinished(deploymentInfo: SelectedDeploymentInfo) {
         // no processing required
     }
 }
