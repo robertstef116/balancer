@@ -27,13 +27,13 @@ fun Route.worker(path: String) {
 
         post {
             val request = call.receive<WorkerCreateRequest>()
-            call.respond(workerService.add(request.alias.trim(), request.host.trim(), request.inUse))
+            call.respond(workerService.add(request.alias.trim(), request.host.trim(), request.port, request.inUse))
         }
 
         put("/{id}") {
             val id = call.parameters["id"].toString()
             val request = call.receive<WorkerUpdateRequest>()
-            call.respond(workerService.update(id, request.alias?.trim(), request.inUse))
+            call.respond(workerService.update(id, request.alias?.trim(), request.port, request.inUse))
         }
 
         delete("/{id}") {

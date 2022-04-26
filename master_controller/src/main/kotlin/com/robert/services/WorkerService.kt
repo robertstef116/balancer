@@ -22,20 +22,20 @@ class WorkerService: UpdateAwareService(Constants.WORKER_SERVICE_KEY) {
         return workerNodeStorage.getAll()
     }
 
-    fun add(alias: String, host: String, inUse: Boolean): WorkerNode {
+    fun add(alias: String, host: String, port: Int, inUse: Boolean): WorkerNode {
         if (!validateWorkerAlias(alias)) {
             throw ValidationException("Invalid alias")
         }
-        val res = workerNodeStorage.add(alias, host, inUse)
+        val res = workerNodeStorage.add(alias, host, port, inUse)
         markChange()
         return res
     }
 
-    fun update(id: String, alias: String?, inUse: Boolean?) {
+    fun update(id: String, alias: String?, port: Int?, inUse: Boolean?) {
         if (alias != null && !validateWorkerAlias(alias)) {
             throw ValidationException("Invalid alias")
         }
-        workerNodeStorage.update(id, alias, inUse)
+        workerNodeStorage.update(id, alias, port, inUse)
         markChange()
     }
 

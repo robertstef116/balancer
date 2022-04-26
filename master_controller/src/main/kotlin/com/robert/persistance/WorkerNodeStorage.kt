@@ -20,6 +20,7 @@ class WorkerNodeStorage {
                                 rs.getString("id"),
                                 rs.getString("alias"),
                                 rs.getString("host"),
+                                rs.getInt("port"),
                                 rs.getBoolean("in_use")
                             )
                         }
@@ -30,7 +31,7 @@ class WorkerNodeStorage {
     }
 
     fun getAll(): List<WorkerNode> {
-        val query = "SELECT id, alias, host, in_use FROM workers order by alias"
+        val query = "SELECT id, alias, host, port, in_use FROM workers order by alias"
         val workerNodes = ArrayList<WorkerNode>()
 
         DBConnector.getConnection().createStatement()
@@ -43,6 +44,7 @@ class WorkerNodeStorage {
                                     rs.getString("id"),
                                     rs.getString("alias"),
                                     rs.getString("host"),
+                                    rs.getInt("port"),
                                     rs.getBoolean("in_use")
                                 )
                             )
@@ -53,37 +55,40 @@ class WorkerNodeStorage {
         return workerNodes
     }
 
-    fun add(alias: String, host: String, inUse: Boolean): WorkerNode {
+    fun add(alias: String, host: String, port: Int, inUse: Boolean): WorkerNode {
         val id = UUID.randomUUID().toString()
 
         DBConnector.getConnection()
-            .prepareStatement("INSERT INTO workers(id, alias, host, in_use) VALUES (?, ?, ?, ?)")
+            .prepareStatement("INSERT INTO workers(id, alias, host, port, in_use) VALUES (?, ?, ?, ?)")
             .use { st ->
 
                 st.setString(1, id)
                 st.setString(2, alias)
                 st.setString(3, host)
-                st.setBoolean(4, inUse)
+                st.setInt(4, port)
+                st.setBoolean(5, inUse)
                 val res = st.executeUpdate()
 
                 if (res > 0) {
-                    return WorkerNode(id, alias, host, inUse)
+                    return WorkerNode(id, alias, host, port, inUse)
                 }
             }
 
         throw ServerException()
     }
 
-    fun update(id: String, alias: String?, inUse: Boolean?) {
+    fun update(id: String, alias: String?, port: Int?, inUse: Boolean?) {
         var workerNode: WorkerNode? = null
-        if (alias == null || inUse == null) {
+        if (alias == null || inUse == null || port == null) {
             workerNode = get(id)
         }
-        DBConnector.getConnection().prepareStatement("UPDATE workers SET alias = ?, in_use = ? WHERE id = ?")
+        DBConnector.getConnection()
+            .prepareStatement("UPDATE workers SET alias = ?, in_use = ?, port = ? WHERE id = ?")
             .use { st ->
-                st.setString(3, id)
+                st.setString(4, id)
                 st.setString(1, alias ?: workerNode!!.alias)
                 st.setBoolean(2, inUse ?: workerNode!!.inUse)
+                st.setInt(3, port ?: workerNode!!.port)
                 StorageUtils.executeUpdate(st)
             }
     }

@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS workers
     id     varchar(36) PRIMARY KEY,
     alias  varchar(50) NOT NULL,
     host   varchar(50) NOT NULL,
+    port   integer NOT NULL,
     in_use boolean     NOT NULL
 );
 
@@ -74,12 +75,13 @@ CREATE TABLE IF NOT EXISTS config
 
 INSERT INTO config(key, value)
 VALUES ('PROCESSING_SOCKET_BUFFER_LENGTH', '2048'),
-       ('COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL', '10');
+       ('COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL', '10')
+ON CONFLICT DO NOTHING;
 
 -- ADD TEST DATA
 
-INSERT INTO workers(id, alias, host, in_use)
-VALUES ('a1511050-b7b3-4d9c-b634-7988ad79ab4b', 'localhost', '127.0.0.1', true)
+INSERT INTO workers(id, alias, host, port, in_use)
+VALUES ('a1511050-b7b3-4d9c-b634-7988ad79ab4b', 'localhost', '127.0.0.1', 8081, true)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO workflows(id, image, memory_limit, algorithm)
