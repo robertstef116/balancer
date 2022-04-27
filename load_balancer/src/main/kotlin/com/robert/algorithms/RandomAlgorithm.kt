@@ -4,8 +4,12 @@ import com.robert.LBAlgorithms
 import com.robert.PathTargetResource
 import com.robert.SelectedDeploymentInfo
 
-class RandomAlgorithm(private val availableTargets: List<PathTargetResource>): LoadBalancingAlgorithm {
+class RandomAlgorithm(private var availableTargets: List<PathTargetResource>): LoadBalancingAlgorithm {
     override val algorithm = LBAlgorithms.RANDOM
+
+    override fun updateTargets(newTargets: List<PathTargetResource>) {
+        availableTargets = newTargets
+    }
 
     override fun selectTargetDeployment(): SelectedDeploymentInfo {
         val targetIdx = (availableTargets.indices).random()

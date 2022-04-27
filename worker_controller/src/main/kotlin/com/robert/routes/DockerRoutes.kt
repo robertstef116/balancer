@@ -17,8 +17,8 @@ fun Route.docker() {
         }
 
         post {
-            val createContainerRequest = call.receive(DockerCreateContainerRequest::class)
-            call.respond(dockerService.startContainer(createContainerRequest))
+            val req = call.receive(DockerCreateContainerRequest::class)
+            call.respond(dockerService.startContainer(req.image, req.memoryLimit, req.ports))
         }
 
         delete("/{id}") {

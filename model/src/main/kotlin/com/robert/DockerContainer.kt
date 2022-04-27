@@ -6,5 +6,5 @@ data class DockerContainer(
     val image: String,
     val created: Long,
     val status: String,
-    val ports: List<DockerPortMapping>
+    val ports: Map<Int, Int>
 )

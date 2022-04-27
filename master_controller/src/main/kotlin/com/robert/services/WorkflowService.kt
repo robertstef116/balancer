@@ -7,13 +7,18 @@ import com.robert.UpdateAwareService
 import com.robert.exceptions.ValidationException
 import com.robert.persistance.WorkflowStorage
 
-class WorkflowService: UpdateAwareService(Constants.WORKFLOW_SERVICE_KEY) {
+class WorkflowService : UpdateAwareService(Constants.WORKFLOW_SERVICE_KEY) {
     companion object {
         fun validateImage(image: String) = Regex("[a-z][a-z0-9]+:[a-z0-9]+").matches(image)
         fun validatePath(path: String) = Regex("/[a-zA-Z0-9_-]+").matches(path)
         fun validatePort(port: Int) = port in 1..65535
         fun validateMemory(memory: Long) = memory > 0
         fun validatePathMapping(pathMapping: Map<String, Int>) = pathMapping.isNotEmpty()
+        fun validateDeploymentLimits(minDeployments: Int?, maxDeployments: Int?): Boolean {
+            val minD = minDeployments ?: 1
+            val maxD = maxDeployments ?: 1
+            return minD in 1..maxD
+        }
     }
 
     private val workflowStorage = WorkflowStorage()
@@ -26,7 +31,18 @@ class WorkflowService: UpdateAwareService(Constants.WORKFLOW_SERVICE_KEY) {
         return workflowStorage.getAll()
     }
 
-    fun add(image: String, memoryLimit: Long?, algorithm: LBAlgorithms, pathMapping: Map<String, Int>): Workflow {
+    fun add(
+        image: String,
+        memoryLimit: Long?,
+        minDeployments: Int?,
+        maxDeployments: Int?,
+        algorithm: LBAlgorithms,
+        pathMapping: Map<String, Int>
+    ): Workflow {
+        if (!validateDeploymentLimits(minDeployments, maxDeployments)) {
+            throw ValidationException("Invalid deployment limits")
+        }
+
         if (!validateImage(image)) {
             throw ValidationException("Invalid workflow image")
         }
@@ -48,17 +64,16 @@ class WorkflowService: UpdateAwareService(Constants.WORKFLOW_SERVICE_KEY) {
             }
         }
 
-        val res = workflowStorage.add(image, memoryLimit, algorithm, pathMapping)
+        val res = workflowStorage.add(image, memoryLimit, minDeployments, maxDeployments, algorithm, pathMapping)
         markChange()
         return res
     }
 
-    fun update(id: String, memoryLimit: Long?, algorithm: LBAlgorithms?) {
-        if (memoryLimit != null && !validateMemory(memoryLimit)) {
-            throw ValidationException("Invalid workflow memory limit")
+    fun update(id: String, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms?) {
+        if (!validateDeploymentLimits(minDeployments, maxDeployments)) {
+            throw ValidationException("Invalid deployment limits")
         }
-
-        workflowStorage.update(id, memoryLimit, algorithm)
+        workflowStorage.update(id, minDeployments, maxDeployments, algorithm)
         markChange()
     }
 

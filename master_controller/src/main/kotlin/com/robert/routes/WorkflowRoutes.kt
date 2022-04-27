@@ -27,13 +27,22 @@ fun Route.workflow(path: String) {
 
         post {
             val request = call.receive<WorkflowCreateRequest>()
-            call.respond(workflowService.add(request.image.trim(), request.memoryLimit, request.algorithm, request.pathMapping))
+            call.respond(
+                workflowService.add(
+                    request.image.trim(),
+                    request.memoryLimit,
+                    request.minDeployments,
+                    request.maxDeployments,
+                    request.algorithm,
+                    request.pathMapping
+                )
+            )
         }
 
         put("/{id}") {
             val id = call.parameters["id"].toString()
             val request = call.receive<WorkflowUpdateRequest>()
-            call.respond(workflowService.update(id, request.memoryLimit, request.algorithm))
+            call.respond(workflowService.update(id, request.minDeployments, request.maxDeployments, request.algorithm))
         }
 
         delete("/{id}") {

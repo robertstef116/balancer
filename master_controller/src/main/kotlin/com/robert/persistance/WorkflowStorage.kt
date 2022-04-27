@@ -14,7 +14,7 @@ import kotlin.collections.HashMap
 class WorkflowStorage {
     fun get(id: String): Workflow {
         val query = """
-            SELECT id, image, memory_limit, algorithm, wm.path, wm.port FROM workflows 
+            SELECT id, image, memory_limit, min_deployments, max_deployments, algorithm, wm.path, wm.port FROM workflows 
             INNER JOIN workflow_mappings wm on workflows.id = wm.workflow_id where id = ?
         """.trimIndent()
 
@@ -25,14 +25,25 @@ class WorkflowStorage {
                 st.executeQuery().use { rs ->
                     if (rs.next()) {
                         val image = rs.getString("image")
-                        val memoryLimit = rs.getLong("memory_limit")
+                        var memoryLimit: Long? = rs.getLong("memory_limit")
+                        if (memoryLimit == 0L) {
+                            memoryLimit = null
+                        }
+                        var minDeployments: Int? = rs.getInt("min_deployments")
+                        if (minDeployments == 0) {
+                            minDeployments = null
+                        }
+                        var maxDeployments: Int? = rs.getInt("max_deployments")
+                        if (maxDeployments == 0) {
+                            maxDeployments = null
+                        }
                         val algorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
                         val pathMapping = HashMap<String, Int>()
                         pathMapping[rs.getString("path")] = rs.getInt("port")
                         while (rs.next()) {
                             pathMapping[rs.getString("path")] = rs.getInt("port")
                         }
-                        return Workflow(id, image, memoryLimit, algorithm, pathMapping)
+                        return Workflow(id, image, memoryLimit, minDeployments, maxDeployments, algorithm, pathMapping)
                     }
                 }
             }
@@ -42,7 +53,7 @@ class WorkflowStorage {
 
     fun getAll(): List<Workflow> {
         val query = """
-            SELECT id, image, memory_limit, algorithm, wm.path, wm.port FROM workflows 
+            SELECT id, image, memory_limit, min_deployments, max_deployments, algorithm, wm.path, wm.port FROM workflows 
             INNER JOIN workflow_mappings wm on workflows.id = wm.workflow_id order by id
         """.trimIndent()
         val workflows = ArrayList<Workflow>()
@@ -53,6 +64,8 @@ class WorkflowStorage {
                     var id: String? = null
                     var image: String? = null
                     var memoryLimit: Long? = null
+                    var minDeployments: Int? = null
+                    var maxDeployments: Int? = null
                     var algorithm: LBAlgorithms? = null
                     var pathMapping: MutableMap<String, Int>? = null
                     var currentId: String?
@@ -61,18 +74,39 @@ class WorkflowStorage {
                         currentId = rs.getString("id")
                         if (currentId != id) {
                             if (id != null) {
-                                workflows.add(Workflow(id, image!!, memoryLimit, algorithm!!, pathMapping!!))
+                                workflows.add(
+                                    Workflow(
+                                        id, image!!, memoryLimit, minDeployments,
+                                        maxDeployments, algorithm!!, pathMapping!!
+                                    )
+                                )
                             }
                             id = currentId
                             image = rs.getString("image")
                             memoryLimit = rs.getLong("memory_limit")
+                            if (memoryLimit == 0L) {
+                                memoryLimit = null
+                            }
+                            minDeployments = rs.getInt("min_deployments")
+                            if (minDeployments == 0) {
+                                minDeployments = null
+                            }
+                            maxDeployments = rs.getInt("max_deployments")
+                            if (maxDeployments == 0) {
+                                maxDeployments = null
+                            }
                             algorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
                             pathMapping = HashMap()
                         }
                         pathMapping!![rs.getString("path")] = rs.getInt("port")
                     }
                     if (id != null) {
-                        workflows.add(Workflow(id, image!!, memoryLimit, algorithm!!, pathMapping!!))
+                        workflows.add(
+                            Workflow(
+                                id, image!!, memoryLimit, minDeployments,
+                                maxDeployments, algorithm!!, pathMapping!!
+                            )
+                        )
                     }
                 }
         }
@@ -80,12 +114,19 @@ class WorkflowStorage {
         return workflows
     }
 
-    fun add(image: String, memoryLimit: Long?, algorithm: LBAlgorithms, pathMapping: Map<String, Int>): Workflow {
+    fun add(
+        image: String,
+        memoryLimit: Long?,
+        minDeployments: Int?,
+        maxDeployments: Int?,
+        algorithm: LBAlgorithms,
+        pathMapping: Map<String, Int>
+    ): Workflow {
         val id = UUID.randomUUID().toString()
 
         DBConnector.getTransactionConnection().use { conn ->
             try {
-                conn.prepareStatement("INSERT INTO workflows(id, image, memory_limit, algorithm) VALUES (?, ?, ?, ?)")
+                conn.prepareStatement("INSERT INTO workflows(id, image, memory_limit, min_deployments, max_deployments, algorithm) VALUES (?, ?, ?, ?, ?, ?)")
                     .use { st ->
                         st.setString(1, id)
                         st.setString(2, image)
@@ -94,7 +135,17 @@ class WorkflowStorage {
                         } else {
                             st.setNull(3, Types.NUMERIC)
                         }
-                        st.setString(4, algorithm.value)
+                        if (minDeployments != null) {
+                            st.setInt(4, minDeployments)
+                        } else {
+                            st.setNull(4, Types.NUMERIC)
+                        }
+                        if (maxDeployments != null) {
+                            st.setInt(5, maxDeployments)
+                        } else {
+                            st.setNull(5, Types.NUMERIC)
+                        }
+                        st.setString(6, algorithm.value)
                         StorageUtils.executeInsert(st)
                     }
                 for (mapping in pathMapping.entries) {
@@ -112,40 +163,48 @@ class WorkflowStorage {
             }
         }
 
-        return Workflow(id, image, memoryLimit, algorithm, pathMapping)
+        return Workflow(id, image, memoryLimit, minDeployments, maxDeployments, algorithm, pathMapping)
     }
 
-    fun update(id: String, memoryLimit: Long?, algorithm: LBAlgorithms?) {
-        var currentMemoryLimit: Long? = null
-        lateinit var currentAlgorithm: LBAlgorithms
+    fun update(id: String, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms?) {
+        var newMinDeployments: Int? = null
+        var newMaxDeployments: Int? = null
+        var newAlgorithm: LBAlgorithms? = null
 
-        if (memoryLimit == null || algorithm == null) {
+        if (minDeployments == null || maxDeployments == null || algorithm == null) {
             DBConnector.getConnection()
-                .prepareStatement("SELECT memory_limit, algorithm FROM workflows WHERE id = ?")
+                .prepareStatement("SELECT min_deployments, max_deployments, algorithm FROM workflows WHERE id = ?")
                 .use { st ->
                     st.executeQuery()
                         .use { rs ->
-                            currentMemoryLimit = rs.getLong("memory_limit")
-                            if (currentMemoryLimit == 0L) {
-                                currentMemoryLimit = null
+                            newMinDeployments = minDeployments ?: rs.getInt("min_deployments")
+                            if (newMinDeployments == 0) {
+                                newMinDeployments = null
                             }
-                            currentAlgorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
+                            newMaxDeployments = maxDeployments ?: rs.getInt("max_deployments")
+                            if (newMaxDeployments == 0) {
+                                newMaxDeployments = null
+                            }
+                            newAlgorithm = algorithm ?: LBAlgorithms.valueOf(rs.getString("algorithm"))
                         }
                 }
         }
 
         DBConnector.getConnection()
-            .prepareStatement("UPDATE workflows SET memory_limit = ?, algorithm = ? WHERE id = ?")
+            .prepareStatement("UPDATE workflows SET min_deployments = ?, max_deployments = ?, algorithm = ? WHERE id = ?")
             .use { st ->
-                st.setString(3, id)
-
-                when {
-                    memoryLimit != null -> st.setLong(2, memoryLimit)
-                    currentMemoryLimit != null -> st.setLong(2, currentMemoryLimit!!)
-                    else -> st.setNull(2, Types.NUMERIC)
+                if (newMinDeployments != null) {
+                    st.setInt(1, newMinDeployments!!)
+                } else {
+                    st.setNull(1, Types.NUMERIC)
                 }
-
-                st.setString(2, algorithm?.value ?: currentAlgorithm.value)
+                if (newMaxDeployments != null) {
+                    st.setInt(2, newMaxDeployments!!)
+                } else {
+                    st.setNull(2, Types.NUMERIC)
+                }
+                st.setString(3, newAlgorithm!!.value)
+                st.setString(4, id)
                 StorageUtils.executeUpdate(st)
             }
     }

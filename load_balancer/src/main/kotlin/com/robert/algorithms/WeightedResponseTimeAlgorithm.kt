@@ -35,21 +35,29 @@ private data class TargetWeightedResponseInfo(
     }
 }
 
-class WeightedResponseTimeAlgorithm(availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
+class WeightedResponseTimeAlgorithm(private var availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
     companion object {
         private val log = LoggerFactory.getLogger(WeightedResponseTimeAlgorithm::class.java)
     }
 
     override val algorithm = LBAlgorithms.WEIGHTED_RESPONSE_TIME
-    private val lock: ReentrantReadWriteLock = ReentrantReadWriteLock()
+    private val lock = ReentrantReadWriteLock()
     private val requests = ConcurrentHashMap<String, Pair<Long, TargetWeightedResponseInfo>>()
-    private val targets: List<TargetWeightedResponseInfo>
+    private var targets: List<TargetWeightedResponseInfo> = emptyList()
     private val computedRequestsSinceLastReWeighting = AtomicInteger(0)
     private val recomputeWeightInterval =
-        DynamicConfigProperties.getIntProperty(Constants.COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL)?:10
+        DynamicConfigProperties.getIntProperty(Constants.COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL) ?: 10
 
     init {
-        targets = availableTargets.map { TargetWeightedResponseInfo(it, 1f / availableTargets.size) }
+        updateTargets(availableTargets)
+    }
+
+    override fun updateTargets(newTargets: List<PathTargetResource>) {
+        // reinitialize all the weights, on targets change
+        lock.write {
+            targets = newTargets.map { TargetWeightedResponseInfo(it, 1f / availableTargets.size) }
+        }
+        availableTargets = newTargets
     }
 
     override fun selectTargetDeployment(): SelectedDeploymentInfo {

@@ -5,9 +5,13 @@ import com.robert.PathTargetResource
 import com.robert.SelectedDeploymentInfo
 import java.util.concurrent.atomic.AtomicInteger
 
-class RoundRobinAlgorithm(private val availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
+class RoundRobinAlgorithm(private var availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
     override val algorithm = LBAlgorithms.ROUND_ROBIN
     private val currentIdx = AtomicInteger(0)
+
+    override fun updateTargets(newTargets: List<PathTargetResource>) {
+        availableTargets = newTargets
+    }
 
     override fun selectTargetDeployment(): SelectedDeploymentInfo {
         val targetIdx = currentIdx.getAndIncrement() % availableTargets.size

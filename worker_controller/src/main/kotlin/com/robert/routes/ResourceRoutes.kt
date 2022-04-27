@@ -2,6 +2,7 @@ package com.robert.routes
 
 import com.robert.DockerContainerStats
 import com.robert.ResourcesInfo
+import com.robert.WorkerResourceResponse
 import com.robert.services.DockerService
 import com.robert.services.ResourceService
 import io.ktor.application.*
@@ -14,9 +15,7 @@ fun Route.resource() {
 
     route("/resource") {
         get {
-            call.respond(ResourceResponse(resourceService.getResources(), dockerService.managedContainersStats()))
+            call.respond(WorkerResourceResponse(resourceService.getResources(), dockerService.managedContainersStats()))
         }
     }
 }
-
-data class ResourceResponse(val resourcesInfo: ResourcesInfo, val containersStats: List<DockerContainerStats>)

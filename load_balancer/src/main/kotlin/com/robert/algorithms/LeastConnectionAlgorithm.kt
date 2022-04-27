@@ -6,14 +6,28 @@ import com.robert.SelectedDeploymentInfo
 import java.util.concurrent.atomic.AtomicLong
 
 
-class LeastConnectionAlgorithm(availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
+class LeastConnectionAlgorithm(private var availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
     override val algorithm = LBAlgorithms.LEAST_CONNECTION
     private val targets = HashMap<PathTargetResource, AtomicLong>()
 
     init {
-        for (target in availableTargets) {
-            targets[target] = AtomicLong(0)
+        updateTargets(availableTargets)
+    }
+
+    override fun updateTargets(newTargets: List<PathTargetResource>) {
+        for (target in targets.keys) {
+            if (!newTargets.contains(target)) {
+                targets.remove(target)
+            }
         }
+
+        for (target in newTargets) {
+            if (targets[target] == null) {
+                targets[target] = AtomicLong(0)
+            }
+        }
+
+        availableTargets = newTargets
     }
 
     override fun selectTargetDeployment(): SelectedDeploymentInfo {
@@ -27,6 +41,6 @@ class LeastConnectionAlgorithm(availableTargets: List<PathTargetResource>) : Loa
     }
 
     override fun registerProcessingFinished(deploymentInfo: SelectedDeploymentInfo) {
-        targets[PathTargetResource(deploymentInfo.host, deploymentInfo.port)]!!.decrementAndGet()
+        targets[PathTargetResource(deploymentInfo.host, deploymentInfo.port)]?.decrementAndGet()
     }
 }

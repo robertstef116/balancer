@@ -7,28 +7,46 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class Storage {
-    fun getWorkers(): List<WorkerNode> {
-        val query = "SELECT id, alias, host FROM workers where in_use = true"
-        val st = DBConnector.getConnection().createStatement()
+    fun getWorkers(inUse: Boolean = true): List<WorkerNode> {
+        val query = "SELECT id, alias, host, port FROM workers where in_use = $inUse"
         val workerNodes = ArrayList<WorkerNode>()
 
-        st.use {
-            val rs = st.executeQuery(query)
-            rs.use {
-                while (rs.next()) {
-                    workerNodes.add(
-                        WorkerNode(
-                            rs.getString("id"),
-                            rs.getString("alias"),
-                            rs.getString("host"),
-                            true
+        DBConnector.getConnection().createStatement().use { st ->
+            st.executeQuery(query)
+                .use { rs ->
+                    while (rs.next()) {
+                        workerNodes.add(
+                            WorkerNode(
+                                rs.getString("id"),
+                                rs.getString("alias"),
+                                rs.getString("host"),
+                                rs.getInt("port"),
+                                true
+                            )
                         )
-                    )
+                    }
                 }
-            }
         }
 
         return workerNodes
+    }
+
+    fun disableWorker(id: String) {
+        DBConnector.getTransactionConnection().use { conn ->
+            try {
+                conn.prepareStatement("UPDATE workers set in_use = false WHERE id = ?").use { st ->
+                    st.setString(1, id)
+                    StorageUtils.executeUpdate(st)
+                }
+                conn.prepareStatement("DELETE FROM deployments WHERE worker_id = ?").use { st ->
+                    st.setString(1, id)
+                    StorageUtils.executeUpdate(st)
+                }
+            } catch (_: Exception) {
+                conn.rollback()
+                throw ServerException()
+            }
+        }
     }
 
     fun getPathsMapping(): Map<WorkflowPath, List<PathTargetResource>> {
@@ -74,7 +92,7 @@ class Storage {
 
     fun getWorkflows(): List<Workflow> {
         val query = """
-            SELECT id, image, memory_limit, algorithm, wm.path, wm.port FROM workflows 
+            SELECT id, image, memory_limit, min_deployments, max_deployments, algorithm, wm.path, wm.port FROM workflows 
             INNER JOIN workflow_mappings wm on workflows.id = wm.workflow_id order by id
         """.trimIndent()
         val workflows = ArrayList<Workflow>()
@@ -85,6 +103,8 @@ class Storage {
                     var id: String? = null
                     var image: String? = null
                     var memoryLimit: Long? = null
+                    var minDeployments: Int? = null
+                    var maxDeployments: Int? = null
                     var algorithm: LBAlgorithms? = null
                     var pathMapping: MutableMap<String, Int>? = null
                     var currentId: String?
@@ -93,7 +113,12 @@ class Storage {
                         currentId = rs.getString("id")
                         if (currentId != id) {
                             if (id != null) {
-                                workflows.add(Workflow(id, image!!, memoryLimit, algorithm!!, pathMapping!!))
+                                workflows.add(
+                                    Workflow(
+                                        id, image!!, memoryLimit, minDeployments,
+                                        maxDeployments, algorithm!!, pathMapping!!
+                                    )
+                                )
                             }
                             id = currentId
                             image = rs.getString("image")
@@ -101,13 +126,26 @@ class Storage {
                             if (memoryLimit == 0L) {
                                 memoryLimit = null
                             }
+                            minDeployments = rs.getInt("min_deployments")
+                            if (minDeployments == 0) {
+                                minDeployments = null
+                            }
+                            maxDeployments = rs.getInt("max_deployments")
+                            if (maxDeployments == 0) {
+                                maxDeployments = null
+                            }
                             algorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
                             pathMapping = HashMap()
                         }
                         pathMapping!![rs.getString("path")] = rs.getInt("port")
                     }
                     if (id != null) {
-                        workflows.add(Workflow(id, image!!, memoryLimit, algorithm!!, pathMapping!!))
+                        workflows.add(
+                            Workflow(
+                                id, image!!, memoryLimit, minDeployments,
+                                maxDeployments, algorithm!!, pathMapping!!
+                            )
+                        )
                     }
                 }
         }
@@ -204,7 +242,7 @@ class Storage {
                             StorageUtils.executeInsert(st)
                         }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 conn.rollback()
                 throw ServerException()
             }

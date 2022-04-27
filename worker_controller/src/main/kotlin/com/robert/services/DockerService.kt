@@ -28,42 +28,37 @@ class DockerService {
                 container.image(),
                 container.created(),
                 container.status(),
-                container.ports()?.map {
-                    DockerPortMapping(
-                        it.privatePort(),
-                        it.publicPort()
-                    )
-                } ?: emptyList()
+                container.ports()?.associateBy({ it.publicPort() }, { it.privatePort() }) ?: emptyMap()
             )
         }
     }
 
-    fun startContainer(createContainerRequest: DockerCreateContainerRequest): DockerCreateContainerResponse {
+    fun startContainer(image: String, memoryLimit: Long?, ports: List<Int>): DockerCreateContainerResponse {
         // TO DO: test image has tag, e.g. latest
 
         val portBindings = HashMap<String, List<PortBinding>>()
-        createContainerRequest.ports.forEach {
+        ports.forEach {
             val portBinding = PortBinding.randomPort("0.0.0.0")
             portBindings[it.toString()] = listOf(portBinding)
         }
 
-        log.debug("pulling image", createContainerRequest.image)
-        docker.pull(createContainerRequest.image, registry)
+        log.debug("pulling image", image)
+        docker.pull(image, registry)
 
         // TO DO: set docker registry
         val hostConfig = HostConfig.builder()
             .restartPolicy(HostConfig.RestartPolicy.unlessStopped())
             .portBindings(portBindings)
 
-        if (createContainerRequest.memoryLimit != null) {
-            hostConfig.memory(createContainerRequest.memoryLimit)
+        if (memoryLimit != null) {
+            hostConfig.memory(memoryLimit)
         }
 
         val containerConfig = ContainerConfig.builder()
             .hostConfig(hostConfig.build())
-            .image(createContainerRequest.image)
+            .image(image)
             .labels(mapOf(Constants.MANAGED_CONTAINER_LABEL to ""))
-            .exposedPorts(*createContainerRequest.ports.map { it.toString() }.toTypedArray())
+            .exposedPorts(*ports.map { it.toString() }.toTypedArray())
             .build()
 
         log.debug("creating container", containerConfig)
@@ -75,11 +70,11 @@ class DockerService {
 
         log.debug("getting container info", id)
         val info = docker.inspectContainer(id)
-        val ports = info.networkSettings().ports()?.entries?.map {
-            DockerPortMapping(it.key.split("/")[0].toInt(), it.value.first().hostPort().toInt())
-        }
+        val containerPorts = info.networkSettings().ports()?.entries?.associate {
+            it.value.first().hostPort().toInt() to it.key.split("/")[0].toInt()
+        } ?: emptyMap()
 
-        return DockerCreateContainerResponse(id, ports ?: emptyList())
+        return DockerCreateContainerResponse(id, containerPorts)
     }
 
     fun removeContainer(id: String) {
