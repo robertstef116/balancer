@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
 import kotlin.random.Random
 
-const val NO_REQS = 2000
+const val NO_REQS = 500
 const val MAX_TIME = 5000L
 const val LB_URL = "http://127.0.0.1:9999/testx/busy"
 //const val LB_URL = " http://192.168.100.93:49166/busy"

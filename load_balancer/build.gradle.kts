@@ -13,6 +13,7 @@ dependencies {
 //    implementation("org.apache.httpcomponents:httpcore:4.4.15")
     implementation("org.postgresql:postgresql:42.3.3")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-network:$ktor_version")
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel"){}

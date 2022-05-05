@@ -1,9 +1,11 @@
 plugins {
+    application
     kotlin("jvm")
+    id("com.github.johnrengelman.shadow")
 }
 
-repositories {
-    mavenCentral()
+application {
+    mainClass.set("com.robert.MainKt")
 }
 
 dependencies {
