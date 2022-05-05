@@ -3,12 +3,19 @@ package com.robert
 import com.robert.algorithms.LoadBalancingAlgorithm
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ValidationException
+import io.ktor.network.selector.*
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.ServerSocket
 import java.net.Socket
+import java.net.SocketOption
+import java.net.SocketOptions
+import java.net.StandardSocketOptions
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlin.properties.Delegates
 
 private data class HeaderProcessingResult(
     val route: String,
@@ -26,12 +33,13 @@ private data class WorkerSocketInfo(
     val algorithm: LoadBalancingAlgorithm
 )
 
-class LoadBalancer(resourcesManager: ResourcesManager) {
+class LoadBalancer(private val resourcesManager: ResourcesManager) {
     companion object {
         private val log = LoggerFactory.getLogger(LoadBalancer::class.java)
         private const val SPACE_CHAR = ' '.code.toByte()
         private const val LF_CHAR = '\n'.code.toByte()
         private const val CR_CHAR = '\r'.code.toByte()
+        private val context = newSingleThreadContext("BALANCER_ENTRY")
 
         private fun redirectProcessedHeader(
             output: OutputStream,
@@ -137,72 +145,90 @@ class LoadBalancer(resourcesManager: ResourcesManager) {
         }
     }
 
-    init {
-        log.debug("initializing load balancer")
+    private var bufferSize by Delegates.notNull<Int>()
+
+    fun start() {
         runBlocking {
-            coroutineScope {
-                val server = withContext(Dispatchers.IO) {
-                    ServerSocket(9999)
+            suspendCoroutine<Unit> {
+                resourcesManager.registerInitializationWaiter {
+                    it.resume(Unit)
                 }
-                while (true) {
-                    val clientSocket = withContext(Dispatchers.IO) {
-                        server.accept()
+            }
+            run()
+        }
+    }
+
+    private fun run() {
+        log.debug("starting load balancer")
+
+//        runBlocking {
+//            coroutineScope {
+//            val server = withContext(Dispatchers.IO) {
+//                ServerSocket(9999)
+//            }
+        val server = ServerSocket(9999)
+
+        while (true) {
+            val clientSocket = server.accept()
+
+            log.debug("received a new request")
+
+            CoroutineScope(Dispatchers.IO).launch {
+                var headerProcessingResult: HeaderProcessingResult? = null
+                var workerSocket: Socket? = null
+                var streamFromClient: InputStream? = null
+                var streamFromWorker: InputStream? = null
+                var streamToClient: OutputStream? = null
+                var streamToWorker: OutputStream? = null
+                var workerSocketInfo: WorkerSocketInfo? = null
+
+                val buffer = ByteArray(bufferSize)
+
+                try {
+                    streamFromClient = clientSocket.getInputStream()
+
+                    headerProcessingResult = processHeader(streamFromClient, buffer)
+                    workerSocketInfo =
+                        getWorkerSocket(headerProcessingResult.route, resourcesManager.pathsMapping.keys)
+                    workerSocket = workerSocketInfo.socket
+                    val routePrefixLength = workerSocketInfo.routePrefix.length
+
+                    streamToWorker = workerSocket.getOutputStream()
+                    redirectProcessedHeader(streamToWorker, routePrefixLength, headerProcessingResult)
+
+                    streamFromWorker = workerSocket.getInputStream()
+                    streamToClient = clientSocket.getOutputStream()
+
+                    if (streamFromClient.available() > 0) {
+                        redirect(streamFromClient, streamToWorker, buffer)
                     }
-
-                    log.debug("received a new request")
-
-                    launch(Dispatchers.IO) {
-                        var headerProcessingResult: HeaderProcessingResult? = null
-                        var workerSocket: Socket? = null
-                        var streamFromClient: InputStream? = null
-                        var streamFromWorker: InputStream? = null
-                        var streamToClient: OutputStream? = null
-                        var streamToWorker: OutputStream? = null
-                        var workerSocketInfo: WorkerSocketInfo? = null
-
-                        val buffer =
-                            ByteArray(DynamicConfigProperties.getIntProperty(Constants.PROCESSING_SOCKET_BUFFER_LENGTH)!!)
-
-                        try {
-                            streamFromClient = clientSocket.getInputStream()
-
-                            headerProcessingResult = processHeader(streamFromClient, buffer)
-                            workerSocketInfo =
-                                getWorkerSocket(headerProcessingResult.route, resourcesManager.pathsMapping.keys)
-                            workerSocket = workerSocketInfo.socket
-                            val routePrefixLength = workerSocketInfo.routePrefix.length
-
-                            streamToWorker = workerSocket.getOutputStream()
-                            redirectProcessedHeader(streamToWorker, routePrefixLength, headerProcessingResult)
-
-                            streamFromWorker = workerSocket.getInputStream()
-                            streamToClient = clientSocket.getOutputStream()
-
-                            if (streamFromClient.available() > 0) {
-                                redirect(streamFromClient, streamToWorker, buffer)
-                            }
-                            redirect(streamFromWorker, streamToClient, buffer)
-                        } catch (e: ValidationException) {
-                            log.debug("Received an invalid request")
-                        } catch (e: NotFoundException) {
-                            log.debug("No registered worker found for {}", headerProcessingResult?.route)
-                            streamToClient = streamToClient ?: clientSocket.getOutputStream()
-                            sendNotFound(streamToClient!!, headerProcessingResult?.protocol ?: "HTTP/1.1")
-                        } catch (e: Exception) {
-                            // TO DO: send Internal Server Error
-                            e.printStackTrace()
-                        } finally {
-                            streamToWorker?.close()
-                            streamToClient?.close()
-                            streamFromClient?.close()
-                            streamFromWorker?.close()
-                            clientSocket.close()
-                            workerSocket?.close()
-                            workerSocketInfo?.algorithm?.registerProcessingFinished(workerSocketInfo.deploymentInfo)
-                        }
-                    }
+                    redirect(streamFromWorker, streamToClient, buffer)
+                } catch (e: ValidationException) {
+                    log.debug("Received an invalid request")
+                } catch (e: NotFoundException) {
+                    log.debug("No registered worker found for {}", headerProcessingResult?.route)
+                    streamToClient = streamToClient ?: clientSocket.getOutputStream()
+                    sendNotFound(streamToClient!!, headerProcessingResult?.protocol ?: "HTTP/1.1")
+                } catch (e: Exception) {
+                    // TO DO: send Internal Server Error
+                    e.printStackTrace()
+                } finally {
+                    streamToWorker?.close()
+                    streamToClient?.close()
+                    streamFromClient?.close()
+                    streamFromWorker?.close()
+                    clientSocket.close()
+                    workerSocket?.close()
+                    workerSocketInfo?.algorithm?.registerProcessingFinished(workerSocketInfo.deploymentInfo)
                 }
             }
         }
+//            }
+//        }
+    }
+
+    fun loadConfigs() {
+        log.debug("load configs")
+        bufferSize = DynamicConfigProperties.getIntPropertyOrDefault(Constants.PROCESSING_SOCKET_BUFFER_LENGTH, 1024)
     }
 }

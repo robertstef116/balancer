@@ -3,16 +3,18 @@ package com.robert
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.util.LinkedList
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 class HealthChecker(
     val worker: WorkerNode,
-    private val checkInterval: Long,
-    private val checkTimeout: Long,
-    private val maxNumberOfFailures: Int,
+    private var checkInterval: Long,
+    private var checkTimeout: Long,
+    private var maxNumberOfFailures: Int,
     private var numberOfRelevantPerformanceMetrics: Int,
+    private val onInitialize: () -> Unit,
     val onFailure: (HealthChecker) -> Unit
 ) {
     companion object {
@@ -35,6 +37,8 @@ class HealthChecker(
 
     private val latestAvailableCpus = LinkedList<Double>()
     private val latestAvailableMemories = LinkedList<Long>()
+
+    val initialized = AtomicBoolean(false)
 
     var deploymentsPerformance: List<DeploymentPerformance> = listOf()
         get() = resourcesLock.read { field }
@@ -84,7 +88,8 @@ class HealthChecker(
 
                             // create deploymentPerformance data for new containers
                             if (deploymentPerformance == null) {
-                                deploymentPerformance = DeploymentPerformance(containerStats.containerId)
+                                deploymentPerformance =
+                                    DeploymentPerformance(containerStats.deploymentId, containerStats.containerId)
                                 deploymentsPerformanceToAdd.add(deploymentPerformance)
                             }
 
@@ -106,10 +111,16 @@ class HealthChecker(
                         deploymentsPerformance = deploymentsPerformance + deploymentsPerformanceToAdd
                     }
                     nrOfFailures = 0
+                    if (initialized.compareAndSet(false, true)) {
+                        onInitialize()
+                    }
                 } catch (e: Exception) {
                     log.error("failed health check on host {}", worker.host)
                     nrOfFailures++
                     if (nrOfFailures >= maxNumberOfFailures) {
+                        if (initialized.compareAndSet(false, true)) {
+                            onInitialize()
+                        }
                         onFailure(currentHealthChecker)
                     }
                 }
@@ -122,9 +133,18 @@ class HealthChecker(
         healthCheckerFn.cancel()
     }
 
-    fun updateNumberOfRelevantPerformanceMetrics(newNumberOfRelevantPerformanceMetrics: Int) {
+    fun updateConfigs(
+        checkInterval: Long,
+        checkTimeout: Long,
+        maxNumberOfFailures: Int,
+        numberOfRelevantPerformanceMetrics: Int
+    ) {
+        log.debug("update configs")
         resourcesLock.write {
-            numberOfRelevantPerformanceMetrics = newNumberOfRelevantPerformanceMetrics
+            this.checkInterval = checkInterval
+            this.checkTimeout = checkTimeout
+            this.maxNumberOfFailures = maxNumberOfFailures
+            this.numberOfRelevantPerformanceMetrics = numberOfRelevantPerformanceMetrics
         }
     }
 }

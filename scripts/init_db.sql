@@ -26,8 +26,8 @@ CREATE TABLE IF NOT EXISTS workflows
     image           varchar(100) NOT NULL,
     memory_limit    numeric,
     algorithm       varchar(20)  NOT NULL,
-    min_deployments numeric, -- not implemented
-    max_deployments numeric  -- not implemented
+    min_deployments numeric,
+    max_deployments numeric
 );
 
 CREATE TABLE IF NOT EXISTS workflow_mappings
@@ -77,37 +77,42 @@ CREATE TABLE IF NOT EXISTS config
 
 INSERT INTO config(key, value)
 VALUES ('PROCESSING_SOCKET_BUFFER_LENGTH', 2048),
-       ('COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL', 10), -- recompute weight every 10 requests
+       ('COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL',
+        10),                                      -- recompute weight every 10 requests, used by weighted response time algorithm
        ('HEALTH_CHECK_TIMEOUT', 10000),
        ('HEALTH_CHECK_INTERVAL', 10000),
        ('HEALTH_CHECK_MAX_FAILURES', 3),
-       ('CPU_WEIGHT', 0.3),                             -- no action on change, only variable change
-       ('MEMORY_WEIGHT', 0.3),                          -- no action on change, only variable change
-       ('DEPLOYMENTS_CHECK_INTERVAL', 60000),           -- no action on change, only variable change
-       ('NUMBER_RELEVANT_PERFORMANCE_METRICS', 3)       -- might need health checks update
+       ('CPU_WEIGHT', 0.3),                       -- no action on change, only variable change
+       ('MEMORY_WEIGHT', 0.7),                    -- no action on change, only variable change
+       ('DEPLOYMENTS_CHECK_INTERVAL', 60000),     -- no action on change, only variable change
+       ('MASTER_CHANGES_CHECK_INTERVAL', 30000),  -- no action on change, only variable change
+       ('NUMBER_RELEVANT_PERFORMANCE_METRICS', 3) -- might need health checks update
 ON CONFLICT DO NOTHING;
 
 -- ADD TEST DATA
 
 INSERT INTO workers(id, alias, host, port, in_use)
-VALUES ('a1511050-b7b3-4d9c-b634-7988ad79ab4b', 'localhost', '127.0.0.1', 8081, true)
+VALUES ('7a0acdc5-9dd0-467a-9c92-9569d47eac1b', 'worker 1', '192.168.100.92', 8081, true),
+       ('d0cb107a-78a5-4e1b-bde2-0318701ac329', 'worker 2', '192.168.100.93', 8081, true)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO workflows(id, image, memory_limit, algorithm)
-VALUES ('2307b2af-dc14-4737-b26b-3f68a9c5667g', 'nginx:latest', 1073741824, 'RANDOM')
+INSERT INTO workflows(id, image, memory_limit, algorithm, min_deployments)
+VALUES ('2307b2af-dc14-4737-b26b-3f68a9c5667g', 'nginx:latest', 1073741824, 'RANDOM', 3),
+       ('e615b36a-cb04-11ec-9d64-0242ac120002', 'r0bb3rt17/test-image:latest', 1073741824, 'RANDOM', 3)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO workflow_mappings(path, workflow_id, port)
 VALUES ('/test-flow', '2307b2af-dc14-4737-b26b-3f68a9c5667g', 80),
-       ('/test-flow2', '2307b2af-dc14-4737-b26b-3f68a9c5667g', 8080)
+       ('/test-flow2', '2307b2af-dc14-4737-b26b-3f68a9c5667g', 8080),
+       ('/testx', 'e615b36a-cb04-11ec-9d64-0242ac120002', 8080)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO deployments(id, worker_id, workflow_id, container_id, timestamp)
-VALUES ('aaa143cc-b6f4-4dbc-b402-0fdc2415634c', 'a1511050-b7b3-4d9c-b634-7988ad79ab4b',
-        '2307b2af-dc14-4737-b26b-3f68a9c5667g', '33793ad97478', 1650612801919)
-ON CONFLICT DO NOTHING;
-
-INSERT INTO deployment_mappings(deployment_id, worker_port, deployment_port)
-VALUES ('aaa143cc-b6f4-4dbc-b402-0fdc2415634c', 8444, 80),
-       ('aaa143cc-b6f4-4dbc-b402-0fdc2415634c', 8445, 8080)
-ON CONFLICT DO NOTHING;
+-- INSERT INTO deployments(id, worker_id, workflow_id, container_id, timestamp)
+-- VALUES ('aaa143cc-b6f4-4dbc-b402-0fdc2415634c', 'a1511050-b7b3-4d9c-b634-7988ad79ab4b',
+--         '2307b2af-dc14-4737-b26b-3f68a9c5667g', '33793ad97478', 1650612801919)
+-- ON CONFLICT DO NOTHING;
+--
+-- INSERT INTO deployment_mappings(deployment_id, worker_port, deployment_port)
+-- VALUES ('aaa143cc-b6f4-4dbc-b402-0fdc2415634c', 8444, 80),
+--        ('aaa143cc-b6f4-4dbc-b402-0fdc2415634c', 8445, 8080)
+-- ON CONFLICT DO NOTHING;

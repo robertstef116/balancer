@@ -1,4 +1,3 @@
-
 buildscript {
     repositories {
         mavenCentral()
@@ -6,20 +5,17 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version  "1.6.10" apply false
+    kotlin("jvm") version "1.6.10" apply false
+    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+    id("com.palantir.docker") version "0.33.0" apply false
 }
 
-allprojects {
-    group = "com.robert"
-    version = "1.0.0"
+group = "com.robert"
+version = "1.0.0"
 
+allprojects {
     repositories {
         mavenCentral()
-    }
-
-    tasks.withType<JavaCompile> {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

@@ -35,7 +35,10 @@ private data class TargetWeightedResponseInfo(
     }
 }
 
-class WeightedResponseTimeAlgorithm(private var availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
+class WeightedResponseTimeAlgorithm(
+    private var availableTargets: List<PathTargetResource>,
+    private var recomputeWeightInterval: Int
+) : LoadBalancingAlgorithm {
     companion object {
         private val log = LoggerFactory.getLogger(WeightedResponseTimeAlgorithm::class.java)
     }
@@ -45,8 +48,6 @@ class WeightedResponseTimeAlgorithm(private var availableTargets: List<PathTarge
     private val requests = ConcurrentHashMap<String, Pair<Long, TargetWeightedResponseInfo>>()
     private var targets: List<TargetWeightedResponseInfo> = emptyList()
     private val computedRequestsSinceLastReWeighting = AtomicInteger(0)
-    private val recomputeWeightInterval =
-        DynamicConfigProperties.getIntProperty(Constants.COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL) ?: 10
 
     init {
         updateTargets(availableTargets)
@@ -109,6 +110,13 @@ class WeightedResponseTimeAlgorithm(private var availableTargets: List<PathTarge
             targets.forEach {
                 it.weight = (avgResponseTimeMap[it]!! / sumComputeTime).toFloat()
             }
+        }
+    }
+
+    fun updateConfigs(recomputeWeightInterval: Int) {
+        log.debug("update configs")
+        lock.write {
+            this.recomputeWeightInterval = recomputeWeightInterval
         }
     }
 }

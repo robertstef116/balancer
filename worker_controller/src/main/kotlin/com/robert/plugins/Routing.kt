@@ -2,12 +2,13 @@ package com.robert.plugins
 
 import com.robert.exceptions.AuthenticationException
 import com.robert.exceptions.AuthorizationException
+import com.robert.exceptions.NotFoundException
 import com.robert.routes.docker
 import com.robert.routes.resource
 import io.ktor.routing.*
 import io.ktor.http.*
-import io.ktor.features.*
 import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.response.*
 
 fun Application.configureRouting() {

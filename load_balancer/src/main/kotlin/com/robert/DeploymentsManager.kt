@@ -7,6 +7,7 @@ import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import kotlin.properties.Delegates
 
 private data class WorkerResource(val worker: WorkerNode, val availableCpu: Double, val availableMemory: Double)
 
@@ -14,25 +15,22 @@ private data class WorkersResources(
     val totalAvailableCpu: Double, val totalAvailableMemory: Double, val workersResources: List<WorkerResource>
 )
 
-class DeploymentsManager(private val resourcesManager: ResourcesManager, private val service: Service) {
+class DeploymentsManager(private val resourcesManager: ResourcesManager, private val service: Service) :
+    UpdateAwareManager(Constants.WORKFLOW_SERVICE_KEY) {
+
     companion object {
         private val log = LoggerFactory.getLogger(DeploymentsManager::class.java)
-        private val context = newSingleThreadContext("HEALTH_CHECK")
+        private val context = newSingleThreadContext("DEPLOYMENTS_MANAGER_CHECK")
     }
-
-    private val cpuWeight = DynamicConfigProperties.getFloatPropertyOrDefault(Constants.CPU_WEIGHT, 0.5f)
-    private val memoryWeight = DynamicConfigProperties.getFloatPropertyOrDefault(Constants.MEMORY_WEIGHT, 0.5f)
-    private val deploymentsCheckInterval =
-        DynamicConfigProperties.getLongPropertyOrDefault(Constants.DEPLOYMENTS_CHECK_INTERVAL, 60000)
-
-    private var workflows: List<Workflow> = emptyList()
-    private var deployments = resourcesManager.getDeployments()
 
     private val processingLock = ReentrantLock()
 
-    init {
-        workflowChanged()
-    }
+    private var cpuWeight by Delegates.notNull<Float>()
+    private var memoryWeight by Delegates.notNull<Float>()
+    private var deploymentsCheckInterval by Delegates.notNull<Long>()
+
+    private var workflows: List<Workflow> = emptyList()
+    private var deployments = resourcesManager.getDeployments()
 
     private fun workflowChanged() {
         val newWorkflows = resourcesManager.getWorkflows()
@@ -40,6 +38,23 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
     }
 
     fun start() {
+        resourcesManager.registerInitializationWaiter {
+            run()
+        }
+    }
+
+    fun loadConfigs() {
+        log.debug("load configs")
+        processingLock.withLock {
+            cpuWeight = (DynamicConfigProperties.getFloatPropertyOrDefault(Constants.CPU_WEIGHT, 0.5f))
+            memoryWeight = DynamicConfigProperties.getFloatPropertyOrDefault(Constants.MEMORY_WEIGHT, 0.5f)
+            deploymentsCheckInterval =
+                DynamicConfigProperties.getLongPropertyOrDefault(Constants.DEPLOYMENTS_CHECK_INTERVAL, 60000)
+        }
+    }
+
+    private fun run() {
+        log.debug("deployment manager started")
         CoroutineScope(context).launch {
             while (true) {
                 try {
@@ -53,10 +68,14 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
                         for ((worker, deploymentPerformanceListPerWorker) in deploymentsPerformancePerWorker) {
                             for (deploymentPerformance in deploymentPerformanceListPerWorker) {
                                 val deployment = deployments.find {
-                                    it.containerId == deploymentPerformance.containerId
+                                    it.id == deploymentPerformance.deploymentId
                                 }
                                 if (deployment == null) {
-                                    service.removeContainer(worker, deploymentPerformance.containerId)
+                                    service.removeDeployment(
+                                        worker,
+                                        deploymentPerformance.deploymentId,
+                                        deploymentPerformance.containerId
+                                    )
                                 }
                             }
                         }
@@ -82,8 +101,9 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
                                 }
 
                                 if (deploymentPerformance == null) {
-                                    val worker = resourcesManager.workers.find { it.id == deployment.workerId }!!
-                                    service.removeContainer(worker, deployment.containerId)
+
+                                   val worker = resourcesManager.workers.find { it.id == deployment.workerId }!!
+                                    service.removeDeployment(worker, deployment.id, deployment.containerId)
                                     removedDeployments.add(deployment)
                                     val newDeployment = deployWorkflow(workflow)
                                     if (newDeployment != null) { // if successfully deployed
@@ -104,6 +124,11 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
                         }
 
                         deployments = deployments - removedDeployments + addedDeployments
+
+                        // TO DO: apply changes instead of reload
+                        if (removedDeployments.size > 0 || addedDeployments.size>0) {
+                            resourcesManager.pathsMappingChanged()
+                        }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -116,11 +141,12 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
 
     private fun deployWorkflow(workflow: Workflow): Deployment? {
         val resources = createWorkersResources(resourcesManager.healthChecks)
+        log.debug("deploying workflow, {} workers available", resources.workersResources.size)
 
         var rand = kotlin.random.Random.nextDouble()
         for (workerResource in resources.workersResources) {
-            val weight = (1 - workerResource.availableCpu / resources.totalAvailableCpu) * cpuWeight +
-                    (1 - workerResource.availableMemory / resources.totalAvailableMemory) * memoryWeight
+            val weight = 1 - ((1 - workerResource.availableCpu / resources.totalAvailableCpu) * cpuWeight +
+                    (1 - workerResource.availableMemory / resources.totalAvailableMemory) * memoryWeight)
             if (rand < weight) {
                 log.debug("deploying workflow {} on worker {}", workflow, workerResource.worker)
                 return service.deployWorkflow(workerResource.worker, workflow)
@@ -136,7 +162,7 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
         val randIdx = kotlin.random.Random.nextInt(workflowDeployments.size)
         val deployment = workflowDeployments[randIdx]
         val worker = resourcesManager.workers.find { it.id == deployment.workerId }!!
-        if (service.removeContainer(worker, deployment.containerId)) {
+        if (service.removeDeployment(worker, deployment.id, deployment.containerId)) {
             return deployment
         }
         return null
@@ -154,5 +180,9 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
         }
 
         return WorkersResources(totalAvailableCpu, totalAvailableMemory, resources)
+    }
+
+    override fun refresh() {
+        workflowChanged()
     }
 }

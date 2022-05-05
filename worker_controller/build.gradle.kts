@@ -5,16 +5,12 @@ val logback_version: String by project
 plugins {
     application
     kotlin("jvm")
+    id("com.github.johnrengelman.shadow")
 }
 
-//group = "com.robert"
-//version = "0.0.1"
-//application {
-//    mainClass.set("com.robert.ApplicationKt")
-//
-//    val isDevelopment: Boolean = project.ext.has("development")
-//    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-//}
+application {
+    mainClass.set("com.robert.ApplicationKt")
+}
 
 dependencies {
     implementation(project(":model"))
@@ -30,4 +26,4 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
 }
 
-tasks.register("prepareKotlinBuildScriptModel"){}
+tasks.register<Task>("prepareKotlinBuildScriptModel"){}

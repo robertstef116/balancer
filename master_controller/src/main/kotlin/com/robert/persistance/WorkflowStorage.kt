@@ -157,6 +157,7 @@ class WorkflowStorage {
                             StorageUtils.executeInsert(st)
                         }
                 }
+                conn.commit()
             } catch (_: Exception) {
                 conn.rollback()
                 throw ServerException()

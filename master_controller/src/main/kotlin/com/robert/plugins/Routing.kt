@@ -2,10 +2,10 @@ package com.robert.plugins
 
 import com.robert.exceptions.*
 import com.robert.exceptions.NotFoundException
-import com.robert.routes.config
-import com.robert.routes.workflow
-import com.robert.routes.login
-import com.robert.routes.worker
+import com.robert.routes.*
+import com.robert.services.ConfigService
+import com.robert.services.WorkerService
+import com.robert.services.WorkflowService
 import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -14,13 +14,18 @@ import io.ktor.features.*
 import io.ktor.response.*
 
 fun Application.configureRouting() {
+    val workerService = WorkerService()
+    val workflowService = WorkflowService()
+    val configService = ConfigService()
+
     routing {
         login()
 
 //        authenticate("auth-jwt") {
-        config("/config")
-        worker("/worker")
-        workflow("/workflow")
+        changes("/change", listOf(configService, workerService, workflowService))
+        config("/config", configService)
+        worker("/worker", workerService)
+        workflow("/workflow", workflowService)
 //        }
 
         // Static plugin. Try to access `/static/index.html`

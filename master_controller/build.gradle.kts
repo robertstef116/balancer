@@ -32,4 +32,4 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
 }
 
-tasks.register("prepareKotlinBuildScriptModel"){}
+tasks.register<Task>("prepareKotlinBuildScriptModel"){}

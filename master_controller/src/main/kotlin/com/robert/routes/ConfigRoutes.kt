@@ -8,9 +8,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Route.config(path: String) {
-    val configService = ConfigService()
-
+fun Route.config(path: String, configService: ConfigService) {
     route(path) {
         put {
             val request = call.receive<ConfigUpdateRequest>()

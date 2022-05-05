@@ -8,14 +8,8 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Route.worker(path: String) {
-    val workerService = WorkerService()
-
+fun Route.worker(path: String, workerService: WorkerService) {
     route(path) {
-        get("/version") {
-            call.respond(workerService.getCurrentVersion())
-        }
-
         get("/{id}") {
             val id = call.parameters["id"].toString()
             call.respond(workerService.get(id))

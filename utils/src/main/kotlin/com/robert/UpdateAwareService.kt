@@ -1,9 +1,11 @@
 package com.robert
 
-open class UpdateAwareService(key: String) {
-    private var version = 0
+import java.util.concurrent.atomic.AtomicInteger
 
-    fun getCurrentVersion() = Update(Constants.HASH, version)
+open class UpdateAwareService(val key: String) {
+    private val version = AtomicInteger(0)
 
-    protected fun markChange() = version++
+    fun getVersion() = version.get()
+
+    protected fun markChange() = version.incrementAndGet()
 }

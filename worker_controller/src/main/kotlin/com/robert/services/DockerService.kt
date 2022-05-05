@@ -11,9 +11,13 @@ import org.slf4j.LoggerFactory
 
 class DockerService {
     companion object {
+        private const val DOCKER_TIMEOUT = 30000L
         private val log = LoggerFactory.getLogger(DockerService::class.java)
         private val managedContainersFilter = ListContainersFilterParam.withLabel(Constants.MANAGED_CONTAINER_LABEL)
-        private val docker: DefaultDockerClient = DefaultDockerClient.fromEnv().build()
+        private val docker: DefaultDockerClient = DefaultDockerClient.fromEnv()
+            .readTimeoutMillis(DOCKER_TIMEOUT)
+            .connectTimeoutMillis(DOCKER_TIMEOUT)
+            .build()
         private val registry = RegistryAuth.builder()
             .serverAddress(ConfigProperties.getString("docker.registry") ?: "hub.docker.com")
             .build()
@@ -33,7 +37,12 @@ class DockerService {
         }
     }
 
-    fun startContainer(image: String, memoryLimit: Long?, ports: List<Int>): DockerCreateContainerResponse {
+    fun startContainer(
+        deploymentId: String,
+        image: String,
+        memoryLimit: Long?,
+        ports: List<Int>
+    ): DockerCreateContainerResponse {
         // TO DO: test image has tag, e.g. latest
 
         val portBindings = HashMap<String, List<PortBinding>>()
@@ -57,7 +66,7 @@ class DockerService {
         val containerConfig = ContainerConfig.builder()
             .hostConfig(hostConfig.build())
             .image(image)
-            .labels(mapOf(Constants.MANAGED_CONTAINER_LABEL to ""))
+            .labels(mapOf(Constants.MANAGED_CONTAINER_LABEL to "", Constants.DEPLOYMENT_ID_KEY_LABEL to deploymentId))
             .exposedPorts(*ports.map { it.toString() }.toTypedArray())
             .build()
 
@@ -101,8 +110,10 @@ class DockerService {
             val cpuDelta = cpuStats.cpuUsage().totalUsage() - preCpuStats.cpuUsage().totalUsage()
             val systemDelta = cpuStats.systemCpuUsage()?.minus(preCpuStats.systemCpuUsage() ?: 0) ?: 0
             val cpuUsage = if (cpuDelta > 0 && systemDelta > 0) cpuDelta.toDouble() / systemDelta * 100 else 0.0
+            val deploymentId = container.labels()?.get(Constants.DEPLOYMENT_ID_KEY_LABEL)!!
 
             DockerContainerStats(
+                deploymentId,
                 container.id(),
                 cpuUsage,
                 memoryStats.limit()?.minus((memoryStats.usage() ?: 0)) ?: 0,

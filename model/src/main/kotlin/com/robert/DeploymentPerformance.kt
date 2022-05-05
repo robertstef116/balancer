@@ -5,6 +5,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 
 data class DeploymentPerformance(
+    val deploymentId: String,
     val containerId: String,
 ) {
     val resourcesLock = ReentrantReadWriteLock()

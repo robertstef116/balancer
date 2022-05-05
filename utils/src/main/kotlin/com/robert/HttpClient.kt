@@ -22,6 +22,9 @@ object HttpClient {
         timeout {
             requestTimeoutMillis = timeout
         }
+        headers {
+            append(HttpHeaders.ContentType, "application/json")
+        }
     }
 
     @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
@@ -31,6 +34,9 @@ object HttpClient {
             timeout {
                 requestTimeoutMillis = timeout
             }
+            headers {
+                append(HttpHeaders.ContentType, "application/json")
+            }
         }
 
     @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
@@ -38,6 +44,9 @@ object HttpClient {
         this.client.delete(url) {
             timeout {
                 requestTimeoutMillis = timeout
+            }
+            headers {
+                append(HttpHeaders.ContentType, "application/json")
             }
         }
 }

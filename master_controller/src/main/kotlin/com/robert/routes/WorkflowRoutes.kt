@@ -8,14 +8,8 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Route.workflow(path: String) {
-    val workflowService = WorkflowService()
-
+fun Route.workflow(path: String, workflowService: WorkflowService) {
     route(path) {
-        get("/version") {
-            call.respond(workflowService.getCurrentVersion())
-        }
-
         get("/{id}") {
             val id = call.parameters["id"].toString()
             call.respond(workflowService.get(id))

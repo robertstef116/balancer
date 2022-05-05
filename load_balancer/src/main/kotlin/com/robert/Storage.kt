@@ -1,12 +1,17 @@
 package com.robert
 
 import com.robert.exceptions.ServerException
+import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class Storage {
+    companion object {
+        private val log = LoggerFactory.getLogger(Storage::class.java)
+    }
+
     fun getWorkers(inUse: Boolean = true): List<WorkerNode> {
         val query = "SELECT id, alias, host, port FROM workers where in_use = $inUse"
         val workerNodes = ArrayList<WorkerNode>()
@@ -42,6 +47,7 @@ class Storage {
                     st.setString(1, id)
                     StorageUtils.executeUpdate(st)
                 }
+                conn.commit()
             } catch (_: Exception) {
                 conn.rollback()
                 throw ServerException()
@@ -214,19 +220,20 @@ class Storage {
     }
 
     fun addDeployment(
+        id: String?,
         workerId: String,
         workflowId: String,
         containerId: String,
         portsMapping: Map<Int, Int>
     ): Deployment {
-        val id = UUID.randomUUID().toString()
+        val deploymentId = id ?: UUID.randomUUID().toString()
         val timestamp = Instant.now().epochSecond
 
         DBConnector.getTransactionConnection().use { conn ->
             try {
                 conn.prepareStatement("INSERT INTO deployments(id, worker_id, workflow_id, container_id, timestamp) VALUES (?, ?, ?, ?, ?)")
                     .use { st ->
-                        st.setString(1, id)
+                        st.setString(1, deploymentId)
                         st.setString(2, workerId)
                         st.setString(3, workflowId)
                         st.setString(4, containerId)
@@ -236,19 +243,21 @@ class Storage {
                 for (mapping in portsMapping.entries) {
                     conn.prepareStatement("INSERT INTO deployment_mappings(deployment_id, deployment_port, worker_port) VALUES (?, ?, ?)")
                         .use { st ->
-                            st.setString(1, id)
-                            st.setInt(2, mapping.key)
-                            st.setInt(3, mapping.value)
+                            st.setString(1, deploymentId)
+                            st.setInt(2, mapping.value)
+                            st.setInt(3, mapping.key)
                             StorageUtils.executeInsert(st)
                         }
                 }
-            } catch (_: Exception) {
+                conn.commit()
+            } catch (e: Exception) {
+                e.printStackTrace()
                 conn.rollback()
                 throw ServerException()
             }
         }
 
-        return Deployment(id, workerId, workflowId, containerId, timestamp, portsMapping)
+        return Deployment(deploymentId, workerId, workflowId, containerId, timestamp, portsMapping)
     }
 
     fun deleteDeployment(id: String) {
