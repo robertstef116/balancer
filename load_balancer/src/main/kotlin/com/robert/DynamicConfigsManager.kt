@@ -5,22 +5,21 @@ class DynamicConfigsManager(
     private val deploymentsManager: DeploymentsManager,
     private val resourcesManager: ResourcesManager,
     private val loadBalancer: LoadBalancer
-) :
-    UpdateAwareManager(Constants.CONFIG_SERVICE_KEY) {
-    private val configs: Map<String, String>
+) : UpdateAwareManager(Constants.CONFIG_SERVICE_KEY) {
+
+    private val configs: Map<String, String> = storage.getConfigs()
 
     init {
-        configs = storage.getConfigs()
         DynamicConfigProperties.setPropertiesData(configs)
-        deploymentsManager.loadConfigs()
-        resourcesManager.loadConfigs()
-        loadBalancer.loadConfigs()
+        deploymentsManager.reloadDynamicConfigs()
+        resourcesManager.reloadDynamicConfigs()
+        loadBalancer.reloadDynamicConfigs()
     }
 
     private lateinit var masterChangesManager: MasterChangesManager
 
     fun setMasterChangesManager(masterChangesManager: MasterChangesManager) {
-        masterChangesManager.loadConfigs()
+        masterChangesManager.reloadDynamicConfigs()
         this.masterChangesManager = masterChangesManager
     }
 
@@ -33,7 +32,7 @@ class DynamicConfigsManager(
             configs[Constants.MEMORY_WEIGHT] != newConfigs[Constants.MEMORY_WEIGHT] ||
             configs[Constants.DEPLOYMENTS_CHECK_INTERVAL] != newConfigs[Constants.DEPLOYMENTS_CHECK_INTERVAL]
         ) {
-            deploymentsManager.loadConfigs()
+            deploymentsManager.reloadDynamicConfigs()
         }
 
         if (configs[Constants.NUMBER_RELEVANT_PERFORMANCE_METRICS] != newConfigs[Constants.NUMBER_RELEVANT_PERFORMANCE_METRICS] ||
@@ -41,15 +40,15 @@ class DynamicConfigsManager(
             configs[Constants.HEALTH_CHECK_INTERVAL] != newConfigs[Constants.HEALTH_CHECK_INTERVAL] ||
             configs[Constants.HEALTH_CHECK_MAX_FAILURES] != newConfigs[Constants.HEALTH_CHECK_MAX_FAILURES]
         ) {
-            resourcesManager.loadConfigs()
+            resourcesManager.reloadDynamicConfigs()
         }
 
         if (configs[Constants.MASTER_CHANGES_CHECK_INTERVAL] != newConfigs[Constants.MASTER_CHANGES_CHECK_INTERVAL]) {
-            masterChangesManager.loadConfigs()
+            masterChangesManager.reloadDynamicConfigs()
         }
 
         if (configs[Constants.PROCESSING_SOCKET_BUFFER_LENGTH] != newConfigs[Constants.PROCESSING_SOCKET_BUFFER_LENGTH]) {
-            loadBalancer.loadConfigs()
+            loadBalancer.reloadDynamicConfigs()
         }
     }
 }

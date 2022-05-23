@@ -9,6 +9,7 @@ plugins {
 dependencies {
     implementation(project(":model"))
     implementation(project(":utils"))
+    implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
 //    implementation("org.apache.httpcomponents:httpcore:4.4.15")
     implementation("org.postgresql:postgresql:42.3.3")

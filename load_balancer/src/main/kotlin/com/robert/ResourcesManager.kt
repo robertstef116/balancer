@@ -3,7 +3,6 @@ package com.robert
 import com.robert.algorithms.*
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -25,31 +24,24 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     private var maxNumberOfHealthFailures by Delegates.notNull<Int>()
     private var recomputeWeightInterval = Constants.DEFAULT_COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL
 
-    private val pathsMappingLock = ReentrantReadWriteLock()
-    private val workersLock = ReentrantReadWriteLock()
-    private val initialized = AtomicBoolean(false)
-    private val initializationWaiters = ConcurrentLinkedQueue<() -> Unit>()
+    private var initialized = false
+
     private val initializationLock = ReentrantLock()
+    private val pathsMappingLock = ReentrantReadWriteLock()
+    private val workersConfigLock = ReentrantLock()
+    private val algorithmConfigLock = ReentrantLock()
+    private val initializationWaiters = ConcurrentLinkedQueue<() -> Unit>()
 
     var pathsMapping: Map<WorkflowPath, List<PathTargetResource>> = emptyMap()
-        get() = pathsMappingLock.read { field }
-        private set
-
     var workers: List<WorkerNode> = emptyList()
-        get() = workersLock.read { field }
-        private set
-
-    // use same lock as the workers
     var healthChecks: List<HealthChecker> = emptyList()
-        get() = workersLock.read { field }
-        private set
 
     fun getWorkflows() = storage.getWorkflows()
     fun getDeployments() = storage.getDeployments()
 
-    fun loadConfigs() {
-        log.debug("load configs")
-        workersLock.write {
+    fun reloadDynamicConfigs() {
+        log.debug("reload dynamic configs")
+        workersConfigLock.withLock {
             numberOfRelevantPerformanceMetrics =
                 DynamicConfigProperties.getIntPropertyOrDefault(Constants.NUMBER_RELEVANT_PERFORMANCE_METRICS, 3)
             healthCheckTimeout =
@@ -60,19 +52,15 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
                 DynamicConfigProperties.getIntPropertyOrDefault(Constants.HEALTH_CHECK_MAX_FAILURES, 3)
 
             healthChecks.forEach {
-                it.updateConfigs(
-                    healthCheckInterval,
-                    healthCheckTimeout,
-                    maxNumberOfHealthFailures,
-                    numberOfRelevantPerformanceMetrics
-                )
+                it.updateConfigs(healthCheckInterval, healthCheckTimeout, maxNumberOfHealthFailures, numberOfRelevantPerformanceMetrics)
             }
+        }
 
-            val newRecomputeWeightInterval =
-                DynamicConfigProperties.getIntPropertyOrDefault(
-                    Constants.COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL,
-                    Constants.DEFAULT_COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL
-                )
+        algorithmConfigLock.withLock {
+            val newRecomputeWeightInterval = DynamicConfigProperties.getIntPropertyOrDefault(
+                Constants.COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL,
+                Constants.DEFAULT_COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL
+            )
 
             if (newRecomputeWeightInterval != recomputeWeightInterval) {
                 pathsMappingLock.write {
@@ -89,24 +77,18 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
         }
     }
 
-    private fun getWorkflowPathAlgorithms(
-        algorithm: LBAlgorithms,
-        targetResources: List<PathTargetResource>
-    ): LoadBalancingAlgorithm {
+    private fun getWorkflowPathAlgorithms(algorithm: LBAlgorithms, targetResources: List<PathTargetResource>): LoadBalancingAlgorithm {
         return when (algorithm) {
             LBAlgorithms.RANDOM -> RandomAlgorithm(targetResources)
             LBAlgorithms.ROUND_ROBIN -> RoundRobinAlgorithm(targetResources)
             LBAlgorithms.LEAST_CONNECTION -> LeastConnectionAlgorithm(targetResources)
-            LBAlgorithms.WEIGHTED_RESPONSE_TIME -> WeightedResponseTimeAlgorithm(
-                targetResources,
-                recomputeWeightInterval
-            )
+            LBAlgorithms.WEIGHTED_RESPONSE_TIME -> WeightedResponseTimeAlgorithm(targetResources, recomputeWeightInterval)
         }
     }
 
     fun registerInitializationWaiter(cb: () -> Unit) {
         initializationLock.withLock {
-            if (initialized.get()) {
+            if (initialized) {
                 cb()
             } else {
                 initializationWaiters.add(cb)
@@ -116,15 +98,14 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
 
     private fun onInitialized() {
         initializationLock.withLock {
-            workersLock.read {
-                for (healthCheck in healthChecks) {
-                    if (!healthCheck.initialized.get()) {
-                        return@withLock
-                    }
+            healthChecks.forEach {
+                if (!it.initialized.get()) {
+                    return@withLock
                 }
             }
             log.debug("resources initialized")
             initializationWaiters.forEach { it() }
+            initialized = true
         }
     }
 
@@ -138,18 +119,17 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
             maxNumberOfHealthFailures,
             this::onInitialized
         ) { healthCheck ->
-            log.debug("worker failed {}", worker)
-            workersLock.write {
-                storage.disableWorker(worker.id)
-                healthCheck.stop()
-                workersChanged()
-            }
+            log.debug("worker check failed {}", worker)
+            storage.disableWorker(worker.id)
+            healthCheck.stop()
+            workersChanged()
         }
         healthCheck.start()
         return healthCheck
     }
 
-    fun workersChanged() {
+    @Synchronized
+    private fun workersChanged() {
         val newWorkers = storage.getWorkers()
         workers.filterNot { newWorkers.contains(it) }.forEach { worker ->
             healthChecks.find { it.worker == worker }?.stop()
@@ -161,19 +141,16 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     }
 
     fun pathsMappingChanged() {
-        val newPathsMapping = storage.getPathsMapping()
+        algorithmConfigLock.withLock {
+            val newPathsMapping = storage.getPathsMapping()
 
-        pathsMappingLock.write {
-            for (workflowPathPair in newPathsMapping.entries) {
-                val oldWorkflowPath = pathsMapping.keys.find { it.path == workflowPathPair.key.path }
+            for ((workflowPath, targets) in newPathsMapping.entries) {
+                val oldWorkflowPath = pathsMapping.keys.find { it.path == workflowPath.path }
                 if (oldWorkflowPath != null) {
-                    workflowPathPair.key.deploymentSelectionAlgorithm = oldWorkflowPath.deploymentSelectionAlgorithm
-                    workflowPathPair.key.deploymentSelectionAlgorithm.updateTargets(workflowPathPair.value)
+                    workflowPath.deploymentSelectionAlgorithm = oldWorkflowPath.deploymentSelectionAlgorithm
+                    workflowPath.deploymentSelectionAlgorithm.updateTargets(targets)
                 } else {
-                    workflowPathPair.key.deploymentSelectionAlgorithm = getWorkflowPathAlgorithms(
-                        workflowPathPair.key.algorithm,
-                        workflowPathPair.value
-                    )
+                    workflowPath.deploymentSelectionAlgorithm = getWorkflowPathAlgorithms(workflowPath.algorithm, targets)
                 }
             }
 
@@ -182,7 +159,7 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     }
 
     override fun refresh() {
-        log.debug("resource manager changed")
+        log.debug("resource manager refresh")
         workersChanged()
         pathsMappingChanged()
     }

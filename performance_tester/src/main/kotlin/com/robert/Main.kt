@@ -3,12 +3,14 @@ package com.robert
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
 import kotlin.random.Random
 
-const val NO_REQS = 500
+const val NO_REQS = 150
 const val MAX_TIME = 5000L
 const val LB_URL = "http://127.0.0.1:9999/testx/busy"
 //const val LB_URL = " http://192.168.100.93:49166/busy"
@@ -30,7 +32,7 @@ fun main() {
                     HttpClient.get<Unit>("$LB_URL/$time", Long.MAX_VALUE)
                     val end = System.nanoTime()
                     data[i] = ReqData(start/1000000, end/1000000, time, null)
-                    println("done")
+                    println("done $time")
                 } catch (e: Exception) {
                     println("error " + e.message)
                     failed.getAndIncrement()
@@ -40,8 +42,8 @@ fun main() {
         }
     }
 
-    File("./test.csv").bufferedWriter().use {
-        it.write("start,end,time,err\n")
+    BufferedWriter(FileWriter("./test.csv", true)).use {
+//        it.write("start,end,time,err\n")
         for (res in data) {
             it.write("${res!!.start},${res.end},${res.time},${res.err}\n")
         }

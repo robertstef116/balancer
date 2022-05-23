@@ -1,20 +1,13 @@
 package com.robert
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import kotlin.properties.Delegates
 
-class MasterChangesManager(
-
-    private val service: Service,
-    private val managers: List<UpdateAwareManager>
-) {
+class MasterChangesManager(private val service: Service, private val managers: List<UpdateAwareManager>): BackgroundService {
     companion object {
         private val log = LoggerFactory.getLogger(MasterChangesManager::class.java)
-        private val context = newSingleThreadContext("DEPLOYMENTS_MANAGER_CHECK")
+        private val context = Dispatchers.IO.limitedParallelism(1)
         private val MASTER_HOST = ConfigProperties.getString("master_controller.host")!!
         private val MASTER_PORT = ConfigProperties.getInteger("master_controller.port")!!
     }
@@ -23,7 +16,7 @@ class MasterChangesManager(
     private var changes: Map<String, Any> = HashMap()
     private var hash = ""
 
-    fun start() {
+    override fun start() {
         run()
     }
 
@@ -52,16 +45,15 @@ class MasterChangesManager(
                     hash = newHash.toString()
                     changes = newChanges
                 } else {
-                    log.warn("skyping changes comparison")
+                    log.warn("skipping changes comparison, unable to fetch changes")
                 }
                 delay(masterChangesCheckInterval)
             }
         }
     }
 
-    fun loadConfigs() {
+    fun reloadDynamicConfigs() {
         log.debug("load configs")
-        masterChangesCheckInterval =
-            DynamicConfigProperties.getLongPropertyOrDefault(Constants.MASTER_CHANGES_CHECK_INTERVAL, 30000)
+        masterChangesCheckInterval = DynamicConfigProperties.getLongPropertyOrDefault(Constants.MASTER_CHANGES_CHECK_INTERVAL, 30000)
     }
 }

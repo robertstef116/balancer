@@ -67,16 +67,14 @@ class Service(private val storage: Storage) {
         }
     }
 
-    fun getMasterChanges(host: String, port: Int): Map<String, Any>? {
-        return runBlocking {
-            val url = "http://$host:$port/change"
-            try {
-                return@runBlocking HttpClient.get(url)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                log.error("error getting master changes {}", e.message)
-            }
-            return@runBlocking null
+    suspend fun getMasterChanges(host: String, port: Int): Map<String, Any>? {
+        val url = "http://$host:$port/change"
+        try {
+            return HttpClient.get(url)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            log.error("error getting master changes {}", e.message)
         }
+        return null
     }
 }

@@ -219,13 +219,7 @@ class Storage {
         return deployments
     }
 
-    fun addDeployment(
-        id: String?,
-        workerId: String,
-        workflowId: String,
-        containerId: String,
-        portsMapping: Map<Int, Int>
-    ): Deployment {
+    fun addDeployment(id: String?, workerId: String, workflowId: String, containerId: String, portsMapping: Map<Int, Int>): Deployment {
         val deploymentId = id ?: UUID.randomUUID().toString()
         val timestamp = Instant.now().epochSecond
 

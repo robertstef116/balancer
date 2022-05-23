@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS workflows
     id              varchar(36) PRIMARY KEY,
     image           varchar(100) NOT NULL,
     memory_limit    numeric,
-    algorithm       varchar(20)  NOT NULL,
+    algorithm       varchar(25)  NOT NULL,
     min_deployments numeric,
     max_deployments numeric
 );
