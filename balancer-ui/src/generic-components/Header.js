@@ -25,7 +25,7 @@ const Header = ({menus, activeMenuPath}) => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto" activeKey={activeMenuPath}>
             {menus.map(menu =>
-              <Nav.Link eventKey={menu.path} onClick={() => navigate(menu.path)}>
+              <Nav.Link key={menu.path} eventKey={menu.path} onClick={() => navigate(menu.path)}>
                 {menu.name}
               </Nav.Link>)}
           </Nav>

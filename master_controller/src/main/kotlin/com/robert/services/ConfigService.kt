@@ -6,11 +6,17 @@ import com.robert.StorageUtils
 import com.robert.UpdateAwareService
 import com.robert.persistance.ConfigStorage
 
-class ConfigService: UpdateAwareService(Constants.CONFIG_SERVICE_KEY) {
+class ConfigService : UpdateAwareService(Constants.CONFIG_SERVICE_KEY) {
     private val configStorage = ConfigStorage()
 
-    fun setConfig(key: String, value: String) {
-        configStorage.setConfig(key, value)
+    fun getConfigs(): Map<String, String> {
+        return configStorage.getConfigs()
+    }
+
+    fun setConfig(configs: Map<String, String>) {
+        for ((key, value) in configs.entries) {
+            configStorage.setConfig(key, value)
+        }
         markChange()
     }
 }

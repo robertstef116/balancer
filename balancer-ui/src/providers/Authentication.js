@@ -38,7 +38,7 @@ const useProvideAuth = () => {
     dispatch(actions.loadCredentials(() => {
       setIsLoading(false);
     }));
-  }, []);
+  }, [dispatch]);
 
   return {
     isLoading,

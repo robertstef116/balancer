@@ -5,12 +5,14 @@ import HomePage from '../pages/Home';
 import Login from '../pages/Login';
 import NotFound from '../pages/NotFound';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
-import Header from "../components/Header";
+import Header from "../generic-components/Header";
 import NodesPage from "../pages/Nodes";
+import ConfigurationPage from "../pages/Configuration";
 
 export const routesPath = {
   homePage: '/',
   nodesPage: '/nodes',
+  configurationPage: '/config',
   loginPage: '/login',
   aboutPage: '/about'
 };
@@ -18,12 +20,14 @@ export const routesPath = {
 const routesWithHeader = [
   routesPath.homePage,
   routesPath.nodesPage,
+  routesPath.configurationPage,
   routesPath.aboutPage
 ]
 
 const headerMenus = [
   {name: 'Home', path: routesPath.homePage},
   {name: 'Nodes', path: routesPath.nodesPage},
+  {name: 'Configuration', path: routesPath.configurationPage},
   {name: 'About', path: routesPath.aboutPage}
 ]
 
@@ -46,6 +50,11 @@ export const AppRoutes = () => {
           <Route path={routesPath.nodesPage} element={
             <PrivateRoute>
               <NodesPage/>
+            </PrivateRoute>
+          }/>
+          <Route path={routesPath.configurationPage} element={
+            <PrivateRoute>
+              <ConfigurationPage/>
             </PrivateRoute>
           }/>
           <Route path={routesPath.loginPage} element={<Login/>}/>

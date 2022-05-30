@@ -1,2001 +1,701 @@
 start,end,time,err
-567360970,567363205,1557,null
-567360972,567364698,3119,null
-567360972,567363808,2164,null
-567360973,567366316,4691,null
-567360973,567363700,2097,null
-567360973,567364211,2605,null
-567360973,567363305,1674,null
-567360973,567361868,158,null
-567360973,567362325,716,null
-567360973,567362791,1197,null
-567360973,567362601,969,null
-567360974,567361874,230,null
-567360974,567363498,1846,null
-567360974,567363063,1438,null
-567360974,567364232,2717,null
-567360974,567364807,3173,null
-567360975,567364332,2760,null
-567360975,567362591,1005,null
-567360975,567366415,4765,null
-567360975,567364512,2828,null
-567360975,567365210,3539,null
-567360975,567365912,4275,null
-567360975,567364210,2594,null
-567360976,567364131,2547,null
-567360976,567365918,4266,null
-567360976,567361884,269,null
-567360976,567365822,4182,null
-567360976,567364102,2433,null
-567360976,567365015,3430,null
-567360977,567365416,3810,null
-567360977,567364002,2368,null
-567360977,567366321,4651,null
-567360977,567363891,2313,null
-567360977,567363520,2005,null
-567360977,567363585,2012,null
-567360977,567363397,1764,null
-567360978,567362225,612,null
-567360978,567362090,415,null
-567360978,567365942,4376,null
-567360980,567363208,1562,null
-567360981,567362175,509,null
-567360981,567362682,1086,null
-567360981,567361868,161,null
-567360981,567364714,3060,null
-567360982,567365241,3627,null
-567360982,567363506,1823,null
-567360982,567365519,3915,null
-567360982,567363901,2228,null
-567360982,567362906,1293,null
-567360982,567361888,281,null
-567360983,567366245,4712,null
-567360983,567365100,3486,null
-567360983,567366024,3546,null
-567360984,567362802,1122,null
-567360984,567363306,1654,null
-567360984,567366527,4931,null
-567360984,567366547,4983,null
-567360984,567365746,4142,null
-567360984,567362387,748,null
-567360985,567364597,2977,null
-567360985,567364404,2806,null
-567360985,567366112,4483,null
-567360985,567364003,2324,null
-567360985,567366124,4492,null
--1,-1,1269,Connection refused: no further information
-567361204,567362608,663,null
--1,-1,1681,Connection refused: no further information
--1,-1,1801,Connection refused: no further information
--1,-1,2125,Connection refused: no further information
-567361204,567366583,4246,null
-567361204,567367234,4980,null
-567361204,567362191,550,null
--1,-1,557,Connection refused: no further information
--1,-1,2757,Connection refused: no further information
--1,-1,2349,Connection refused: no further information
-567361204,567364309,2341,null
--1,-1,1271,Connection refused: no further information
--1,-1,757,Connection refused: no further information
-567361204,567365114,2961,null
--1,-1,195,Connection refused: no further information
--1,-1,4650,Connection refused: no further information
--1,-1,4724,Connection refused: no further information
-567361204,567363821,2011,null
--1,-1,1353,Connection refused: no further information
--1,-1,4516,Connection refused: no further information
-567361204,567362700,837,null
-567361204,567366726,4779,null
--1,-1,3696,Connection refused: no further information
--1,-1,1483,Connection refused: no further information
--1,-1,4964,Connection refused: no further information
--1,-1,3873,Connection refused: no further information
--1,-1,1507,Connection refused: no further information
-567361204,567364725,2494,null
--1,-1,1432,Connection refused: no further information
--1,-1,2892,Connection refused: no further information
-567361204,567363842,1426,null
--1,-1,767,Connection refused: no further information
--1,-1,1709,Connection refused: no further information
--1,-1,222,Connection refused: no further information
-567361211,567367442,3101,null
-567361211,567364718,436,null
--1,-1,3590,Connection refused: no further information
--1,-1,72,Connection refused: no further information
-567361210,567368548,4439,null
-567361210,567366839,2584,null
--1,-1,3295,Connection refused: no further information
--1,-1,180,Connection refused: no further information
--1,-1,3343,Connection refused: no further information
--1,-1,2162,Connection refused: no further information
--1,-1,2438,Connection refused: no further information
--1,-1,2266,Connection refused: no further information
--1,-1,16,Connection refused: no further information
--1,-1,2087,Connection refused: no further information
-567361209,567366526,2323,null
--1,-1,4356,Connection refused: no further information
--1,-1,2774,Connection refused: no further information
--1,-1,3582,Connection refused: no further information
--1,-1,2133,Connection refused: no further information
--1,-1,2671,Connection refused: no further information
--1,-1,3471,Connection refused: no further information
-567361209,567367334,3598,null
--1,-1,4425,Connection refused: no further information
--1,-1,2851,Connection refused: no further information
--1,-1,2188,Connection refused: no further information
-567361208,567366836,3290,null
--1,-1,1170,Connection refused: no further information
--1,-1,3915,Connection refused: no further information
--1,-1,3376,Connection refused: no further information
-567361208,567368241,4679,null
--1,-1,1922,Connection refused: no further information
-567361208,567366434,3176,null
-567361208,567365842,2265,null
-567361208,567365931,3111,null
-567361207,567365428,2757,null
--1,-1,292,Connection refused: no further information
--1,-1,740,Connection refused: no further information
--1,-1,3533,Connection refused: no further information
--1,-1,978,Connection refused: no further information
--1,-1,112,Connection refused: no further information
--1,-1,271,Connection refused: no further information
--1,-1,2732,Connection refused: no further information
--1,-1,3054,Connection refused: no further information
--1,-1,1903,Connection refused: no further information
--1,-1,1047,Connection refused: no further information
--1,-1,4784,Connection refused: no further information
--1,-1,4668,Connection refused: no further information
--1,-1,2234,Connection refused: no further information
--1,-1,3510,Connection refused: no further information
--1,-1,4638,Connection refused: no further information
--1,-1,3397,Connection refused: no further information
--1,-1,1132,Connection refused: no further information
--1,-1,1099,Connection refused: no further information
--1,-1,2438,Connection refused: no further information
--1,-1,1785,Connection refused: no further information
--1,-1,3085,Connection refused: no further information
--1,-1,848,Connection refused: no further information
--1,-1,4621,Connection refused: no further information
--1,-1,2465,Connection refused: no further information
--1,-1,246,Connection refused: no further information
--1,-1,4641,Connection refused: no further information
--1,-1,3406,Connection refused: no further information
--1,-1,2799,Connection refused: no further information
--1,-1,2010,Connection refused: no further information
--1,-1,2284,Connection refused: no further information
--1,-1,2596,Connection refused: no further information
--1,-1,1355,Connection refused: no further information
--1,-1,4621,Connection refused: no further information
--1,-1,4640,Connection refused: no further information
--1,-1,4120,Connection refused: no further information
--1,-1,4529,Connection refused: no further information
-567361207,567367251,4640,null
--1,-1,2268,Connection refused: no further information
--1,-1,579,Connection refused: no further information
-567361207,567365822,2948,null
--1,-1,4807,Connection refused: no further information
-567361207,567364825,2190,null
--1,-1,470,Connection refused: no further information
-567361208,567367435,4705,null
--1,-1,46,Connection refused: no further information
--1,-1,171,Connection refused: no further information
-567361208,567364218,1459,null
-567361208,567364317,966,null
-567361208,567365137,2202,null
-567361208,567365181,2087,null
-567361208,567367541,4305,null
--1,-1,157,Connection refused: no further information
-567361208,567366532,3211,null
-567361208,567365215,1754,null
--1,-1,2723,Connection refused: no further information
--1,-1,4854,Connection refused: no further information
-567361209,567364797,1147,null
--1,-1,4286,Connection refused: no further information
-567361209,567364113,224,null
-567361209,567367254,3380,null
-567361209,567368072,4166,null
--1,-1,613,Connection refused: no further information
--1,-1,692,Connection refused: no further information
--1,-1,4279,Connection refused: no further information
--1,-1,647,Connection refused: no further information
--1,-1,615,Connection refused: no further information
--1,-1,2762,Connection refused: no further information
--1,-1,2903,Connection refused: no further information
--1,-1,2297,Connection refused: no further information
--1,-1,1450,Connection refused: no further information
--1,-1,2537,Connection refused: no further information
--1,-1,340,Connection refused: no further information
--1,-1,4107,Connection refused: no further information
--1,-1,4662,Connection refused: no further information
--1,-1,350,Connection refused: no further information
--1,-1,4159,Connection refused: no further information
--1,-1,194,Connection refused: no further information
--1,-1,2839,Connection refused: no further information
--1,-1,1446,Connection refused: no further information
--1,-1,2046,Connection refused: no further information
-567361210,567368874,4720,null
-567361210,567368546,4565,null
--1,-1,1051,Connection refused: no further information
-567361210,567368542,4593,null
--1,-1,3076,Connection refused: no further information
-567361210,567365522,1513,null
-567361211,567365022,854,null
-567361211,567368667,4343,null
--1,-1,4240,Connection refused: no further information
--1,-1,3887,Connection refused: no further information
-567361211,567368858,4393,null
-567361211,567367241,3011,null
-567361211,567364413,41,null
-567361211,567366449,2093,null
--1,-1,3935,Connection refused: no further information
-567361211,567366426,1959,null
--1,-1,1619,Connection refused: no further information
--1,-1,3284,Connection refused: no further information
--1,-1,3394,Connection refused: no further information
--1,-1,2184,Connection refused: no further information
--1,-1,2823,Connection refused: no further information
--1,-1,4192,Connection refused: no further information
--1,-1,2908,Connection refused: no further information
--1,-1,3702,Connection refused: no further information
--1,-1,3110,Connection refused: no further information
--1,-1,3378,Connection refused: no further information
--1,-1,671,Connection refused: no further information
--1,-1,1518,Connection refused: no further information
--1,-1,4867,Connection refused: no further information
--1,-1,4184,Connection refused: no further information
--1,-1,4916,Connection refused: no further information
--1,-1,3093,Connection refused: no further information
--1,-1,42,Connection refused: no further information
--1,-1,4091,Connection refused: no further information
--1,-1,3118,Connection refused: no further information
--1,-1,1539,Connection refused: no further information
--1,-1,3362,Connection refused: no further information
--1,-1,2807,Connection refused: no further information
--1,-1,3149,Connection refused: no further information
--1,-1,1153,Connection refused: no further information
--1,-1,1996,Connection refused: no further information
--1,-1,4111,Connection refused: no further information
--1,-1,3001,Connection refused: no further information
--1,-1,2238,Connection refused: no further information
--1,-1,441,Connection refused: no further information
--1,-1,1491,Connection refused: no further information
--1,-1,2401,Connection refused: no further information
--1,-1,1358,Connection refused: no further information
--1,-1,3716,Connection refused: no further information
--1,-1,4050,Connection refused: no further information
--1,-1,3534,Connection refused: no further information
--1,-1,1168,Connection refused: no further information
--1,-1,2311,Connection refused: no further information
--1,-1,2632,Connection refused: no further information
--1,-1,2504,Connection refused: no further information
--1,-1,2722,Connection refused: no further information
--1,-1,2500,Connection refused: no further information
--1,-1,1950,Connection refused: no further information
--1,-1,4261,Connection refused: no further information
--1,-1,2409,Connection refused: no further information
--1,-1,2103,Connection refused: no further information
--1,-1,3044,Connection refused: no further information
--1,-1,1378,Connection refused: no further information
--1,-1,3184,Connection refused: no further information
--1,-1,4551,Connection refused: no further information
--1,-1,3030,Connection refused: no further information
--1,-1,1032,Connection refused: no further information
--1,-1,3772,Connection refused: no further information
--1,-1,1168,Connection refused: no further information
--1,-1,2886,Connection refused: no further information
--1,-1,3535,Connection refused: no further information
--1,-1,3040,Connection refused: no further information
--1,-1,1551,Connection refused: no further information
--1,-1,4195,Connection refused: no further information
--1,-1,2258,Connection refused: no further information
--1,-1,2178,Connection refused: no further information
--1,-1,844,Connection refused: no further information
--1,-1,137,Connection refused: no further information
--1,-1,2105,Connection refused: no further information
--1,-1,3880,Connection refused: no further information
--1,-1,1779,Connection refused: no further information
--1,-1,2217,Connection refused: no further information
--1,-1,324,Connection refused: no further information
--1,-1,94,Connection refused: no further information
--1,-1,715,Connection refused: no further information
--1,-1,2923,Connection refused: no further information
--1,-1,4806,Connection refused: no further information
--1,-1,2936,Connection refused: no further information
--1,-1,2523,Connection refused: no further information
--1,-1,893,Connection refused: no further information
--1,-1,2572,Connection refused: no further information
--1,-1,789,Connection refused: no further information
--1,-1,3100,Connection refused: no further information
--1,-1,1678,Connection refused: no further information
--1,-1,4856,Connection refused: no further information
--1,-1,2064,Connection refused: no further information
--1,-1,737,Connection refused: no further information
--1,-1,991,Connection refused: no further information
--1,-1,2065,Connection refused: no further information
--1,-1,3698,Connection refused: no further information
--1,-1,558,Connection refused: no further information
--1,-1,4596,Connection refused: no further information
--1,-1,3837,Connection refused: no further information
--1,-1,1517,Connection refused: no further information
--1,-1,3828,Connection refused: no further information
--1,-1,2614,Connection refused: no further information
--1,-1,1186,Connection refused: no further information
--1,-1,933,Connection refused: no further information
--1,-1,3584,Connection refused: no further information
--1,-1,3789,Connection refused: no further information
--1,-1,306,Connection refused: no further information
--1,-1,3915,Connection refused: no further information
--1,-1,892,Connection refused: no further information
--1,-1,4938,Connection refused: no further information
--1,-1,192,Connection refused: no further information
--1,-1,2610,Connection refused: no further information
--1,-1,1705,Connection refused: no further information
--1,-1,3242,Connection refused: no further information
--1,-1,3977,Connection refused: no further information
--1,-1,4206,Connection refused: no further information
--1,-1,34,Connection refused: no further information
--1,-1,3174,Connection refused: no further information
--1,-1,3322,Connection refused: no further information
--1,-1,2874,Connection refused: no further information
--1,-1,4424,Connection refused: no further information
--1,-1,4467,Connection refused: no further information
--1,-1,764,Connection refused: no further information
--1,-1,2386,Connection refused: no further information
--1,-1,3645,Connection refused: no further information
--1,-1,3860,Connection refused: no further information
--1,-1,579,Connection refused: no further information
--1,-1,3107,Connection refused: no further information
--1,-1,4135,Connection refused: no further information
--1,-1,2635,Connection refused: no further information
--1,-1,819,Connection refused: no further information
--1,-1,2406,Connection refused: no further information
--1,-1,3957,Connection refused: no further information
--1,-1,4138,Connection refused: no further information
--1,-1,2834,Connection refused: no further information
--1,-1,640,Connection refused: no further information
--1,-1,2124,Connection refused: no further information
--1,-1,2134,Connection refused: no further information
--1,-1,909,Connection refused: no further information
--1,-1,4907,Connection refused: no further information
--1,-1,288,Connection refused: no further information
--1,-1,3543,Connection refused: no further information
--1,-1,1474,Connection refused: no further information
--1,-1,2740,Connection refused: no further information
--1,-1,2236,Connection refused: no further information
--1,-1,1678,Connection refused: no further information
--1,-1,2982,Connection refused: no further information
--1,-1,2594,Connection refused: no further information
--1,-1,2115,Connection refused: no further information
--1,-1,2627,Connection refused: no further information
--1,-1,1918,Connection refused: no further information
--1,-1,2759,Connection refused: no further information
--1,-1,4617,Connection refused: no further information
--1,-1,1669,Connection refused: no further information
--1,-1,4972,Connection refused: no further information
--1,-1,4071,Connection refused: no further information
--1,-1,2778,Connection refused: no further information
--1,-1,2248,Connection refused: no further information
--1,-1,444,Connection refused: no further information
--1,-1,3755,Connection refused: no further information
--1,-1,597,Connection refused: no further information
--1,-1,4749,Connection refused: no further information
--1,-1,4258,Connection refused: no further information
--1,-1,155,Connection refused: no further information
--1,-1,3063,Connection refused: no further information
--1,-1,4842,Connection refused: no further information
--1,-1,875,Connection refused: no further information
--1,-1,3322,Connection refused: no further information
--1,-1,2831,Connection refused: no further information
--1,-1,4311,Connection refused: no further information
--1,-1,2805,Connection refused: no further information
--1,-1,1479,Connection refused: no further information
--1,-1,758,Connection refused: no further information
--1,-1,3662,Connection refused: no further information
--1,-1,4814,Connection refused: no further information
--1,-1,2645,Connection refused: no further information
--1,-1,4863,Connection refused: no further information
--1,-1,569,Connection refused: no further information
--1,-1,1443,Connection refused: no further information
--1,-1,181,Connection refused: no further information
--1,-1,3811,Connection refused: no further information
--1,-1,3121,Connection refused: no further information
--1,-1,320,Connection refused: no further information
--1,-1,1519,Connection refused: no further information
--1,-1,3463,Connection refused: no further information
--1,-1,4975,Connection refused: no further information
--1,-1,1950,Connection refused: no further information
--1,-1,3351,Connection refused: no further information
--1,-1,2295,Connection refused: no further information
--1,-1,2388,Connection refused: no further information
--1,-1,1475,Connection refused: no further information
--1,-1,748,Connection refused: no further information
--1,-1,3255,Connection refused: no further information
--1,-1,3056,Connection refused: no further information
--1,-1,2452,Connection refused: no further information
--1,-1,3299,Connection refused: no further information
--1,-1,567,Connection refused: no further information
--1,-1,3254,Connection refused: no further information
--1,-1,2274,Connection refused: no further information
--1,-1,687,Connection refused: no further information
--1,-1,18,Connection refused: no further information
--1,-1,269,Connection refused: no further information
--1,-1,1757,Connection refused: no further information
--1,-1,993,Connection refused: no further information
--1,-1,2291,Connection refused: no further information
--1,-1,264,Connection refused: no further information
--1,-1,3015,Connection refused: no further information
--1,-1,4511,Connection refused: no further information
--1,-1,599,Connection refused: no further information
--1,-1,4508,Connection refused: no further information
--1,-1,4097,Connection refused: no further information
--1,-1,905,Connection refused: no further information
--1,-1,3042,Connection refused: no further information
--1,-1,276,Connection refused: no further information
--1,-1,2077,Connection refused: no further information
--1,-1,1667,Connection refused: no further information
--1,-1,2105,Connection refused: no further information
--1,-1,4154,Connection refused: no further information
--1,-1,608,Connection refused: no further information
--1,-1,1423,Connection refused: no further information
--1,-1,2528,Connection refused: no further information
--1,-1,2823,Connection refused: no further information
--1,-1,871,Connection refused: no further information
--1,-1,1913,Connection refused: no further information
--1,-1,3372,Connection refused: no further information
--1,-1,1183,Connection refused: no further information
--1,-1,3340,Connection refused: no further information
--1,-1,3084,Connection refused: no further information
--1,-1,2958,Connection refused: no further information
--1,-1,1771,Connection refused: no further information
--1,-1,4249,Connection refused: no further information
--1,-1,3981,Connection refused: no further information
--1,-1,1667,Connection refused: no further information
--1,-1,3182,Connection refused: no further information
--1,-1,382,Connection refused: no further information
--1,-1,1849,Connection refused: no further information
--1,-1,2975,Connection refused: no further information
--1,-1,1507,Connection refused: no further information
--1,-1,3840,Connection refused: no further information
--1,-1,4289,Connection refused: no further information
--1,-1,4501,Connection refused: no further information
--1,-1,4416,Connection refused: no further information
--1,-1,2751,Connection refused: no further information
--1,-1,1198,Connection refused: no further information
--1,-1,4743,Connection refused: no further information
--1,-1,3703,Connection refused: no further information
--1,-1,3373,Connection refused: no further information
--1,-1,4239,Connection refused: no further information
--1,-1,2575,Connection refused: no further information
--1,-1,234,Connection refused: no further information
--1,-1,4572,Connection refused: no further information
--1,-1,1303,Connection refused: no further information
--1,-1,3002,Connection refused: no further information
--1,-1,1694,Connection refused: no further information
--1,-1,86,Connection refused: no further information
--1,-1,1668,Connection refused: no further information
--1,-1,2505,Connection refused: no further information
--1,-1,1769,Connection refused: no further information
--1,-1,3180,Connection refused: no further information
--1,-1,2944,Connection refused: no further information
--1,-1,4045,Connection refused: no further information
--1,-1,4961,Connection refused: no further information
--1,-1,4416,Connection refused: no further information
--1,-1,3133,Connection refused: no further information
--1,-1,66,Connection refused: no further information
--1,-1,787,Connection refused: no further information
--1,-1,2077,Connection refused: no further information
--1,-1,2841,Connection refused: no further information
--1,-1,656,Connection refused: no further information
--1,-1,1529,Connection refused: no further information
--1,-1,1719,Connection refused: no further information
--1,-1,2943,Connection refused: no further information
--1,-1,1688,Connection refused: no further information
--1,-1,2961,Connection refused: no further information
--1,-1,4552,Connection refused: no further information
--1,-1,4622,Connection refused: no further information
--1,-1,3235,Connection refused: no further information
--1,-1,2740,Connection refused: no further information
--1,-1,3666,Connection refused: no further information
--1,-1,838,Connection refused: no further information
--1,-1,4650,Connection refused: no further information
--1,-1,3687,Connection refused: no further information
--1,-1,1435,Connection refused: no further information
--1,-1,4545,Connection refused: no further information
--1,-1,2638,Connection refused: no further information
--1,-1,3642,Connection refused: no further information
--1,-1,4865,Connection refused: no further information
--1,-1,1277,Connection refused: no further information
--1,-1,3403,Connection refused: no further information
--1,-1,1629,Connection refused: no further information
--1,-1,1538,Connection refused: no further information
--1,-1,878,Connection refused: no further information
--1,-1,3809,Connection refused: no further information
--1,-1,4855,Connection refused: no further information
--1,-1,2607,Connection refused: no further information
--1,-1,544,Connection refused: no further information
--1,-1,839,Connection refused: no further information
--1,-1,1904,Connection refused: no further information
--1,-1,1586,Connection refused: no further information
--1,-1,1470,Connection refused: no further information
--1,-1,1335,Connection refused: no further information
--1,-1,4703,Connection refused: no further information
--1,-1,40,Connection refused: no further information
--1,-1,415,Connection refused: no further information
--1,-1,3734,Connection refused: no further information
--1,-1,1931,Connection refused: no further information
--1,-1,2808,Connection refused: no further information
--1,-1,287,Connection refused: no further information
--1,-1,3656,Connection refused: no further information
--1,-1,1226,Connection refused: no further information
--1,-1,3733,Connection refused: no further information
+66326271,66331129,4266,null
+66326274,66327691,222,null
+66326274,66328852,1637,null
+66326274,66328903,1617,null
+66326274,66329106,1785,null
+66326275,66328714,1589,null
+66326275,66328054,971,null
+66326275,66328548,1352,null
+66326275,66328808,1684,null
+66326275,66331796,4992,null
+66326275,66328675,1541,null
+66326275,66328008,825,null
+66326276,66327562,18,null
+66326276,66327687,473,null
+66326276,66330170,2931,null
+66326276,66328715,1659,null
+66326276,66329263,1996,null
+66326276,66331250,4370,null
+66326277,66330725,3429,null
+66326277,66331608,4756,null
+66326277,66327916,740,null
+66326277,66330533,3203,null
+66326277,66328092,805,null
+66326277,66329238,2190,null
+66326277,66329054,1927,null
+66326277,66329096,2037,null
+66326277,66327962,639,null
+66326278,66328258,1017,null
+66326278,66328292,1152,null
+66326278,66327871,765,null
+66326278,66331319,4424,null
+66326278,66328769,1642,null
+66326278,66330375,3394,null
+66326278,66328042,781,null
+66326279,66331619,4804,null
+66326279,66328953,1778,null
+66326279,66330273,3023,null
+66326279,66332257,4955,null
+66326279,66329619,2561,null
+66326283,66332048,4746,null
+66326283,66330280,3072,null
+66326283,66329560,2337,null
+66326283,66328579,1477,null
+66326283,66329970,2804,null
+66326283,66328150,1078,null
+66326283,66328103,917,null
+66326283,66331881,4681,null
+66326283,66330318,2997,null
+66326284,66329714,2453,null
+66326284,66329055,1771,null
+66326284,66328484,1378,null
+66326284,66329939,3014,null
+66326284,66329457,2250,null
+66326284,66331757,4469,null
+66326284,66329432,2370,null
+66326284,66329334,2292,null
+66326284,66329868,2672,null
+66326285,66331983,4760,null
+66326285,66329087,2026,null
+66326285,66329562,2274,null
+66326285,66327914,766,null
+66326285,66329416,2117,null
+66326285,66329964,2772,null
+66326285,66329458,2220,null
+66326479,66331036,3748,null
+66326479,66329511,2242,null
+66326480,66327688,323,null
+66326479,66328957,1853,null
+66326479,66329412,2166,null
+66326482,66328676,1522,null
+66326479,66329515,2262,null
+66326479,66327683,458,null
+66326482,66328299,994,null
+66326482,66329761,2576,null
+66326482,66327905,244,null
+66326479,66330091,3048,null
+66326482,66328295,974,null
+66326479,66328500,1223,null
+66326481,66328997,1992,null
+66326481,66330734,3453,null
+66326479,66329107,1779,null
+66326481,66328343,1253,null
+66326479,66329056,1924,null
+66326481,66327910,557,null
+66326480,66331240,4360,null
+66326480,66329750,2799,null
+66326481,66329963,2696,null
+66326481,66329308,2062,null
+66326481,66328348,1085,null
+66326480,66327772,598,null
+66326481,66331076,3826,null
+66326481,66328256,991,null
+66326482,66327679,182,null
+66326480,66327958,308,null
+66326482,66331601,4781,null
+66326482,66331545,4286,null
+66326480,66331846,4562,null
+66326480,66328654,1406,null
+66326480,66331610,4759,null
+66326482,66329145,2061,null
+76381905,76385822,3345,null
+76381907,76382519,11,null
+76381907,76383712,1283,null
+76381907,76386534,4432,null
+76381908,76383895,1680,null
+76381908,76385114,2895,null
+76381908,76384714,2317,null
+76381908,76386932,4519,null
+76381908,76385823,3418,null
+76381908,76386733,4289,null
+76381909,76382519,89,null
+76381909,76386841,4343,null
+76381909,76385115,2868,null
+76381909,76384171,1917,null
+76381909,76386025,3566,null
+76381909,76386427,3941,null
+76381910,76384922,2430,null
+76381910,76387345,4913,null
+76381910,76383049,658,null
+76381910,76385871,3742,null
+76381910,76384418,1962,null
+76381910,76383333,979,null
+76381911,76383409,1007,null
+76381911,76382768,391,null
+76381911,76383707,1225,null
+76381911,76382519,66,null
+76381911,76382860,431,null
+76381911,76385870,3734,null
+76381912,76384721,2245,null
+76381912,76382676,284,null
+76381912,76382770,340,null
+76381912,76383410,989,null
+76381912,76383508,1071,null
+76381912,76384920,2430,null
+76381912,76383505,1022,null
+76381912,76386156,4032,null
+76381912,76384621,2195,null
+76381913,76384264,2013,null
+76381916,76385024,2605,null
+76381916,76384009,1559,null
+76381917,76387033,4588,null
+76381917,76384220,1770,null
+76381917,76386430,4018,null
+76381917,76385491,3314,null
+76381917,76383609,1228,null
+76381918,76384822,2399,null
+76381918,76383812,1331,null
+76381918,76383000,541,null
+76381918,76385114,2942,null
+76381918,76386824,4757,null
+76381918,76387243,4805,null
+76381918,76383519,1204,null
+76381918,76384715,2303,null
+76381918,76384450,2136,null
+76381919,76386327,3872,null
+76381919,76382519,9,null
+76381919,76382955,571,null
+76381920,76386743,4296,null
+76381920,76385871,3752,null
+76381920,76383101,631,null
+76381921,76386440,4362,null
+76381921,76385621,3154,null
+76381921,76383408,951,null
+76381922,76384827,2565,null
+76382122,76383708,1226,null
+76382123,76384519,2119,null
+76382122,76384637,2361,null
+76382123,76385023,2544,null
+76382123,76386440,4345,null
+76382123,76384816,2419,null
+76382123,76383001,546,null
+76382125,76383144,720,null
+76382122,76387139,4698,null
+76382129,76383240,836,null
+76382129,76383889,1541,null
+76382122,76384357,2128,null
+76382128,76383908,1470,null
+76382128,76383611,1162,null
+76382129,76385319,2833,null
+76382122,76382899,476,null
+76382122,76383236,827,null
+76382122,76385319,2891,null
+76382122,76385208,2962,null
+76382122,76384620,2205,null
+76382122,76387342,4864,null
+76382128,76384613,2178,null
+76382128,76383240,859,null
+76382128,76386229,3766,null
+76382128,76386531,4108,null
+76382128,76382597,103,null
+76382122,76383705,1332,null
+76382122,76385588,3373,null
+76382128,76384454,2138,null
+76382128,76384009,1594,null
+76382128,76386346,4285,null
+76382128,76382519,14,null
+76382123,76383711,1309,null
+76382123,76384226,1751,null
+76382127,76386840,4360,null
+76382123,76382703,283,null
+76382123,76385969,3854,null
+76382127,76386738,4235,null
+76382123,76387014,4966,null
+76382127,76382702,248,null
+76382127,76383203,782,null
+76382127,76385824,3371,null
+76382123,76384919,2424,null
+76382123,76385928,3486,null
+76382127,76386063,3940,null
+76382123,76385520,3037,null
+76382123,76384357,2096,null
+76382123,76386125,3714,null
+76382124,76386251,4129,null
+76382124,76384214,1781,null
+76382124,76386061,3944,null
+76382124,76383609,1208,null
+76382124,76385224,2825,null
+76382127,76385492,3295,null
+76382124,76384077,1735,null
+76382127,76386060,3957,null
+76382124,76385587,3376,null
+76382124,76386837,4424,null
+76382124,76385681,3486,null
+76382124,76386157,4035,null
+76382124,76386839,4343,null
+76382125,76386062,3881,null
+76382125,76382766,345,null
+76382125,76384267,2001,null
+76382127,76385626,3218,null
+76382127,76385971,3844,null
+76382125,76384640,2383,null
+76382126,76384918,2435,null
+76382125,76383709,1220,null
+76382125,76384519,2037,null
+76382126,76385017,2548,null
+76382125,76384546,2247,null
+76382125,76385325,2831,null
+76382125,76386158,4013,null
+76382125,76387012,4933,null
+76382125,76384113,1669,null
+76382125,76383714,1311,null
+76382125,76385967,3844,null
+76382126,76386822,4715,null
+76382129,76386129,3678,null
+76382126,76385019,2838,null
+76382126,76386631,4151,null
+76382126,76383610,1130,null
+76382126,76383705,1406,null
+76382126,76385589,3422,null
+76382126,76384830,2612,null
+-1,-1,1979,Connection refused: no further information
+-1,-1,3545,Connection refused: no further information
+-1,-1,2708,Connection refused: no further information
+-1,-1,2344,Connection refused: no further information
+-1,-1,2520,Connection refused: no further information
+-1,-1,3799,Connection refused: no further information
+-1,-1,1534,Connection refused: no further information
+-1,-1,4369,Connection refused: no further information
+-1,-1,4583,Connection refused: no further information
+-1,-1,1824,Connection refused: no further information
+-1,-1,1402,Connection refused: no further information
+-1,-1,3421,Connection refused: no further information
 -1,-1,123,Connection refused: no further information
--1,-1,1341,Connection refused: no further information
--1,-1,223,Connection refused: no further information
--1,-1,3694,Connection refused: no further information
--1,-1,2381,Connection refused: no further information
--1,-1,305,Connection refused: no further information
--1,-1,2255,Connection refused: no further information
--1,-1,727,Connection refused: no further information
--1,-1,2164,Connection refused: no further information
--1,-1,4598,Connection refused: no further information
--1,-1,256,Connection refused: no further information
--1,-1,896,Connection refused: no further information
--1,-1,1679,Connection refused: no further information
--1,-1,2794,Connection refused: no further information
--1,-1,890,Connection refused: no further information
--1,-1,3850,Connection refused: no further information
--1,-1,865,Connection refused: no further information
--1,-1,3960,Connection refused: no further information
--1,-1,4531,Connection refused: no further information
--1,-1,3656,Connection refused: no further information
--1,-1,4102,Connection refused: no further information
--1,-1,1539,Connection refused: no further information
--1,-1,603,Connection refused: no further information
--1,-1,1140,Connection refused: no further information
--1,-1,3470,Connection refused: no further information
--1,-1,2096,Connection refused: no further information
--1,-1,2946,Connection refused: no further information
--1,-1,2879,Connection refused: no further information
--1,-1,397,Connection refused: no further information
--1,-1,2233,Connection refused: no further information
--1,-1,100,Connection refused: no further information
--1,-1,2067,Connection refused: no further information
--1,-1,2352,Connection refused: no further information
--1,-1,38,Connection refused: no further information
--1,-1,3220,Connection refused: no further information
--1,-1,2127,Connection refused: no further information
--1,-1,4077,Connection refused: no further information
--1,-1,1772,Connection refused: no further information
--1,-1,1782,Connection refused: no further information
--1,-1,3304,Connection refused: no further information
--1,-1,2042,Connection refused: no further information
--1,-1,3278,Connection refused: no further information
--1,-1,644,Connection refused: no further information
--1,-1,4146,Connection refused: no further information
--1,-1,1472,Connection refused: no further information
--1,-1,4034,Connection refused: no further information
--1,-1,1921,Connection refused: no further information
--1,-1,861,Connection refused: no further information
--1,-1,1870,Connection refused: no further information
--1,-1,843,Connection refused: no further information
--1,-1,2817,Connection refused: no further information
--1,-1,2953,Connection refused: no further information
--1,-1,1529,Connection refused: no further information
--1,-1,3475,Connection refused: no further information
--1,-1,518,Connection refused: no further information
--1,-1,3006,Connection refused: no further information
--1,-1,3810,Connection refused: no further information
--1,-1,2126,Connection refused: no further information
--1,-1,1659,Connection refused: no further information
--1,-1,2645,Connection refused: no further information
--1,-1,592,Connection refused: no further information
--1,-1,4729,Connection refused: no further information
--1,-1,4507,Connection refused: no further information
--1,-1,2290,Connection refused: no further information
--1,-1,4530,Connection refused: no further information
--1,-1,2580,Connection refused: no further information
--1,-1,2525,Connection refused: no further information
--1,-1,388,Connection refused: no further information
--1,-1,4205,Connection refused: no further information
--1,-1,1545,Connection refused: no further information
--1,-1,875,Connection refused: no further information
--1,-1,3155,Connection refused: no further information
--1,-1,1542,Connection refused: no further information
--1,-1,1493,Connection refused: no further information
--1,-1,1387,Connection refused: no further information
--1,-1,3458,Connection refused: no further information
--1,-1,2176,Connection refused: no further information
--1,-1,3291,Connection refused: no further information
--1,-1,703,Connection refused: no further information
--1,-1,2981,Connection refused: no further information
--1,-1,2624,Connection refused: no further information
--1,-1,4218,Connection refused: no further information
--1,-1,2789,Connection refused: no further information
--1,-1,2631,Connection refused: no further information
--1,-1,1687,Connection refused: no further information
--1,-1,3683,Connection refused: no further information
--1,-1,408,Connection refused: no further information
--1,-1,2747,Connection refused: no further information
--1,-1,4228,Connection refused: no further information
--1,-1,4577,Connection refused: no further information
--1,-1,2485,Connection refused: no further information
--1,-1,2855,Connection refused: no further information
--1,-1,2155,Connection refused: no further information
--1,-1,1609,Connection refused: no further information
--1,-1,3062,Connection refused: no further information
--1,-1,614,Connection refused: no further information
--1,-1,4270,Connection refused: no further information
--1,-1,3465,Connection refused: no further information
--1,-1,2728,Connection refused: no further information
--1,-1,2540,Connection refused: no further information
--1,-1,2467,Connection refused: no further information
--1,-1,4958,Connection refused: no further information
--1,-1,1571,Connection refused: no further information
--1,-1,365,Connection refused: no further information
--1,-1,4313,Connection refused: no further information
--1,-1,4010,Connection refused: no further information
--1,-1,2805,Connection refused: no further information
--1,-1,603,Connection refused: no further information
--1,-1,135,Connection refused: no further information
--1,-1,1499,Connection refused: no further information
--1,-1,675,Connection refused: no further information
--1,-1,2960,Connection refused: no further information
--1,-1,3935,Connection refused: no further information
--1,-1,392,Connection refused: no further information
--1,-1,1445,Connection refused: no further information
--1,-1,3739,Connection refused: no further information
--1,-1,3853,Connection refused: no further information
--1,-1,1711,Connection refused: no further information
--1,-1,1316,Connection refused: no further information
--1,-1,4503,Connection refused: no further information
--1,-1,4121,Connection refused: no further information
--1,-1,4811,Connection refused: no further information
--1,-1,4487,Connection refused: no further information
--1,-1,3559,Connection refused: no further information
--1,-1,2167,Connection refused: no further information
--1,-1,4198,Connection refused: no further information
--1,-1,4026,Connection refused: no further information
--1,-1,4381,Connection refused: no further information
--1,-1,375,Connection refused: no further information
--1,-1,4692,Connection refused: no further information
--1,-1,1365,Connection refused: no further information
--1,-1,1994,Connection refused: no further information
--1,-1,3189,Connection refused: no further information
--1,-1,4801,Connection refused: no further information
--1,-1,2452,Connection refused: no further information
--1,-1,3208,Connection refused: no further information
--1,-1,4659,Connection refused: no further information
--1,-1,3201,Connection refused: no further information
--1,-1,1507,Connection refused: no further information
--1,-1,3512,Connection refused: no further information
--1,-1,3743,Connection refused: no further information
--1,-1,4459,Connection refused: no further information
--1,-1,873,Connection refused: no further information
--1,-1,4288,Connection refused: no further information
--1,-1,503,Connection refused: no further information
--1,-1,321,Connection refused: no further information
--1,-1,3452,Connection refused: no further information
--1,-1,2872,Connection refused: no further information
--1,-1,433,Connection refused: no further information
--1,-1,1601,Connection refused: no further information
--1,-1,2132,Connection refused: no further information
--1,-1,2541,Connection refused: no further information
--1,-1,2877,Connection refused: no further information
--1,-1,135,Connection refused: no further information
--1,-1,1568,Connection refused: no further information
--1,-1,3329,Connection refused: no further information
--1,-1,4648,Connection refused: no further information
--1,-1,1970,Connection refused: no further information
--1,-1,1607,Connection refused: no further information
--1,-1,3865,Connection refused: no further information
--1,-1,1465,Connection refused: no further information
--1,-1,1226,Connection refused: no further information
--1,-1,769,Connection refused: no further information
--1,-1,2226,Connection refused: no further information
--1,-1,2122,Connection refused: no further information
--1,-1,2313,Connection refused: no further information
--1,-1,2441,Connection refused: no further information
--1,-1,4615,Connection refused: no further information
--1,-1,4620,Connection refused: no further information
--1,-1,281,Connection refused: no further information
--1,-1,3377,Connection refused: no further information
--1,-1,2262,Connection refused: no further information
--1,-1,3425,Connection refused: no further information
--1,-1,1903,Connection refused: no further information
--1,-1,876,Connection refused: no further information
--1,-1,1851,Connection refused: no further information
--1,-1,823,Connection refused: no further information
--1,-1,63,Connection refused: no further information
--1,-1,4077,Connection refused: no further information
--1,-1,1043,Connection refused: no further information
--1,-1,3904,Connection refused: no further information
--1,-1,1477,Connection refused: no further information
--1,-1,1598,Connection refused: no further information
--1,-1,1532,Connection refused: no further information
--1,-1,1300,Connection refused: no further information
--1,-1,1935,Connection refused: no further information
--1,-1,2189,Connection refused: no further information
--1,-1,1074,Connection refused: no further information
--1,-1,801,Connection refused: no further information
--1,-1,2456,Connection refused: no further information
--1,-1,2018,Connection refused: no further information
--1,-1,2095,Connection refused: no further information
--1,-1,2606,Connection refused: no further information
--1,-1,3626,Connection refused: no further information
--1,-1,3802,Connection refused: no further information
--1,-1,4792,Connection refused: no further information
--1,-1,3202,Connection refused: no further information
--1,-1,536,Connection refused: no further information
--1,-1,730,Connection refused: no further information
--1,-1,2443,Connection refused: no further information
--1,-1,2665,Connection refused: no further information
--1,-1,845,Connection refused: no further information
--1,-1,3288,Connection refused: no further information
--1,-1,2702,Connection refused: no further information
--1,-1,330,Connection refused: no further information
--1,-1,1983,Connection refused: no further information
--1,-1,3174,Connection refused: no further information
--1,-1,1658,Connection refused: no further information
--1,-1,4626,Connection refused: no further information
--1,-1,3965,Connection refused: no further information
--1,-1,2639,Connection refused: no further information
--1,-1,1342,Connection refused: no further information
--1,-1,157,Connection refused: no further information
--1,-1,2867,Connection refused: no further information
--1,-1,1695,Connection refused: no further information
--1,-1,1812,Connection refused: no further information
--1,-1,2403,Connection refused: no further information
--1,-1,1317,Connection refused: no further information
--1,-1,4755,Connection refused: no further information
--1,-1,3677,Connection refused: no further information
--1,-1,2976,Connection refused: no further information
--1,-1,662,Connection refused: no further information
--1,-1,1319,Connection refused: no further information
--1,-1,728,Connection refused: no further information
--1,-1,4522,Connection refused: no further information
--1,-1,3895,Connection refused: no further information
--1,-1,4924,Connection refused: no further information
--1,-1,1480,Connection refused: no further information
--1,-1,1087,Connection refused: no further information
--1,-1,2527,Connection refused: no further information
--1,-1,880,Connection refused: no further information
--1,-1,3009,Connection refused: no further information
--1,-1,435,Connection refused: no further information
--1,-1,3701,Connection refused: no further information
--1,-1,2059,Connection refused: no further information
--1,-1,1303,Connection refused: no further information
--1,-1,3845,Connection refused: no further information
--1,-1,2386,Connection refused: no further information
--1,-1,2033,Connection refused: no further information
--1,-1,4086,Connection refused: no further information
--1,-1,2525,Connection refused: no further information
--1,-1,1743,Connection refused: no further information
--1,-1,3157,Connection refused: no further information
--1,-1,3287,Connection refused: no further information
--1,-1,1424,Connection refused: no further information
--1,-1,3667,Connection refused: no further information
--1,-1,2843,Connection refused: no further information
--1,-1,1780,Connection refused: no further information
--1,-1,3193,Connection refused: no further information
--1,-1,3490,Connection refused: no further information
--1,-1,1089,Connection refused: no further information
--1,-1,1444,Connection refused: no further information
--1,-1,567,Connection refused: no further information
--1,-1,2031,Connection refused: no further information
--1,-1,1420,Connection refused: no further information
--1,-1,1518,Connection refused: no further information
--1,-1,2240,Connection refused: no further information
--1,-1,706,Connection refused: no further information
--1,-1,2715,Connection refused: no further information
--1,-1,2379,Connection refused: no further information
--1,-1,75,Connection refused: no further information
--1,-1,2420,Connection refused: no further information
--1,-1,3655,Connection refused: no further information
--1,-1,2843,Connection refused: no further information
--1,-1,1880,Connection refused: no further information
--1,-1,2315,Connection refused: no further information
--1,-1,2198,Connection refused: no further information
--1,-1,4548,Connection refused: no further information
--1,-1,3608,Connection refused: no further information
--1,-1,4911,Connection refused: no further information
--1,-1,4827,Connection refused: no further information
--1,-1,961,Connection refused: no further information
--1,-1,61,Connection refused: no further information
--1,-1,3003,Connection refused: no further information
--1,-1,2679,Connection refused: no further information
--1,-1,1572,Connection refused: no further information
--1,-1,4721,Connection refused: no further information
--1,-1,563,Connection refused: no further information
--1,-1,1171,Connection refused: no further information
--1,-1,2197,Connection refused: no further information
--1,-1,3208,Connection refused: no further information
--1,-1,894,Connection refused: no further information
--1,-1,4653,Connection refused: no further information
 -1,-1,1586,Connection refused: no further information
--1,-1,4965,Connection refused: no further information
--1,-1,3170,Connection refused: no further information
--1,-1,2535,Connection refused: no further information
--1,-1,1392,Connection refused: no further information
--1,-1,4978,Connection refused: no further information
--1,-1,2580,Connection refused: no further information
--1,-1,3397,Connection refused: no further information
--1,-1,1580,Connection refused: no further information
--1,-1,2549,Connection refused: no further information
--1,-1,4386,Connection refused: no further information
--1,-1,2035,Connection refused: no further information
--1,-1,2328,Connection refused: no further information
--1,-1,3272,Connection refused: no further information
--1,-1,4692,Connection refused: no further information
--1,-1,2685,Connection refused: no further information
--1,-1,189,Connection refused: no further information
--1,-1,954,Connection refused: no further information
--1,-1,156,Connection refused: no further information
--1,-1,572,Connection refused: no further information
--1,-1,2315,Connection refused: no further information
--1,-1,3916,Connection refused: no further information
--1,-1,201,Connection refused: no further information
--1,-1,1338,Connection refused: no further information
--1,-1,3284,Connection refused: no further information
--1,-1,650,Connection refused: no further information
--1,-1,3490,Connection refused: no further information
--1,-1,3071,Connection refused: no further information
--1,-1,742,Connection refused: no further information
--1,-1,4864,Connection refused: no further information
--1,-1,783,Connection refused: no further information
--1,-1,4911,Connection refused: no further information
--1,-1,927,Connection refused: no further information
--1,-1,2823,Connection refused: no further information
--1,-1,2264,Connection refused: no further information
--1,-1,3892,Connection refused: no further information
--1,-1,1782,Connection refused: no further information
--1,-1,1165,Connection refused: no further information
--1,-1,1127,Connection refused: no further information
--1,-1,2404,Connection refused: no further information
--1,-1,4611,Connection refused: no further information
--1,-1,1759,Connection refused: no further information
--1,-1,1067,Connection refused: no further information
--1,-1,3232,Connection refused: no further information
--1,-1,616,Connection refused: no further information
--1,-1,2850,Connection refused: no further information
--1,-1,2145,Connection refused: no further information
--1,-1,1425,Connection refused: no further information
--1,-1,2216,Connection refused: no further information
--1,-1,452,Connection refused: no further information
--1,-1,2489,Connection refused: no further information
--1,-1,1310,Connection refused: no further information
--1,-1,2870,Connection refused: no further information
--1,-1,4681,Connection refused: no further information
--1,-1,1865,Connection refused: no further information
--1,-1,341,Connection refused: no further information
--1,-1,3356,Connection refused: no further information
--1,-1,2201,Connection refused: no further information
--1,-1,1965,Connection refused: no further information
--1,-1,2308,Connection refused: no further information
--1,-1,686,Connection refused: no further information
--1,-1,3762,Connection refused: no further information
--1,-1,3871,Connection refused: no further information
--1,-1,22,Connection refused: no further information
--1,-1,4463,Connection refused: no further information
--1,-1,1572,Connection refused: no further information
--1,-1,4232,Connection refused: no further information
--1,-1,895,Connection refused: no further information
--1,-1,1758,Connection refused: no further information
--1,-1,4643,Connection refused: no further information
--1,-1,1327,Connection refused: no further information
--1,-1,4778,Connection refused: no further information
--1,-1,872,Connection refused: no further information
--1,-1,856,Connection refused: no further information
--1,-1,2179,Connection refused: no further information
--1,-1,4494,Connection refused: no further information
--1,-1,1745,Connection refused: no further information
--1,-1,944,Connection refused: no further information
--1,-1,3567,Connection refused: no further information
--1,-1,3857,Connection refused: no further information
--1,-1,628,Connection refused: no further information
--1,-1,2867,Connection refused: no further information
--1,-1,4994,Connection refused: no further information
--1,-1,4980,Connection refused: no further information
--1,-1,362,Connection refused: no further information
--1,-1,3494,Connection refused: no further information
--1,-1,1664,Connection refused: no further information
--1,-1,947,Connection refused: no further information
--1,-1,4975,Connection refused: no further information
--1,-1,3902,Connection refused: no further information
--1,-1,4869,Connection refused: no further information
--1,-1,3412,Connection refused: no further information
--1,-1,2589,Connection refused: no further information
--1,-1,1826,Connection refused: no further information
--1,-1,794,Connection refused: no further information
--1,-1,4158,Connection refused: no further information
--1,-1,4850,Connection refused: no further information
--1,-1,4299,Connection refused: no further information
--1,-1,1092,Connection refused: no further information
--1,-1,3951,Connection refused: no further information
--1,-1,1428,Connection refused: no further information
--1,-1,2088,Connection refused: no further information
--1,-1,4363,Connection refused: no further information
--1,-1,343,Connection refused: no further information
--1,-1,1136,Connection refused: no further information
--1,-1,2567,Connection refused: no further information
--1,-1,372,Connection refused: no further information
--1,-1,2472,Connection refused: no further information
--1,-1,4624,Connection refused: no further information
--1,-1,2741,Connection refused: no further information
--1,-1,1613,Connection refused: no further information
--1,-1,4359,Connection refused: no further information
--1,-1,4968,Connection refused: no further information
--1,-1,3818,Connection refused: no further information
--1,-1,3478,Connection refused: no further information
--1,-1,827,Connection refused: no further information
--1,-1,1636,Connection refused: no further information
--1,-1,4140,Connection refused: no further information
--1,-1,4066,Connection refused: no further information
--1,-1,668,Connection refused: no further information
--1,-1,4688,Connection refused: no further information
--1,-1,2219,Connection refused: no further information
--1,-1,3446,Connection refused: no further information
--1,-1,2617,Connection refused: no further information
--1,-1,532,Connection refused: no further information
--1,-1,3787,Connection refused: no further information
--1,-1,2109,Connection refused: no further information
--1,-1,2896,Connection refused: no further information
--1,-1,694,Connection refused: no further information
--1,-1,527,Connection refused: no further information
--1,-1,4311,Connection refused: no further information
--1,-1,3475,Connection refused: no further information
--1,-1,1631,Connection refused: no further information
--1,-1,498,Connection refused: no further information
--1,-1,1115,Connection refused: no further information
--1,-1,3249,Connection refused: no further information
--1,-1,629,Connection refused: no further information
--1,-1,4823,Connection refused: no further information
--1,-1,1204,Connection refused: no further information
--1,-1,4379,Connection refused: no further information
--1,-1,1539,Connection refused: no further information
--1,-1,3572,Connection refused: no further information
--1,-1,3172,Connection refused: no further information
+-1,-1,1870,Connection refused: no further information
 -1,-1,1968,Connection refused: no further information
--1,-1,2536,Connection refused: no further information
--1,-1,3225,Connection refused: no further information
--1,-1,2385,Connection refused: no further information
--1,-1,1461,Connection refused: no further information
--1,-1,2129,Connection refused: no further information
--1,-1,641,Connection refused: no further information
--1,-1,768,Connection refused: no further information
--1,-1,2739,Connection refused: no further information
--1,-1,464,Connection refused: no further information
--1,-1,1956,Connection refused: no further information
--1,-1,1335,Connection refused: no further information
--1,-1,1602,Connection refused: no further information
--1,-1,4584,Connection refused: no further information
--1,-1,1176,Connection refused: no further information
--1,-1,2844,Connection refused: no further information
--1,-1,1569,Connection refused: no further information
--1,-1,2960,Connection refused: no further information
--1,-1,726,Connection refused: no further information
--1,-1,777,Connection refused: no further information
--1,-1,1251,Connection refused: no further information
--1,-1,3919,Connection refused: no further information
--1,-1,823,Connection refused: no further information
--1,-1,3952,Connection refused: no further information
--1,-1,2470,Connection refused: no further information
--1,-1,4980,Connection refused: no further information
--1,-1,1109,Connection refused: no further information
--1,-1,4535,Connection refused: no further information
--1,-1,2641,Connection refused: no further information
--1,-1,2721,Connection refused: no further information
--1,-1,3816,Connection refused: no further information
--1,-1,3619,Connection refused: no further information
--1,-1,3418,Connection refused: no further information
--1,-1,156,Connection refused: no further information
--1,-1,1174,Connection refused: no further information
--1,-1,23,Connection refused: no further information
--1,-1,3356,Connection refused: no further information
--1,-1,4191,Connection refused: no further information
--1,-1,1197,Connection refused: no further information
--1,-1,1160,Connection refused: no further information
--1,-1,2442,Connection refused: no further information
--1,-1,4086,Connection refused: no further information
--1,-1,4014,Connection refused: no further information
--1,-1,989,Connection refused: no further information
--1,-1,4655,Connection refused: no further information
--1,-1,3524,Connection refused: no further information
--1,-1,4315,Connection refused: no further information
--1,-1,110,Connection refused: no further information
--1,-1,551,Connection refused: no further information
--1,-1,3900,Connection refused: no further information
--1,-1,2357,Connection refused: no further information
--1,-1,2246,Connection refused: no further information
--1,-1,863,Connection refused: no further information
--1,-1,4112,Connection refused: no further information
--1,-1,111,Connection refused: no further information
--1,-1,1372,Connection refused: no further information
--1,-1,170,Connection refused: no further information
--1,-1,3598,Connection refused: no further information
--1,-1,45,Connection refused: no further information
--1,-1,2138,Connection refused: no further information
--1,-1,7,Connection refused: no further information
--1,-1,3302,Connection refused: no further information
--1,-1,508,Connection refused: no further information
--1,-1,3762,Connection refused: no further information
--1,-1,4078,Connection refused: no further information
--1,-1,1169,Connection refused: no further information
--1,-1,4314,Connection refused: no further information
--1,-1,655,Connection refused: no further information
--1,-1,431,Connection refused: no further information
--1,-1,1364,Connection refused: no further information
--1,-1,3173,Connection refused: no further information
--1,-1,1290,Connection refused: no further information
--1,-1,2892,Connection refused: no further information
--1,-1,3921,Connection refused: no further information
--1,-1,4773,Connection refused: no further information
--1,-1,3748,Connection refused: no further information
--1,-1,3643,Connection refused: no further information
--1,-1,4917,Connection refused: no further information
--1,-1,1,Connection refused: no further information
--1,-1,4069,Connection refused: no further information
--1,-1,1197,Connection refused: no further information
--1,-1,4636,Connection refused: no further information
--1,-1,3528,Connection refused: no further information
--1,-1,815,Connection refused: no further information
--1,-1,4932,Connection refused: no further information
--1,-1,1602,Connection refused: no further information
--1,-1,4126,Connection refused: no further information
--1,-1,1361,Connection refused: no further information
--1,-1,2614,Connection refused: no further information
--1,-1,2751,Connection refused: no further information
--1,-1,2314,Connection refused: no further information
--1,-1,4624,Connection refused: no further information
--1,-1,3405,Connection refused: no further information
--1,-1,95,Connection refused: no further information
--1,-1,381,Connection refused: no further information
--1,-1,3491,Connection refused: no further information
--1,-1,1937,Connection refused: no further information
--1,-1,1214,Connection refused: no further information
--1,-1,1261,Connection refused: no further information
--1,-1,1208,Connection refused: no further information
--1,-1,874,Connection refused: no further information
--1,-1,1712,Connection refused: no further information
--1,-1,2286,Connection refused: no further information
--1,-1,4882,Connection refused: no further information
--1,-1,2751,Connection refused: no further information
--1,-1,1140,Connection refused: no further information
--1,-1,4032,Connection refused: no further information
--1,-1,182,Connection refused: no further information
--1,-1,1867,Connection refused: no further information
--1,-1,1733,Connection refused: no further information
--1,-1,4495,Connection refused: no further information
--1,-1,3657,Connection refused: no further information
--1,-1,2875,Connection refused: no further information
--1,-1,4848,Connection refused: no further information
--1,-1,3054,Connection refused: no further information
--1,-1,493,Connection refused: no further information
--1,-1,1126,Connection refused: no further information
--1,-1,3949,Connection refused: no further information
--1,-1,2697,Connection refused: no further information
--1,-1,3615,Connection refused: no further information
--1,-1,289,Connection refused: no further information
--1,-1,1787,Connection refused: no further information
--1,-1,4530,Connection refused: no further information
--1,-1,1743,Connection refused: no further information
--1,-1,2974,Connection refused: no further information
--1,-1,6,Connection refused: no further information
--1,-1,3776,Connection refused: no further information
--1,-1,643,Connection refused: no further information
--1,-1,3220,Connection refused: no further information
--1,-1,591,Connection refused: no further information
--1,-1,642,Connection refused: no further information
--1,-1,3224,Connection refused: no further information
--1,-1,3839,Connection refused: no further information
--1,-1,2444,Connection refused: no further information
--1,-1,1519,Connection refused: no further information
--1,-1,2133,Connection refused: no further information
--1,-1,2931,Connection refused: no further information
--1,-1,141,Connection refused: no further information
--1,-1,1266,Connection refused: no further information
--1,-1,1903,Connection refused: no further information
--1,-1,3700,Connection refused: no further information
--1,-1,1702,Connection refused: no further information
--1,-1,1202,Connection refused: no further information
--1,-1,3968,Connection refused: no further information
--1,-1,364,Connection refused: no further information
--1,-1,505,Connection refused: no further information
--1,-1,2279,Connection refused: no further information
--1,-1,706,Connection refused: no further information
--1,-1,4984,Connection refused: no further information
--1,-1,4355,Connection refused: no further information
--1,-1,562,Connection refused: no further information
--1,-1,3868,Connection refused: no further information
--1,-1,3244,Connection refused: no further information
--1,-1,2916,Connection refused: no further information
--1,-1,1872,Connection refused: no further information
--1,-1,3284,Connection refused: no further information
--1,-1,65,Connection refused: no further information
--1,-1,4270,Connection refused: no further information
--1,-1,2132,Connection refused: no further information
--1,-1,4511,Connection refused: no further information
--1,-1,4473,Connection refused: no further information
--1,-1,3930,Connection refused: no further information
--1,-1,2622,Connection refused: no further information
--1,-1,3319,Connection refused: no further information
--1,-1,3785,Connection refused: no further information
--1,-1,4364,Connection refused: no further information
--1,-1,3040,Connection refused: no further information
--1,-1,3038,Connection refused: no further information
--1,-1,531,Connection refused: no further information
--1,-1,2195,Connection refused: no further information
--1,-1,293,Connection refused: no further information
--1,-1,1675,Connection refused: no further information
--1,-1,4039,Connection refused: no further information
--1,-1,1088,Connection refused: no further information
--1,-1,3013,Connection refused: no further information
--1,-1,1422,Connection refused: no further information
--1,-1,1787,Connection refused: no further information
--1,-1,2633,Connection refused: no further information
--1,-1,2185,Connection refused: no further information
--1,-1,1556,Connection refused: no further information
--1,-1,3591,Connection refused: no further information
--1,-1,1913,Connection refused: no further information
--1,-1,1629,Connection refused: no further information
--1,-1,1345,Connection refused: no further information
--1,-1,1143,Connection refused: no further information
--1,-1,3391,Connection refused: no further information
--1,-1,129,Connection refused: no further information
--1,-1,1023,Connection refused: no further information
--1,-1,2990,Connection refused: no further information
--1,-1,3701,Connection refused: no further information
--1,-1,38,Connection refused: no further information
--1,-1,17,Connection refused: no further information
--1,-1,1225,Connection refused: no further information
--1,-1,1480,Connection refused: no further information
--1,-1,110,Connection refused: no further information
--1,-1,3085,Connection refused: no further information
--1,-1,4813,Connection refused: no further information
--1,-1,3161,Connection refused: no further information
--1,-1,3811,Connection refused: no further information
--1,-1,4868,Connection refused: no further information
--1,-1,1726,Connection refused: no further information
--1,-1,3652,Connection refused: no further information
--1,-1,2760,Connection refused: no further information
--1,-1,4193,Connection refused: no further information
--1,-1,4322,Connection refused: no further information
--1,-1,4921,Connection refused: no further information
--1,-1,953,Connection refused: no further information
--1,-1,2650,Connection refused: no further information
--1,-1,4389,Connection refused: no further information
--1,-1,4485,Connection refused: no further information
--1,-1,4822,Connection refused: no further information
--1,-1,1999,Connection refused: no further information
--1,-1,2311,Connection refused: no further information
--1,-1,4342,Connection refused: no further information
--1,-1,1716,Connection refused: no further information
--1,-1,3203,Connection refused: no further information
--1,-1,3320,Connection refused: no further information
--1,-1,4007,Connection refused: no further information
--1,-1,4272,Connection refused: no further information
--1,-1,945,Connection refused: no further information
--1,-1,2789,Connection refused: no further information
--1,-1,896,Connection refused: no further information
--1,-1,3266,Connection refused: no further information
--1,-1,3977,Connection refused: no further information
--1,-1,1214,Connection refused: no further information
--1,-1,4831,Connection refused: no further information
--1,-1,563,Connection refused: no further information
--1,-1,3798,Connection refused: no further information
--1,-1,3530,Connection refused: no further information
--1,-1,1789,Connection refused: no further information
--1,-1,96,Connection refused: no further information
--1,-1,2233,Connection refused: no further information
--1,-1,2236,Connection refused: no further information
--1,-1,3127,Connection refused: no further information
--1,-1,2837,Connection refused: no further information
--1,-1,965,Connection refused: no further information
--1,-1,2337,Connection refused: no further information
--1,-1,2813,Connection refused: no further information
--1,-1,1525,Connection refused: no further information
--1,-1,3866,Connection refused: no further information
--1,-1,2657,Connection refused: no further information
--1,-1,2895,Connection refused: no further information
--1,-1,4869,Connection refused: no further information
--1,-1,3684,Connection refused: no further information
--1,-1,2339,Connection refused: no further information
--1,-1,4789,Connection refused: no further information
--1,-1,1744,Connection refused: no further information
--1,-1,2083,Connection refused: no further information
--1,-1,305,Connection refused: no further information
--1,-1,2593,Connection refused: no further information
--1,-1,1894,Connection refused: no further information
--1,-1,382,Connection refused: no further information
--1,-1,2831,Connection refused: no further information
--1,-1,3049,Connection refused: no further information
--1,-1,4032,Connection refused: no further information
--1,-1,1526,Connection refused: no further information
--1,-1,4746,Connection refused: no further information
--1,-1,736,Connection refused: no further information
--1,-1,1010,Connection refused: no further information
--1,-1,3436,Connection refused: no further information
--1,-1,2043,Connection refused: no further information
--1,-1,308,Connection refused: no further information
--1,-1,127,Connection refused: no further information
--1,-1,3787,Connection refused: no further information
--1,-1,2213,Connection refused: no further information
--1,-1,2675,Connection refused: no further information
--1,-1,2080,Connection refused: no further information
--1,-1,2081,Connection refused: no further information
--1,-1,3745,Connection refused: no further information
--1,-1,3088,Connection refused: no further information
--1,-1,2263,Connection refused: no further information
--1,-1,148,Connection refused: no further information
--1,-1,1121,Connection refused: no further information
--1,-1,930,Connection refused: no further information
--1,-1,2380,Connection refused: no further information
--1,-1,2834,Connection refused: no further information
--1,-1,1032,Connection refused: no further information
--1,-1,565,Connection refused: no further information
--1,-1,1188,Connection refused: no further information
--1,-1,531,Connection refused: no further information
--1,-1,4339,Connection refused: no further information
--1,-1,4983,Connection refused: no further information
--1,-1,1069,Connection refused: no further information
--1,-1,4764,Connection refused: no further information
--1,-1,5,Connection refused: no further information
--1,-1,2368,Connection refused: no further information
--1,-1,2319,Connection refused: no further information
--1,-1,342,Connection refused: no further information
--1,-1,1768,Connection refused: no further information
--1,-1,281,Connection refused: no further information
--1,-1,4708,Connection refused: no further information
--1,-1,3888,Connection refused: no further information
--1,-1,438,Connection refused: no further information
--1,-1,3598,Connection refused: no further information
--1,-1,1185,Connection refused: no further information
--1,-1,3078,Connection refused: no further information
--1,-1,4750,Connection refused: no further information
--1,-1,1653,Connection refused: no further information
--1,-1,1797,Connection refused: no further information
--1,-1,3483,Connection refused: no further information
--1,-1,2838,Connection refused: no further information
--1,-1,4096,Connection refused: no further information
--1,-1,2273,Connection refused: no further information
--1,-1,3842,Connection refused: no further information
--1,-1,1642,Connection refused: no further information
--1,-1,2317,Connection refused: no further information
--1,-1,4778,Connection refused: no further information
--1,-1,2180,Connection refused: no further information
--1,-1,1075,Connection refused: no further information
--1,-1,3770,Connection refused: no further information
--1,-1,1503,Connection refused: no further information
--1,-1,1655,Connection refused: no further information
--1,-1,1122,Connection refused: no further information
--1,-1,32,Connection refused: no further information
--1,-1,4215,Connection refused: no further information
--1,-1,4184,Connection refused: no further information
--1,-1,1425,Connection refused: no further information
--1,-1,2688,Connection refused: no further information
--1,-1,4906,Connection refused: no further information
--1,-1,2722,Connection refused: no further information
--1,-1,661,Connection refused: no further information
--1,-1,552,Connection refused: no further information
--1,-1,380,Connection refused: no further information
--1,-1,942,Connection refused: no further information
--1,-1,4530,Connection refused: no further information
--1,-1,2376,Connection refused: no further information
--1,-1,1195,Connection refused: no further information
--1,-1,1899,Connection refused: no further information
--1,-1,4427,Connection refused: no further information
--1,-1,3630,Connection refused: no further information
--1,-1,2519,Connection refused: no further information
--1,-1,21,Connection refused: no further information
--1,-1,615,Connection refused: no further information
--1,-1,4435,Connection refused: no further information
--1,-1,2997,Connection refused: no further information
--1,-1,1203,Connection refused: no further information
--1,-1,4511,Connection refused: no further information
--1,-1,1032,Connection refused: no further information
--1,-1,634,Connection refused: no further information
--1,-1,1932,Connection refused: no further information
--1,-1,4658,Connection refused: no further information
--1,-1,406,Connection refused: no further information
--1,-1,950,Connection refused: no further information
--1,-1,4166,Connection refused: no further information
--1,-1,4445,Connection refused: no further information
--1,-1,1659,Connection refused: no further information
--1,-1,1414,Connection refused: no further information
--1,-1,1878,Connection refused: no further information
--1,-1,3504,Connection refused: no further information
--1,-1,2183,Connection refused: no further information
--1,-1,1721,Connection refused: no further information
--1,-1,3489,Connection refused: no further information
--1,-1,1733,Connection refused: no further information
--1,-1,1381,Connection refused: no further information
--1,-1,2326,Connection refused: no further information
--1,-1,3155,Connection refused: no further information
--1,-1,2069,Connection refused: no further information
--1,-1,3472,Connection refused: no further information
--1,-1,4716,Connection refused: no further information
--1,-1,3823,Connection refused: no further information
--1,-1,3740,Connection refused: no further information
--1,-1,2816,Connection refused: no further information
--1,-1,196,Connection refused: no further information
--1,-1,3923,Connection refused: no further information
--1,-1,1112,Connection refused: no further information
--1,-1,4708,Connection refused: no further information
--1,-1,2844,Connection refused: no further information
--1,-1,1834,Connection refused: no further information
--1,-1,3815,Connection refused: no further information
--1,-1,2444,Connection refused: no further information
--1,-1,231,Connection refused: no further information
--1,-1,1425,Connection refused: no further information
--1,-1,3180,Connection refused: no further information
--1,-1,1913,Connection refused: no further information
--1,-1,3629,Connection refused: no further information
--1,-1,3378,Connection refused: no further information
--1,-1,3219,Connection refused: no further information
--1,-1,934,Connection refused: no further information
--1,-1,2478,Connection refused: no further information
--1,-1,1984,Connection refused: no further information
--1,-1,3,Connection refused: no further information
--1,-1,2176,Connection refused: no further information
--1,-1,4492,Connection refused: no further information
--1,-1,2444,Connection refused: no further information
--1,-1,587,Connection refused: no further information
--1,-1,4282,Connection refused: no further information
--1,-1,1975,Connection refused: no further information
--1,-1,4342,Connection refused: no further information
--1,-1,4797,Connection refused: no further information
--1,-1,151,Connection refused: no further information
--1,-1,4591,Connection refused: no further information
--1,-1,1972,Connection refused: no further information
--1,-1,4422,Connection refused: no further information
--1,-1,1680,Connection refused: no further information
--1,-1,904,Connection refused: no further information
--1,-1,1207,Connection refused: no further information
--1,-1,592,Connection refused: no further information
--1,-1,4261,Connection refused: no further information
--1,-1,3432,Connection refused: no further information
--1,-1,2772,Connection refused: no further information
--1,-1,3015,Connection refused: no further information
--1,-1,415,Connection refused: no further information
--1,-1,2551,Connection refused: no further information
--1,-1,2413,Connection refused: no further information
--1,-1,1167,Connection refused: no further information
--1,-1,1835,Connection refused: no further information
--1,-1,986,Connection refused: no further information
--1,-1,4947,Connection refused: no further information
--1,-1,600,Connection refused: no further information
--1,-1,4572,Connection refused: no further information
--1,-1,1678,Connection refused: no further information
--1,-1,4693,Connection refused: no further information
--1,-1,257,Connection refused: no further information
--1,-1,1365,Connection refused: no further information
--1,-1,337,Connection refused: no further information
--1,-1,2519,Connection refused: no further information
--1,-1,899,Connection refused: no further information
--1,-1,760,Connection refused: no further information
--1,-1,2588,Connection refused: no further information
--1,-1,4210,Connection refused: no further information
--1,-1,942,Connection refused: no further information
--1,-1,3312,Connection refused: no further information
--1,-1,2828,Connection refused: no further information
--1,-1,1589,Connection refused: no further information
--1,-1,4197,Connection refused: no further information
--1,-1,4016,Connection refused: no further information
--1,-1,3983,Connection refused: no further information
--1,-1,1973,Connection refused: no further information
--1,-1,3647,Connection refused: no further information
--1,-1,2106,Connection refused: no further information
--1,-1,4560,Connection refused: no further information
--1,-1,3998,Connection refused: no further information
--1,-1,937,Connection refused: no further information
--1,-1,1764,Connection refused: no further information
--1,-1,268,Connection refused: no further information
--1,-1,4097,Connection refused: no further information
--1,-1,111,Connection refused: no further information
--1,-1,29,Connection refused: no further information
--1,-1,2251,Connection refused: no further information
--1,-1,3239,Connection refused: no further information
--1,-1,3351,Connection refused: no further information
--1,-1,61,Connection refused: no further information
--1,-1,1148,Connection refused: no further information
--1,-1,3117,Connection refused: no further information
--1,-1,2629,Connection refused: no further information
--1,-1,4311,Connection refused: no further information
--1,-1,4223,Connection refused: no further information
--1,-1,469,Connection refused: no further information
--1,-1,2136,Connection refused: no further information
--1,-1,4123,Connection refused: no further information
--1,-1,1011,Connection refused: no further information
--1,-1,2458,Connection refused: no further information
--1,-1,4027,Connection refused: no further information
--1,-1,1885,Connection refused: no further information
--1,-1,670,Connection refused: no further information
--1,-1,4753,Connection refused: no further information
--1,-1,3535,Connection refused: no further information
--1,-1,1803,Connection refused: no further information
--1,-1,1226,Connection refused: no further information
--1,-1,2664,Connection refused: no further information
--1,-1,519,Connection refused: no further information
--1,-1,4126,Connection refused: no further information
--1,-1,2791,Connection refused: no further information
--1,-1,689,Connection refused: no further information
--1,-1,333,Connection refused: no further information
--1,-1,1067,Connection refused: no further information
--1,-1,524,Connection refused: no further information
--1,-1,3334,Connection refused: no further information
--1,-1,76,Connection refused: no further information
--1,-1,1081,Connection refused: no further information
--1,-1,3697,Connection refused: no further information
--1,-1,4673,Connection refused: no further information
--1,-1,1508,Connection refused: no further information
--1,-1,2384,Connection refused: no further information
--1,-1,1904,Connection refused: no further information
--1,-1,4168,Connection refused: no further information
--1,-1,2339,Connection refused: no further information
--1,-1,1703,Connection refused: no further information
--1,-1,4297,Connection refused: no further information
--1,-1,1775,Connection refused: no further information
--1,-1,4603,Connection refused: no further information
--1,-1,547,Connection refused: no further information
--1,-1,1702,Connection refused: no further information
--1,-1,3657,Connection refused: no further information
--1,-1,4486,Connection refused: no further information
--1,-1,1840,Connection refused: no further information
--1,-1,2709,Connection refused: no further information
--1,-1,362,Connection refused: no further information
--1,-1,393,Connection refused: no further information
--1,-1,3212,Connection refused: no further information
--1,-1,1900,Connection refused: no further information
--1,-1,177,Connection refused: no further information
+-1,-1,2621,Connection refused: no further information
+-1,-1,1705,Connection refused: no further information
+-1,-1,3820,Connection refused: no further information
 -1,-1,3276,Connection refused: no further information
--1,-1,4886,Connection refused: no further information
--1,-1,143,Connection refused: no further information
--1,-1,2433,Connection refused: no further information
--1,-1,833,Connection refused: no further information
--1,-1,1105,Connection refused: no further information
--1,-1,2104,Connection refused: no further information
--1,-1,3260,Connection refused: no further information
--1,-1,2191,Connection refused: no further information
--1,-1,3120,Connection refused: no further information
--1,-1,1847,Connection refused: no further information
--1,-1,3092,Connection refused: no further information
--1,-1,3018,Connection refused: no further information
--1,-1,11,Connection refused: no further information
--1,-1,826,Connection refused: no further information
--1,-1,4478,Connection refused: no further information
--1,-1,3034,Connection refused: no further information
--1,-1,1832,Connection refused: no further information
--1,-1,2024,Connection refused: no further information
--1,-1,1074,Connection refused: no further information
--1,-1,3824,Connection refused: no further information
--1,-1,1375,Connection refused: no further information
--1,-1,1637,Connection refused: no further information
--1,-1,2220,Connection refused: no further information
--1,-1,3960,Connection refused: no further information
--1,-1,4278,Connection refused: no further information
--1,-1,4610,Connection refused: no further information
--1,-1,2309,Connection refused: no further information
--1,-1,865,Connection refused: no further information
--1,-1,3445,Connection refused: no further information
--1,-1,4579,Connection refused: no further information
--1,-1,4913,Connection refused: no further information
--1,-1,2373,Connection refused: no further information
--1,-1,3145,Connection refused: no further information
--1,-1,607,Connection refused: no further information
--1,-1,1360,Connection refused: no further information
--1,-1,318,Connection refused: no further information
--1,-1,3885,Connection refused: no further information
--1,-1,1697,Connection refused: no further information
--1,-1,2633,Connection refused: no further information
--1,-1,2717,Connection refused: no further information
--1,-1,3383,Connection refused: no further information
--1,-1,1322,Connection refused: no further information
--1,-1,2337,Connection refused: no further information
--1,-1,816,Connection refused: no further information
--1,-1,4684,Connection refused: no further information
--1,-1,4882,Connection refused: no further information
--1,-1,580,Connection refused: no further information
--1,-1,1848,Connection refused: no further information
--1,-1,2073,Connection refused: no further information
--1,-1,2309,Connection refused: no further information
--1,-1,1736,Connection refused: no further information
--1,-1,2800,Connection refused: no further information
--1,-1,4014,Connection refused: no further information
--1,-1,3779,Connection refused: no further information
--1,-1,1820,Connection refused: no further information
--1,-1,3491,Connection refused: no further information
--1,-1,3305,Connection refused: no further information
--1,-1,3299,Connection refused: no further information
--1,-1,235,Connection refused: no further information
--1,-1,3911,Connection refused: no further information
--1,-1,1747,Connection refused: no further information
--1,-1,4954,Connection refused: no further information
--1,-1,3794,Connection refused: no further information
--1,-1,2,Connection refused: no further information
--1,-1,3427,Connection refused: no further information
--1,-1,3296,Connection refused: no further information
--1,-1,3420,Connection refused: no further information
--1,-1,762,Connection refused: no further information
--1,-1,930,Connection refused: no further information
--1,-1,3938,Connection refused: no further information
--1,-1,4268,Connection refused: no further information
--1,-1,1839,Connection refused: no further information
--1,-1,4860,Connection refused: no further information
--1,-1,3944,Connection refused: no further information
--1,-1,1132,Connection refused: no further information
--1,-1,3071,Connection refused: no further information
--1,-1,1302,Connection refused: no further information
--1,-1,4943,Connection refused: no further information
--1,-1,3268,Connection refused: no further information
--1,-1,4569,Connection refused: no further information
--1,-1,3639,Connection refused: no further information
--1,-1,245,Connection refused: no further information
--1,-1,2592,Connection refused: no further information
--1,-1,3109,Connection refused: no further information
--1,-1,4960,Connection refused: no further information
--1,-1,2782,Connection refused: no further information
--1,-1,4597,Connection refused: no further information
--1,-1,4659,Connection refused: no further information
--1,-1,1570,Connection refused: no further information
--1,-1,3113,Connection refused: no further information
--1,-1,2031,Connection refused: no further information
--1,-1,2659,Connection refused: no further information
--1,-1,4158,Connection refused: no further information
--1,-1,1454,Connection refused: no further information
--1,-1,565,Connection refused: no further information
--1,-1,1456,Connection refused: no further information
--1,-1,4297,Connection refused: no further information
--1,-1,1704,Connection refused: no further information
--1,-1,4586,Connection refused: no further information
--1,-1,1673,Connection refused: no further information
--1,-1,637,Connection refused: no further information
--1,-1,1240,Connection refused: no further information
--1,-1,4304,Connection refused: no further information
--1,-1,3349,Connection refused: no further information
--1,-1,1175,Connection refused: no further information
--1,-1,3905,Connection refused: no further information
--1,-1,2224,Connection refused: no further information
--1,-1,4709,Connection refused: no further information
--1,-1,653,Connection refused: no further information
--1,-1,756,Connection refused: no further information
--1,-1,931,Connection refused: no further information
--1,-1,4399,Connection refused: no further information
--1,-1,742,Connection refused: no further information
--1,-1,4995,Connection refused: no further information
--1,-1,1801,Connection refused: no further information
--1,-1,2485,Connection refused: no further information
--1,-1,4482,Connection refused: no further information
--1,-1,4445,Connection refused: no further information
--1,-1,2319,Connection refused: no further information
--1,-1,2726,Connection refused: no further information
--1,-1,2309,Connection refused: no further information
--1,-1,3436,Connection refused: no further information
--1,-1,3737,Connection refused: no further information
--1,-1,2470,Connection refused: no further information
--1,-1,4345,Connection refused: no further information
--1,-1,1283,Connection refused: no further information
--1,-1,2302,Connection refused: no further information
--1,-1,4718,Connection refused: no further information
--1,-1,2472,Connection refused: no further information
--1,-1,2070,Connection refused: no further information
--1,-1,3965,Connection refused: no further information
--1,-1,3641,Connection refused: no further information
--1,-1,3200,Connection refused: no further information
--1,-1,2353,Connection refused: no further information
--1,-1,1367,Connection refused: no further information
--1,-1,4126,Connection refused: no further information
--1,-1,3654,Connection refused: no further information
--1,-1,4812,Connection refused: no further information
--1,-1,2038,Connection refused: no further information
--1,-1,1754,Connection refused: no further information
--1,-1,4979,Connection refused: no further information
--1,-1,543,Connection refused: no further information
--1,-1,4864,Connection refused: no further information
--1,-1,2125,Connection refused: no further information
--1,-1,961,Connection refused: no further information
--1,-1,3865,Connection refused: no further information
--1,-1,1144,Connection refused: no further information
--1,-1,4590,Connection refused: no further information
--1,-1,935,Connection refused: no further information
--1,-1,714,Connection refused: no further information
--1,-1,2662,Connection refused: no further information
--1,-1,831,Connection refused: no further information
--1,-1,1351,Connection refused: no further information
--1,-1,1373,Connection refused: no further information
--1,-1,2994,Connection refused: no further information
--1,-1,2607,Connection refused: no further information
--1,-1,4079,Connection refused: no further information
--1,-1,1836,Connection refused: no further information
--1,-1,3125,Connection refused: no further information
--1,-1,436,Connection refused: no further information
--1,-1,1680,Connection refused: no further information
--1,-1,569,Connection refused: no further information
--1,-1,4459,Connection refused: no further information
--1,-1,1431,Connection refused: no further information
--1,-1,4722,Connection refused: no further information
--1,-1,1585,Connection refused: no further information
--1,-1,1329,Connection refused: no further information
--1,-1,2766,Connection refused: no further information
--1,-1,1632,Connection refused: no further information
--1,-1,4466,Connection refused: no further information
--1,-1,4000,Connection refused: no further information
--1,-1,3323,Connection refused: no further information
--1,-1,4879,Connection refused: no further information
--1,-1,3007,Connection refused: no further information
--1,-1,3248,Connection refused: no further information
--1,-1,2760,Connection refused: no further information
--1,-1,1236,Connection refused: no further information
--1,-1,3598,Connection refused: no further information
--1,-1,701,Connection refused: no further information
--1,-1,561,Connection refused: no further information
--1,-1,2990,Connection refused: no further information
--1,-1,1241,Connection refused: no further information
--1,-1,2332,Connection refused: no further information
--1,-1,1880,Connection refused: no further information
--1,-1,3136,Connection refused: no further information
--1,-1,1767,Connection refused: no further information
--1,-1,3581,Connection refused: no further information
--1,-1,3883,Connection refused: no further information
--1,-1,1816,Connection refused: no further information
--1,-1,15,Connection refused: no further information
--1,-1,842,Connection refused: no further information
--1,-1,4390,Connection refused: no further information
--1,-1,3427,Connection refused: no further information
--1,-1,2864,Connection refused: no further information
--1,-1,2817,Connection refused: no further information
--1,-1,3844,Connection refused: no further information
--1,-1,2739,Connection refused: no further information
--1,-1,389,Connection refused: no further information
--1,-1,3074,Connection refused: no further information
--1,-1,1842,Connection refused: no further information
--1,-1,2865,Connection refused: no further information
--1,-1,1383,Connection refused: no further information
--1,-1,2915,Connection refused: no further information
--1,-1,326,Connection refused: no further information
--1,-1,2773,Connection refused: no further information
--1,-1,1922,Connection refused: no further information
--1,-1,1423,Connection refused: no further information
--1,-1,1150,Connection refused: no further information
--1,-1,4706,Connection refused: no further information
--1,-1,4406,Connection refused: no further information
--1,-1,2992,Connection refused: no further information
--1,-1,257,Connection refused: no further information
--1,-1,2066,Connection refused: no further information
--1,-1,954,Connection refused: no further information
--1,-1,2034,Connection refused: no further information
--1,-1,2309,Connection refused: no further information
--1,-1,3652,Connection refused: no further information
--1,-1,403,Connection refused: no further information
--1,-1,615,Connection refused: no further information
--1,-1,235,Connection refused: no further information
--1,-1,336,Connection refused: no further information
--1,-1,3389,Connection refused: no further information
--1,-1,3961,Connection refused: no further information
--1,-1,3709,Connection refused: no further information
--1,-1,222,Connection refused: no further information
--1,-1,2936,Connection refused: no further information
--1,-1,159,Connection refused: no further information
--1,-1,890,Connection refused: no further information
--1,-1,3152,Connection refused: no further information
--1,-1,4964,Connection refused: no further information
--1,-1,4658,Connection refused: no further information
--1,-1,859,Connection refused: no further information
--1,-1,1052,Connection refused: no further information
--1,-1,4799,Connection refused: no further information
--1,-1,2984,Connection refused: no further information
--1,-1,4457,Connection refused: no further information
--1,-1,2430,Connection refused: no further information
--1,-1,1995,Connection refused: no further information
--1,-1,749,Connection refused: no further information
--1,-1,1567,Connection refused: no further information
--1,-1,4182,Connection refused: no further information
--1,-1,2248,Connection refused: no further information
--1,-1,4657,Connection refused: no further information
--1,-1,3309,Connection refused: no further information
--1,-1,3686,Connection refused: no further information
--1,-1,4422,Connection refused: no further information
--1,-1,41,Connection refused: no further information
--1,-1,4968,Connection refused: no further information
--1,-1,3310,Connection refused: no further information
--1,-1,48,Connection refused: no further information
--1,-1,3721,Connection refused: no further information
--1,-1,1734,Connection refused: no further information
--1,-1,2392,Connection refused: no further information
--1,-1,2334,Connection refused: no further information
--1,-1,4371,Connection refused: no further information
--1,-1,1887,Connection refused: no further information
--1,-1,1883,Connection refused: no further information
--1,-1,3963,Connection refused: no further information
--1,-1,3705,Connection refused: no further information
--1,-1,4505,Connection refused: no further information
--1,-1,3909,Connection refused: no further information
--1,-1,1547,Connection refused: no further information
--1,-1,3640,Connection refused: no further information
--1,-1,965,Connection refused: no further information
--1,-1,932,Connection refused: no further information
--1,-1,345,Connection refused: no further information
--1,-1,3775,Connection refused: no further information
--1,-1,2997,Connection refused: no further information
--1,-1,759,Connection refused: no further information
+-1,-1,3523,Connection refused: no further information
+-1,-1,1440,Connection refused: no further information
+-1,-1,3788,Connection refused: no further information
+-1,-1,1481,Connection refused: no further information
 -1,-1,2878,Connection refused: no further information
--1,-1,3768,Connection refused: no further information
--1,-1,3609,Connection refused: no further information
--1,-1,585,Connection refused: no further information
--1,-1,3382,Connection refused: no further information
--1,-1,3615,Connection refused: no further information
--1,-1,1915,Connection refused: no further information
--1,-1,3307,Connection refused: no further information
--1,-1,3677,Connection refused: no further information
--1,-1,4776,Connection refused: no further information
--1,-1,2409,Connection refused: no further information
--1,-1,2455,Connection refused: no further information
+-1,-1,4323,Connection refused: no further information
+-1,-1,3804,Connection refused: no further information
+-1,-1,4063,Connection refused: no further information
+-1,-1,3942,Connection refused: no further information
+-1,-1,558,Connection refused: no further information
+-1,-1,4523,Connection refused: no further information
+-1,-1,2781,Connection refused: no further information
+-1,-1,1134,Connection refused: no further information
+-1,-1,4443,Connection refused: no further information
+-1,-1,339,Connection refused: no further information
+-1,-1,2754,Connection refused: no further information
+-1,-1,4788,Connection refused: no further information
+-1,-1,665,Connection refused: no further information
+-1,-1,156,Connection refused: no further information
+-1,-1,2636,Connection refused: no further information
+-1,-1,3856,Connection refused: no further information
+-1,-1,4248,Connection refused: no further information
+-1,-1,2754,Connection refused: no further information
+-1,-1,1781,Connection refused: no further information
+-1,-1,945,Connection refused: no further information
+-1,-1,504,Connection refused: no further information
+-1,-1,3174,Connection refused: no further information
+-1,-1,553,Connection refused: no further information
+-1,-1,2646,Connection refused: no further information
+-1,-1,176,Connection refused: no further information
+-1,-1,4044,Connection refused: no further information
+-1,-1,3383,Connection refused: no further information
+-1,-1,2808,Connection refused: no further information
+-1,-1,2660,Connection refused: no further information
+-1,-1,4321,Connection refused: no further information
+-1,-1,2415,Connection refused: no further information
+-1,-1,3099,Connection refused: no further information
+-1,-1,3819,Connection refused: no further information
+-1,-1,2665,Connection refused: no further information
+-1,-1,1489,Connection refused: no further information
+-1,-1,162,Connection refused: no further information
+-1,-1,3324,Connection refused: no further information
+-1,-1,2234,Connection refused: no further information
+-1,-1,4155,Connection refused: no further information
+-1,-1,2777,Connection refused: no further information
+-1,-1,3098,Connection refused: no further information
+-1,-1,734,Connection refused: no further information
 -1,-1,3468,Connection refused: no further information
--1,-1,2891,Connection refused: no further information
--1,-1,408,Connection refused: no further information
--1,-1,3212,Connection refused: no further information
--1,-1,1216,Connection refused: no further information
--1,-1,4162,Connection refused: no further information
--1,-1,49,Connection refused: no further information
--1,-1,1219,Connection refused: no further information
--1,-1,781,Connection refused: no further information
--1,-1,2587,Connection refused: no further information
--1,-1,4152,Connection refused: no further information
--1,-1,838,Connection refused: no further information
--1,-1,1964,Connection refused: no further information
--1,-1,2810,Connection refused: no further information
--1,-1,386,Connection refused: no further information
--1,-1,2586,Connection refused: no further information
--1,-1,3283,Connection refused: no further information
--1,-1,786,Connection refused: no further information
--1,-1,3230,Connection refused: no further information
--1,-1,2637,Connection refused: no further information
--1,-1,2031,Connection refused: no further information
--1,-1,4465,Connection refused: no further information
--1,-1,1627,Connection refused: no further information
--1,-1,3616,Connection refused: no further information
--1,-1,4291,Connection refused: no further information
--1,-1,3605,Connection refused: no further information
--1,-1,2286,Connection refused: no further information
--1,-1,1856,Connection refused: no further information
--1,-1,3298,Connection refused: no further information
--1,-1,926,Connection refused: no further information
--1,-1,1337,Connection refused: no further information
--1,-1,874,Connection refused: no further information
--1,-1,4390,Connection refused: no further information
--1,-1,3935,Connection refused: no further information
--1,-1,3274,Connection refused: no further information
--1,-1,1562,Connection refused: no further information
--1,-1,656,Connection refused: no further information
--1,-1,357,Connection refused: no further information
--1,-1,62,Connection refused: no further information
--1,-1,4742,Connection refused: no further information
--1,-1,2796,Connection refused: no further information
--1,-1,1136,Connection refused: no further information
--1,-1,4352,Connection refused: no further information
--1,-1,991,Connection refused: no further information
--1,-1,4984,Connection refused: no further information
--1,-1,3735,Connection refused: no further information
--1,-1,751,Connection refused: no further information
--1,-1,3272,Connection refused: no further information
--1,-1,4724,Connection refused: no further information
--1,-1,914,Connection refused: no further information
--1,-1,4946,Connection refused: no further information
--1,-1,4775,Connection refused: no further information
--1,-1,2560,Connection refused: no further information
--1,-1,4576,Connection refused: no further information
--1,-1,3479,Connection refused: no further information
--1,-1,4611,Connection refused: no further information
--1,-1,3410,Connection refused: no further information
--1,-1,851,Connection refused: no further information
--1,-1,1909,Connection refused: no further information
--1,-1,1448,Connection refused: no further information
--1,-1,4291,Connection refused: no further information
--1,-1,4467,Connection refused: no further information
--1,-1,4530,Connection refused: no further information
--1,-1,323,Connection refused: no further information
--1,-1,2153,Connection refused: no further information
--1,-1,2367,Connection refused: no further information
--1,-1,1263,Connection refused: no further information
--1,-1,3218,Connection refused: no further information
--1,-1,4818,Connection refused: no further information
--1,-1,1045,Connection refused: no further information
--1,-1,4957,Connection refused: no further information
--1,-1,2633,Connection refused: no further information
--1,-1,2261,Connection refused: no further information
--1,-1,968,Connection refused: no further information
--1,-1,4106,Connection refused: no further information
--1,-1,1107,Connection refused: no further information
--1,-1,646,Connection refused: no further information
--1,-1,3291,Connection refused: no further information
--1,-1,1423,Connection refused: no further information
--1,-1,4705,Connection refused: no further information
--1,-1,3576,Connection refused: no further information
--1,-1,60,Connection refused: no further information
--1,-1,4459,Connection refused: no further information
--1,-1,4056,Connection refused: no further information
--1,-1,1019,Connection refused: no further information
--1,-1,4984,Connection refused: no further information
--1,-1,249,Connection refused: no further information
--1,-1,2116,Connection refused: no further information
--1,-1,477,Connection refused: no further information
--1,-1,2763,Connection refused: no further information
--1,-1,1855,Connection refused: no further information
--1,-1,2249,Connection refused: no further information
--1,-1,3663,Connection refused: no further information
--1,-1,2981,Connection refused: no further information
--1,-1,1602,Connection refused: no further information
--1,-1,2388,Connection refused: no further information
--1,-1,853,Connection refused: no further information
--1,-1,3637,Connection refused: no further information
--1,-1,419,Connection refused: no further information
--1,-1,1898,Connection refused: no further information
--1,-1,800,Connection refused: no further information
--1,-1,1083,Connection refused: no further information
--1,-1,4502,Connection refused: no further information
--1,-1,3960,Connection refused: no further information
--1,-1,4256,Connection refused: no further information
--1,-1,1616,Connection refused: no further information
--1,-1,819,Connection refused: no further information
--1,-1,1380,Connection refused: no further information
--1,-1,3364,Connection refused: no further information
--1,-1,3504,Connection refused: no further information
--1,-1,425,Connection refused: no further information
--1,-1,1923,Connection refused: no further information
--1,-1,3282,Connection refused: no further information
--1,-1,892,Connection refused: no further information
--1,-1,1518,Connection refused: no further information
--1,-1,1400,Connection refused: no further information
--1,-1,2715,Connection refused: no further information
--1,-1,3317,Connection refused: no further information
--1,-1,4649,Connection refused: no further information
--1,-1,3378,Connection refused: no further information
--1,-1,1377,Connection refused: no further information
--1,-1,1766,Connection refused: no further information
--1,-1,523,Connection refused: no further information
--1,-1,712,Connection refused: no further information
--1,-1,220,Connection refused: no further information
--1,-1,2488,Connection refused: no further information
--1,-1,4253,Connection refused: no further information
--1,-1,760,Connection refused: no further information
--1,-1,1140,Connection refused: no further information
--1,-1,3289,Connection refused: no further information
--1,-1,3394,Connection refused: no further information
--1,-1,3246,Connection refused: no further information
--1,-1,1987,Connection refused: no further information
--1,-1,193,Connection refused: no further information
--1,-1,2856,Connection refused: no further information
--1,-1,4710,Connection refused: no further information
--1,-1,778,Connection refused: no further information
--1,-1,756,Connection refused: no further information
--1,-1,2472,Connection refused: no further information
--1,-1,3538,Connection refused: no further information
--1,-1,2022,Connection refused: no further information
--1,-1,56,Connection refused: no further information
--1,-1,2523,Connection refused: no further information
--1,-1,3933,Connection refused: no further information
--1,-1,1139,Connection refused: no further information
--1,-1,3650,Connection refused: no further information
--1,-1,4336,Connection refused: no further information
--1,-1,2568,Connection refused: no further information
--1,-1,2799,Connection refused: no further information
--1,-1,1537,Connection refused: no further information
--1,-1,460,Connection refused: no further information
--1,-1,4709,Connection refused: no further information
--1,-1,4893,Connection refused: no further information
--1,-1,343,Connection refused: no further information
--1,-1,4996,Connection refused: no further information
--1,-1,3926,Connection refused: no further information
--1,-1,111,Connection refused: no further information
--1,-1,1155,Connection refused: no further information
--1,-1,3352,Connection refused: no further information
--1,-1,2635,Connection refused: no further information
--1,-1,388,Connection refused: no further information
--1,-1,1611,Connection refused: no further information
--1,-1,468,Connection refused: no further information
--1,-1,189,Connection refused: no further information
--1,-1,4037,Connection refused: no further information
--1,-1,4632,Connection refused: no further information
--1,-1,2319,Connection refused: no further information
--1,-1,2270,Connection refused: no further information
--1,-1,3200,Connection refused: no further information
--1,-1,1375,Connection refused: no further information
--1,-1,2046,Connection refused: no further information
--1,-1,1875,Connection refused: no further information
--1,-1,1675,Connection refused: no further information
--1,-1,2470,Connection refused: no further information
--1,-1,4024,Connection refused: no further information
--1,-1,2363,Connection refused: no further information
--1,-1,4459,Connection refused: no further information
--1,-1,847,Connection refused: no further information
--1,-1,2427,Connection refused: no further information
--1,-1,4382,Connection refused: no further information
--1,-1,1564,Connection refused: no further information
--1,-1,3866,Connection refused: no further information
--1,-1,3360,Connection refused: no further information
--1,-1,141,Connection refused: no further information
--1,-1,137,Connection refused: no further information
--1,-1,733,Connection refused: no further information
--1,-1,1601,Connection refused: no further information
--1,-1,522,Connection refused: no further information
--1,-1,1401,Connection refused: no further information
--1,-1,444,Connection refused: no further information
--1,-1,1678,Connection refused: no further information
--1,-1,4144,Connection refused: no further information
--1,-1,247,Connection refused: no further information
--1,-1,4380,Connection refused: no further information
--1,-1,405,Connection refused: no further information
--1,-1,2330,Connection refused: no further information
--1,-1,3061,Connection refused: no further information
--1,-1,1813,Connection refused: no further information
--1,-1,1841,Connection refused: no further information
--1,-1,1564,Connection refused: no further information
--1,-1,2871,Connection refused: no further information
--1,-1,563,Connection refused: no further information
--1,-1,2550,Connection refused: no further information
--1,-1,3500,Connection refused: no further information
--1,-1,3096,Connection refused: no further information
--1,-1,1265,Connection refused: no further information
--1,-1,3885,Connection refused: no further information
--1,-1,1977,Connection refused: no further information
--1,-1,1047,Connection refused: no further information
--1,-1,4523,Connection refused: no further information
--1,-1,4558,Connection refused: no further information
--1,-1,3622,Connection refused: no further information
--1,-1,532,Connection refused: no further information
--1,-1,2627,Connection refused: no further information
--1,-1,1475,Connection refused: no further information
--1,-1,2955,Connection refused: no further information
--1,-1,1620,Connection refused: no further information
--1,-1,4630,Connection refused: no further information
--1,-1,227,Connection refused: no further information
--1,-1,4199,Connection refused: no further information
--1,-1,1840,Connection refused: no further information
--1,-1,425,Connection refused: no further information
--1,-1,4444,Connection refused: no further information
--1,-1,2996,Connection refused: no further information
--1,-1,4025,Connection refused: no further information
--1,-1,1503,Connection refused: no further information
--1,-1,14,Connection refused: no further information
--1,-1,31,Connection refused: no further information
--1,-1,4065,Connection refused: no further information
--1,-1,4543,Connection refused: no further information
--1,-1,2463,Connection refused: no further information
--1,-1,3766,Connection refused: no further information
--1,-1,4508,Connection refused: no further information
--1,-1,3921,Connection refused: no further information
--1,-1,2538,Connection refused: no further information
--1,-1,718,Connection refused: no further information
--1,-1,1150,Connection refused: no further information
--1,-1,3211,Connection refused: no further information
--1,-1,4234,Connection refused: no further information
--1,-1,4378,Connection refused: no further information
--1,-1,3671,Connection refused: no further information
--1,-1,454,Connection refused: no further information
--1,-1,244,Connection refused: no further information
--1,-1,3229,Connection refused: no further information
--1,-1,2722,Connection refused: no further information
--1,-1,867,Connection refused: no further information
--1,-1,3442,Connection refused: no further information
--1,-1,223,Connection refused: no further information
--1,-1,867,Connection refused: no further information
--1,-1,3903,Connection refused: no further information
--1,-1,3321,Connection refused: no further information
--1,-1,4991,Connection refused: no further information
+-1,-1,3928,Connection refused: no further information
+-1,-1,1821,Connection refused: no further information
+-1,-1,4254,Connection refused: no further information
+-1,-1,1583,Connection refused: no further information
+-1,-1,1345,Connection refused: no further information
+-1,-1,1830,Connection refused: no further information
+-1,-1,3690,Connection refused: no further information
+-1,-1,2208,Connection refused: no further information
+-1,-1,346,Connection refused: no further information
+-1,-1,1228,Connection refused: no further information
+-1,-1,4609,Connection refused: no further information
+-1,-1,3189,Connection refused: no further information
+-1,-1,496,Connection refused: no further information
+-1,-1,186,Connection refused: no further information
+-1,-1,1024,Connection refused: no further information
+-1,-1,88,Connection refused: no further information
+-1,-1,4417,Connection refused: no further information
+-1,-1,598,Connection refused: no further information
+-1,-1,2790,Connection refused: no further information
+-1,-1,3358,Connection refused: no further information
+-1,-1,4232,Connection refused: no further information
+-1,-1,2581,Connection refused: no further information
+-1,-1,2453,Connection refused: no further information
+-1,-1,724,Connection refused: no further information
+-1,-1,1162,Connection refused: no further information
+-1,-1,777,Connection refused: no further information
+-1,-1,3925,Connection refused: no further information
+-1,-1,2816,Connection refused: no further information
+-1,-1,3879,Connection refused: no further information
+-1,-1,2162,Connection refused: no further information
+-1,-1,1416,Connection refused: no further information
+-1,-1,999,Connection refused: no further information
+-1,-1,1838,Connection refused: no further information
+-1,-1,4405,Connection refused: no further information
+-1,-1,4962,Connection refused: no further information
 -1,-1,3716,Connection refused: no further information
--1,-1,4620,Connection refused: no further information
--1,-1,3792,Connection refused: no further information
--1,-1,4523,Connection refused: no further information
--1,-1,3195,Connection refused: no further information
--1,-1,2969,Connection refused: no further information
--1,-1,2435,Connection refused: no further information
--1,-1,90,Connection refused: no further information
--1,-1,3275,Connection refused: no further information
--1,-1,3014,Connection refused: no further information
--1,-1,1913,Connection refused: no further information
--1,-1,1368,Connection refused: no further information
--1,-1,622,Connection refused: no further information
--1,-1,936,Connection refused: no further information
--1,-1,3213,Connection refused: no further information
--1,-1,1929,Connection refused: no further information
--1,-1,4372,Connection refused: no further information
--1,-1,3086,Connection refused: no further information
--1,-1,761,Connection refused: no further information
+-1,-1,3941,Connection refused: no further information
+-1,-1,4035,Connection refused: no further information
+-1,-1,3549,Connection refused: no further information
+-1,-1,1928,Connection refused: no further information
+-1,-1,1487,Connection refused: no further information
+-1,-1,95,Connection refused: no further information
+-1,-1,3785,Connection refused: no further information
+-1,-1,1314,Connection refused: no further information
+-1,-1,3623,Connection refused: no further information
+-1,-1,3711,Connection refused: no further information
+-1,-1,1932,Connection refused: no further information
+-1,-1,1957,Connection refused: no further information
+-1,-1,1352,Connection refused: no further information
+-1,-1,4496,Connection refused: no further information
+-1,-1,1854,Connection refused: no further information
+-1,-1,3906,Connection refused: no further information
+-1,-1,623,Connection refused: no further information
+-1,-1,1694,Connection refused: no further information
+-1,-1,2245,Connection refused: no further information
+-1,-1,4127,Connection refused: no further information
+-1,-1,2304,Connection refused: no further information
+-1,-1,4834,Connection refused: no further information
+-1,-1,1333,Connection refused: no further information
+-1,-1,3099,Connection refused: no further information
+-1,-1,386,Connection refused: no further information
+-1,-1,1302,Connection refused: no further information
+-1,-1,4174,Connection refused: no further information
+-1,-1,1308,Connection refused: no further information
+-1,-1,4135,Connection refused: no further information
+-1,-1,1177,Connection refused: no further information
+-1,-1,2865,Connection refused: no further information
+-1,-1,3637,Connection refused: no further information
+-1,-1,522,Connection refused: no further information
+-1,-1,2337,Connection refused: no further information
+-1,-1,1152,Connection refused: no further information
+-1,-1,3469,Connection refused: no further information
+-1,-1,843,Connection refused: no further information
+-1,-1,1532,Connection refused: no further information
+-1,-1,109,Connection refused: no further information
+-1,-1,2087,Connection refused: no further information
+-1,-1,2864,Connection refused: no further information
+-1,-1,4250,Connection refused: no further information
+-1,-1,4049,Connection refused: no further information
+-1,-1,2650,Connection refused: no further information
+-1,-1,1886,Connection refused: no further information
+-1,-1,4577,Connection refused: no further information
+76478912,76481566,2305,null
+76478915,76482824,3618,null
+76478915,76482230,2999,null
+76478915,76481526,2045,null
+76478916,76480433,1116,null
+76478916,76480053,635,null
+76478916,76480246,892,null
+76478916,76479531,46,null
+76478916,76481662,2450,null
+76478916,76480907,1614,null
+76478916,76483864,4823,null
+76478916,76480115,631,null
+76478917,76481856,2574,null
+76478917,76481822,2347,null
+76478917,76482630,3467,null
+76478917,76480519,1103,null
+76478917,76482440,3234,null
+76478917,76479968,573,null
+76478917,76480925,1419,null
+76478918,76482529,3089,null
+76478918,76483132,3666,null
+76478918,76483958,4919,null
+76478918,76481864,2641,null
+76478918,76481323,1908,null
+76478918,76483682,4603,null
+76478918,76482441,3254,null
+76478918,76484148,4720,null
+76478919,76481853,2613,null
+76478919,76482048,2844,null
+76478919,76482824,3628,null
+76478919,76483013,3838,null
+76478919,76483580,4527,null
+76478920,76480316,836,null
+76478920,76484147,4658,null
+76478920,76481469,2200,null
+76478920,76482834,3340,null
+76478920,76480611,1171,null
+76478921,76480918,1430,null
+76478923,76480618,1123,null
+76478924,76482535,3360,null
+76478924,76480713,1416,null
+76478924,76481865,2566,null
+76478924,76484259,4741,null
+76478924,76482225,2818,null
+76478924,76480998,1664,null
+76478924,76480520,1037,null
+76478924,76483866,4816,null
+76478924,76480341,919,null
+76478925,76481375,2041,null
+76478925,76483542,4110,null
+76478925,76481947,2667,null
+76478925,76482823,3610,null
+76478925,76481023,1561,null
+76478925,76480915,1416,null
+76478925,76482124,2677,null
+76478926,76480053,681,null
+76478926,76481629,2155,null
+76478926,76482228,2797,null
+76478926,76480714,1352,null
+76478926,76483337,3894,null
+76478926,76479813,310,null
+76478926,76479685,253,null
+76478927,76480341,968,null
+76478927,76483579,4478,null
+76479148,76483840,4363,null
+76479148,76480619,1267,null
+76479147,76480808,1497,null
+76479148,76484056,4954,null
+76479148,76480410,957,null
+76479151,76482123,2677,null
+76479151,76482731,3563,null
+76479151,76482834,3382,null
+76479151,76480622,1253,null
+76479151,76483482,4416,null
+76479148,76482140,2905,null
+76479148,76479865,486,null
+76479148,76481223,1734,null
+76479148,76480409,909,null
+76479148,76481186,1836,null
+76479148,76482726,3526,null
+76479148,76479867,424,null
+76479150,76479531,83,null
+76479148,76480521,1090,null
+76479149,76482729,3545,null
+76479148,76481922,2438,null
+76479150,76483104,3959,null
+76479148,76480007,545,null
+76479149,76479614,132,null
+76479149,76482227,2819,null
+76479154,76480999,1646,null
+76479149,76481219,1765,null
+76479154,76482336,2868,null
+76479149,76480621,1242,null
+76479154,76483538,4101,null
+76479149,76480521,1090,null
+76479154,76482136,2957,null
+76479149,76483581,4448,null
+76479149,76483960,4932,null
+76479154,76483041,3610,null
+76479154,76482527,3094,null
+76479154,76483946,4500,null
+76479149,76479531,10,null
+76479154,76480713,1346,null
+76479149,76484054,4941,null
+76479154,76479692,222,null
+76479149,76482333,2914,null
+76479153,76480610,1123,null
+76479149,76483942,4521,null
+76479153,76483342,3891,null
+76479153,76481860,2605,null
+76479149,76481114,1669,null
+76479149,76483867,4742,null
+76479153,76481218,1774,null
+76479153,76484254,4755,null
+76479153,76480108,615,null
+76479149,76482534,3095,null
+76479153,76483538,4111,null
+76479153,76483677,4558,null
+76479153,76481282,1995,null
+76479149,76482023,2551,null
+76479153,76480719,1301,null
+76479153,76480911,1589,null
+76479149,76481281,1965,null
+76479153,76481022,1596,null
+76479152,76481222,1785,null
+76479150,76480922,1502,null
+76479150,76483199,4057,null
+76479152,76481418,1973,null
+76479150,76483138,3658,null
+76479150,76480215,768,null
+76479150,76480811,1320,null
+76479152,76482343,3146,null
+76479150,76480060,687,null
+76479152,76479913,462,null
+76479150,76480518,1019,null
+76479152,76481569,2254,null
+76479150,76479961,579,null
+76479150,76482045,2852,null
+76479152,76482049,2833,null
+76479152,76482441,3236,null
+76479152,76483236,3755,null
+76479152,76482345,3177,null
+76479152,76482438,3262,null
+76479150,76480820,1366,null
+76479152,76481862,2638,null
+76479151,76483845,4432,null
+76479152,76482433,2969,null
+76479151,76482628,3150,null
+76479151,76480719,1287,null
+76479151,76479783,407,null
+76798305,76799411,619,null
+76798307,76800357,1640,null
+76798307,76801115,2523,null
+76798307,76798951,64,null
+76798308,76802826,4319,null
+76798308,76799519,722,null
+76798308,76803036,4608,null
+76798308,76800101,1261,null
+76798308,76802724,3877,null
+76798308,76799391,566,null
+76798308,76803014,4586,null
+76798309,76801302,2674,null
+76798309,76799391,589,null
+76798309,76799180,315,null
+76798309,76802062,3561,null
+76798309,76802441,3900,null
+76798309,76800385,1575,null
+76798309,76801217,2429,null
+76798310,76800505,1667,null
+76798310,76802322,3523,null
+76798310,76800488,1674,null
+76798310,76801873,3293,null
+76798310,76802824,4350,null
+76798310,76800501,1648,null
+76798311,76803022,4176,null
+76798311,76800395,1777,null
+76798311,76799693,914,null
+76798311,76800272,1528,null
+76798311,76801876,3305,null
+76798312,76799891,1191,null
+76798312,76803635,4781,null
+76798312,76803824,4996,null
+76798312,76802325,3519,null
+76798312,76800197,1410,null
+76798312,76802515,3684,null
+76798312,76801813,2982,null
+76798312,76799390,527,null
+76798315,76799681,820,null
+76798316,76799800,1098,null
+76798316,76801968,3473,null
+76798316,76801211,2381,null
+76798316,76802731,3864,null
+76798316,76799038,300,null
+76798316,76803436,4653,null
+76798316,76802443,3882,null
+76798316,76802631,4150,null
+76798316,76800609,1813,null
+76798316,76799184,320,null
+76798317,76800543,1873,null
+76798317,76801610,2830,null
+76798317,76801585,3038,null
+76798317,76803126,4256,null
+76798317,76799224,468,null
+76798317,76803321,4532,null
+76798317,76802930,4101,null
+76798317,76799892,1184,null
+76798318,76800791,1961,null
+76798318,76802825,4340,null
+76798318,76801591,2987,null
+76798318,76803232,4427,null
+76798318,76803332,4462,null
+76798318,76800387,1557,null
+76798318,76803297,4892,null
+76798318,76800183,1357,null
+76798528,76801211,2638,null
+76798529,76802537,4020,null
+76798528,76801112,2293,null
+76798528,76801589,3031,null
+76798529,76801776,3243,null
+76798528,76800637,2010,null
+76798528,76801420,2600,null
+76798528,76802728,4226,null
+76798533,76802731,4223,null
+76798528,76802112,3262,null
+76798532,76801922,3067,null
+76798532,76800269,1585,null
+76798528,76802539,4079,null
+76798532,76800608,1807,null
+76798532,76801410,2617,null
+76798532,76799052,247,null
+76798532,76799276,416,null
+76798532,76799317,514,null
+76798528,76802428,3643,null
+76798532,76799881,1092,null
+76798529,76802157,3631,null
+76798529,76802735,3887,null
+76798531,76801419,2578,null
+76798531,76800301,1456,null
+76798529,76800543,1860,null
+76798534,76799784,909,null
+76798534,76799578,723,null
+76798529,76801419,2641,null
+76798529,76802250,3748,null
+76798534,76801812,2970,null
+76798534,76798975,174,null
+76798529,76802720,3934,null
+76798534,76800923,2329,null
+76798529,76799891,1142,null
+76798529,76799051,216,null
+76798529,76800172,1432,null
+76798534,76801588,3054,null
+76798529,76802345,3887,null
+76798534,76802633,4147,null
+76798529,76799694,903,null
+76798534,76800386,1553,null
+76798534,76801411,2586,null
+76798529,76800733,2084,null
+76798529,76799693,823,null
+76798534,76802424,3639,null
+76798533,76800915,2096,null
+76798530,76800638,1977,null
+76798530,76801116,2523,null
+76798530,76803232,4448,null
+76798533,76801822,2975,null
+76798530,76800507,1706,null
+76798530,76801680,3092,null
+76798533,76799598,884,null
+76798533,76802823,4321,null
+76798530,76802444,3960,null
+76798530,76801209,2357,null
+76798530,76801108,2251,null
+76798530,76799680,865,null
+76798530,76803201,4796,null
+76798533,76802213,3428,null
+76798533,76801510,2724,null
+76798530,76799051,285,null
+76798530,76800810,1959,null
+76798530,76801017,2229,null
+76798533,76801509,2654,null
+76798533,76801019,2346,null
+76798530,76799895,1022,null
+76798530,76801872,3348,null
+76798530,76801875,3300,null
+76798530,76802227,3395,null
+76798531,76803534,4667,null
+76798533,76801491,2902,null
+76798531,76799679,809,null
+76798531,76801586,3027,null
+76798533,76801208,2341,null
+76798531,76803111,4696,null
+76798533,76802225,3395,null
+76798531,76802917,4484,null
+76798531,76801621,2760,null
+76798531,76801811,3003,null
+76798531,76800700,1830,null
+76798531,76802736,4274,null
+76798531,76802633,4193,null
+76798531,76799694,829,null
+76798533,76799881,1059,null
+76798531,76800925,2241,null

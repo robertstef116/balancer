@@ -2,7 +2,7 @@ $body-bg: #D6EEFF;
 $primary: #FC7F03;
 $secondary: #6264A7;
 
-$input-bg: transparent;
+$input-bg: #D6EEFF60;
 $form-label-font-weight: bold;
 
 // Import Bootstrap and its default variables
@@ -15,7 +15,7 @@ $form-label-font-weight: bold;
   }
 }
 
-.spinner-overlay{
+.spinner-overlay {
   display: flex;
   position: absolute;
   align-items: center;
@@ -36,16 +36,11 @@ $form-label-font-weight: bold;
   border-width: medium !important;
 }
 
-.widget-header {
-  margin-bottom: -5px;
-}
-
 .widget-action {
   font-size: 30px;
   line-height: 0;
   color: $primary;
   margin-right: -8px;
-  padding-bottom: 5px;
 }
 
 .widget-action:hover {
@@ -72,3 +67,37 @@ $form-label-font-weight: bold;
 .username-header .dropdown-item:hover {
   background-color: $gray-800;
 }
+
+.scrollable-table thead th {
+  position: sticky;
+  top: 0;
+}
+
+.widget-row {
+  height: 400px;
+  max-height: 400px;
+}
+
+.wh-1 {
+  height: 400px;
+}
+
+.icon-button {
+  cursor: pointer;
+  -webkit-text-stroke: 1px;
+}
+
+//.default-widget {
+//  width: 400px;
+//  height: 400px;
+//}
+//
+//.tall-widget {
+//  width: 400px;
+//  height: 600px;
+//}
+//
+//.wide-widget {
+//  width: 600px;
+//  height: 400px;
+//}

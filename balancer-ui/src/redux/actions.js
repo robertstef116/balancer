@@ -4,7 +4,7 @@ import * as api from '../api';
 
 export const login = (username, password, cb) => async (dispatch, getState) => {
   try {
-    const token = await api.login(username, password);
+    const token = await api.login({username, password});
     if (token) {
       sessionStorage.setItem('JWT_TOKEN', token);
       sessionStorage.setItem('USERNAME', username);
@@ -47,7 +47,71 @@ export const loadCredentials = (cb) => (dispatch) => {
         token,
         isAuthenticated: true
       }
-    })
+    });
   }
   cb();
+}
+
+export const getWorkers = (cb) => async (dispatch, getState) => {
+  const {token} = getState()
+  try {
+    const workers = await api.getWorkers(token);
+    dispatch({
+      type: types.GET_WORKERS,
+      payload: {
+        workers
+      }
+    });
+    cb()
+  } catch (e) {
+    cb(errors.GET_WORKERS_ERROR);
+  }
+}
+
+export const getWorkflows = (cb) => async (dispatch, getState) => {
+  const {token} = getState()
+  try {
+    const workflows = await api.getWorkflows(token);
+    dispatch({
+      type: types.GET_WORKFLOWS,
+      payload: {
+        workflows
+      }
+    });
+    cb()
+  } catch (e) {
+    cb(errors.GET_WORKFLOWS_ERROR);
+  }
+}
+
+export const getConfigs = (cb) => async (dispatch, getState) => {
+  const {token} = getState()
+  try {
+    const configs = await api.getConfigs(token);
+    dispatch({
+      type: types.GET_CONFIGS,
+      payload: {
+        configs
+      }
+    });
+    cb()
+  } catch (e) {
+    cb(errors.GET_CONFIGS_ERROR);
+  }
+}
+
+export const saveConfigs = (configs, cb) => async (dispatch, getState) => {
+  const {token} = getState()
+  try {
+    await api.saveConfigs({token, configs});
+    dispatch({
+      type: types.SAVE_CONFIGS,
+      payload: {
+        configs
+      }
+    });
+    cb()
+  } catch (e) {
+    cb(errors.SAVE_CONFIGS_ERROR);
+  }
 }

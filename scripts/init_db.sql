@@ -77,16 +77,15 @@ CREATE TABLE IF NOT EXISTS config
 
 INSERT INTO config(key, value)
 VALUES ('PROCESSING_SOCKET_BUFFER_LENGTH', 2048),
-       ('COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL',
-        10),                                      -- recompute weight every 10 requests, used by weighted response time algorithm
+       ('COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL', 10), -- recompute weight every 10 requests, used by weighted response time algorithm
        ('HEALTH_CHECK_TIMEOUT', 10000),
        ('HEALTH_CHECK_INTERVAL', 10000),
        ('HEALTH_CHECK_MAX_FAILURES', 3),
-       ('CPU_WEIGHT', 0.3),                       -- no action on change, only variable change
-       ('MEMORY_WEIGHT', 0.7),                    -- no action on change, only variable change
-       ('DEPLOYMENTS_CHECK_INTERVAL', 60000),     -- no action on change, only variable change
-       ('MASTER_CHANGES_CHECK_INTERVAL', 30000),  -- no action on change, only variable change
-       ('NUMBER_RELEVANT_PERFORMANCE_METRICS', 3) -- might need health checks update
+       ('CPU_WEIGHT', 0.3),                             -- no action on change, only variable change
+       ('MEMORY_WEIGHT', 0.7),                          -- no action on change, only variable change
+       ('DEPLOYMENTS_CHECK_INTERVAL', 60000),           -- no action on change, only variable change
+       ('MASTER_CHANGES_CHECK_INTERVAL', 30000),        -- no action on change, only variable change
+       ('NUMBER_RELEVANT_PERFORMANCE_METRICS', 3)       -- might need health checks update
 ON CONFLICT DO NOTHING;
 
 -- ADD TEST DATA
