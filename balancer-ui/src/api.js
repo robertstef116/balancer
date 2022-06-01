@@ -34,7 +34,7 @@ export const getConfigs = async () => {
 }
 
 export const saveConfigs = async ({configs}) => {
-  const res = await axios.post(`${API_URL}/config`, configs);
+  const res = await axios.put(`${API_URL}/config`, configs);
   if (res.status !== 200) {
     throw new Error('Failed to save configs!');
   }

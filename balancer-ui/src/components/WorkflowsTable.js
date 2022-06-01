@@ -2,7 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import TableWidget from "../generic-components/TableWidget";
 import {useSelector} from "react-redux";
 import {getWorkflows} from "../redux/actions";
-import useWidgetUtils from "../utils/useWidgetUtils";
+import useWidgetUtils from "../custom-hooks/useWidgetUtils";
 
 const WorkflowsTable = ({className}) => {
   const {widgetProps, actionWrapper} = useWidgetUtils();

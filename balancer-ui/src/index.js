@@ -4,6 +4,7 @@ import './index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import * as ReactDOM from "react-dom";
+import 'normalize.css';
 
 ReactDOM.render(
   <React.StrictMode>

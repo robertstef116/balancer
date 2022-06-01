@@ -1,5 +1,6 @@
 import React from 'react';
 import Spinner from "./Spinner";
+import classNames from "classnames";
 
 const WidgetWrapper = ({className, children, title, isLoading, error = null, dismissError = null, actions = []}) => {
   return (
@@ -14,8 +15,9 @@ const WidgetWrapper = ({className, children, title, isLoading, error = null, dis
           )}
         </span>
       </span>
-      <div className='d-flex flex-column widget shadow border border-primary rounded position-relative w-100 h-100 bg-light'>
-        {error && <div className='bg-danger text-light px-1 d-flex justify-content-between'>
+      <div className={classNames('d-flex flex-column widget shadow border border-primary rounded w-100 h-100 bg-light',
+        {'border-danger': !!error})}>
+        {error && <div className='bg-danger text-light px-1 d-inline-flex justify-content-between rounded m-1'>
           {error}
           <i className='icon-button bi bi-x-lg' onClick={dismissError}/>
         </div>}

@@ -87,6 +87,20 @@ $form-label-font-weight: bold;
   -webkit-text-stroke: 1px;
 }
 
+.input-error {
+  display: none;
+  color: $danger;
+}
+
+.has-error .input-error {
+  display: block;
+}
+
+.has-error input {
+  border: 1px solid $danger;
+  color: $danger;
+}
+
 //.default-widget {
 //  width: 400px;
 //  height: 400px;
