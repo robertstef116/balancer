@@ -13,7 +13,7 @@ function WorkflowsTable({ className }) {
     if (!workflowsRef.current) {
       actionWrapper({ action: getWorkflows });
     }
-  }, [actionWrapper]);
+  }, []);
 
   return (
     <TableWidget

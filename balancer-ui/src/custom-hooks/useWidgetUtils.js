@@ -14,7 +14,20 @@ const useWidgetUtils = () => {
     setError(null);
   };
 
-  const actionWrapper = ({ action, params = [], cb }) => {
+  const apiWrapper = ({ action, params, cb = null }) => {
+    setIsLoading(true);
+    action(...params, (err, data) => {
+      setIsLoading(false);
+      if (err) {
+        setError(err);
+      } else if (cb) {
+        cb(data);
+      }
+    });
+  };
+
+  const actionWrapper = ({ action, params = [], cb = null }) => {
+    setIsLoading(true);
     dispatch(action(...params, (err) => {
       setIsLoading(false);
       if (err) {
@@ -27,6 +40,7 @@ const useWidgetUtils = () => {
   return {
     emitError,
     actionWrapper,
+    apiWrapper,
     setIsLoading,
     widgetProps: {
       error,

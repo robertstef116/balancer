@@ -18,7 +18,8 @@ class RandomAlgorithm(private var availableTargets: List<PathTargetResource>): L
         return SelectedDeploymentInfo(
             target.host,
             target.port,
-            "" // no need for a reference
+            "", // no need for a reference,
+            target
         )
     }
 

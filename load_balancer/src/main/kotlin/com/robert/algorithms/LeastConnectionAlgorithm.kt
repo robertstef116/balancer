@@ -36,11 +36,12 @@ class LeastConnectionAlgorithm(private var availableTargets: List<PathTargetReso
         return SelectedDeploymentInfo(
             minTarget.key.host,
             minTarget.key.port,
-            ""
+            "",
+            minTarget.key
         )
     }
 
     override fun registerProcessingFinished(deploymentInfo: SelectedDeploymentInfo) {
-        targets[PathTargetResource(deploymentInfo.host, deploymentInfo.port)]?.decrementAndGet()
+        targets[deploymentInfo.targetResource]?.decrementAndGet()
     }
 }

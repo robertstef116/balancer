@@ -115,3 +115,12 @@ export const saveConfigs = (configs, cb) => async (dispatch, getState) => {
     cb(errors.SAVE_CONFIGS_ERROR);
   }
 };
+
+export const getAnalyticsData = async (from, cb) => {
+  try {
+    const res = await api.getAnalyticsData({ from });
+    cb(null, res);
+  } catch (e) {
+    cb(errors.SAVE_CONFIGS_ERROR);
+  }
+};

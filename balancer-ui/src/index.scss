@@ -73,11 +73,6 @@ $form-label-font-weight: bold;
   top: 0;
 }
 
-.widget-row {
-  height: 400px;
-  max-height: 400px;
-}
-
 .wh-1 {
   height: 400px;
 }
@@ -99,6 +94,14 @@ $form-label-font-weight: bold;
 .has-error input {
   border: 1px solid $danger;
   color: $danger;
+}
+
+.widget-header {
+  height: 32px;
+}
+
+.widget-header .dropdown button {
+  padding: 0 10px;
 }
 
 //.default-widget {

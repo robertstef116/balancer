@@ -75,6 +75,14 @@ CREATE TABLE IF NOT EXISTS config
     value varchar(50) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS analytics
+(
+    workflow_id   varchar(36) NOT NULL,
+    deployment_id varchar(36) NOT NULL,
+    worker_id     varchar(36) NOT NULL,
+    timestamp     numeric     NOT NULL
+);
+
 INSERT INTO config(key, value)
 VALUES ('PROCESSING_SOCKET_BUFFER_LENGTH', 2048),
        ('COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL', 10), -- recompute weight every 10 requests, used by weighted response time algorithm

@@ -20,7 +20,8 @@ class RoundRobinAlgorithm(private var availableTargets: List<PathTargetResource>
         return SelectedDeploymentInfo(
             target.host,
             target.port,
-            "" // no need for a reference
+            "", // no need for a reference
+            target
         )
     }
 

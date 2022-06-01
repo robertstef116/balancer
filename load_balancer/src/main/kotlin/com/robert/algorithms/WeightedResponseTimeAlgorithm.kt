@@ -69,6 +69,7 @@ class WeightedResponseTimeAlgorithm(
             targetInfo.target.host,
             targetInfo.target.port,
             referenceId,
+            targetInfo.target
         )
     }
 

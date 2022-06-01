@@ -5,7 +5,7 @@ fun main() {
     val service = Service(storage)
     val resourcesManager = ResourcesManager(storage)
     val deploymentsManager = DeploymentsManager(resourcesManager, service)
-    val loadBalancer = LoadBalancer(resourcesManager)
+    val loadBalancer = LoadBalancer(resourcesManager, service)
     val dynamicConfigsManager = DynamicConfigsManager(storage, deploymentsManager, resourcesManager, loadBalancer)
     val masterChangesManager = MasterChangesManager(service, listOf(dynamicConfigsManager, resourcesManager, deploymentsManager))
     dynamicConfigsManager.setMasterChangesManager(masterChangesManager)

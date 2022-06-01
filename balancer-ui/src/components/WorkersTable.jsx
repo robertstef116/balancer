@@ -13,7 +13,7 @@ function WorkersTable({ className }) {
     if (!workersRef.current) {
       actionWrapper({ action: getWorkers });
     }
-  }, [actionWrapper]);
+  }, []);
 
   return (
     <TableWidget

@@ -28,7 +28,7 @@ private data class WorkerSocketInfo(
     val algorithm: LoadBalancingAlgorithm
 )
 
-class LoadBalancer(private val resourcesManager: ResourcesManager) : BackgroundService {
+class LoadBalancer(private val resourcesManager: ResourcesManager, private val service: Service) : BackgroundService {
     companion object {
         private val log = LoggerFactory.getLogger(LoadBalancer::class.java)
         private const val SPACE_CHAR = ' '.code.toByte()
@@ -121,7 +121,8 @@ class LoadBalancer(private val resourcesManager: ResourcesManager) : BackgroundS
     private var bufferSize by Delegates.notNull<Int>()
 
     override fun start() {
-        CoroutineScope(Dispatchers.IO).launch {
+//        CoroutineScope(Dispatchers.IO).launch {
+        runBlocking {
             suspendCoroutine<Unit> {
                 resourcesManager.registerInitializationWaiter { it.resume(Unit) }
             }
@@ -169,6 +170,7 @@ class LoadBalancer(private val resourcesManager: ResourcesManager) : BackgroundS
                     }
 
                     redirect(streamFromWorker, streamToClient, buffer)
+                    service.persistAnalytics(workerSocketInfo.deploymentInfo.targetResource)
                 } catch (e: ValidationException) {
                     log.debug("Received an invalid request")
                 } catch (e: NotFoundException) {

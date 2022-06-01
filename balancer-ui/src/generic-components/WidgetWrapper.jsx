@@ -3,11 +3,11 @@ import classNames from 'classnames';
 import Spinner from './Spinner';
 
 function WidgetWrapper({
-  className, children, title, isLoading, error = null, dismissError = null, actions = [],
+  className, children, title, isLoading, customAction, error = null, dismissError = null, actions = [],
 }) {
   return (
     <div className={`p-4 animate__animated animate__zoomIn animate__faster ${className}`}>
-      <span className="d-flex">
+      <span className="d-flex align-items-center widget-header">
         <div className="fw-bold d-flex align-items-center text-dark">{title}</div>
         <span className="ms-auto">
           {actions.map((action) => (
@@ -18,10 +18,11 @@ function WidgetWrapper({
               onClick={action.onClick}
             />
           ))}
+          {customAction}
         </span>
       </span>
       <div className={classNames(
-        'd-flex flex-column widget shadow border border-primary rounded w-100 h-100 bg-light',
+        'd-flex flex-column widget shadow border border-primary position-relative rounded w-100 h-100 bg-light',
         { 'border-danger': !!error },
       )}
       >

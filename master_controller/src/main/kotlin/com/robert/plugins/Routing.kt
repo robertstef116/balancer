@@ -3,6 +3,7 @@ package com.robert.plugins
 import com.robert.exceptions.*
 import com.robert.exceptions.NotFoundException
 import com.robert.routes.*
+import com.robert.services.AnalyticsService
 import com.robert.services.ConfigService
 import com.robert.services.WorkerService
 import com.robert.services.WorkflowService
@@ -17,6 +18,7 @@ fun Application.configureRouting() {
     val workerService = WorkerService()
     val workflowService = WorkflowService()
     val configService = ConfigService()
+    val analyticsService = AnalyticsService()
 
     routing {
         login()
@@ -26,6 +28,7 @@ fun Application.configureRouting() {
         config("/config", configService)
         worker("/worker", workerService)
         workflow("/workflow", workflowService)
+        analytics("/analytics", analyticsService)
 //        }
 
         // Static plugin. Try to access `/static/index.html`

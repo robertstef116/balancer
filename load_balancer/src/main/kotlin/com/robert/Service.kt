@@ -2,6 +2,7 @@ package com.robert
 
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
+import java.time.Instant
 import java.util.*
 
 class Service(private val storage: Storage) {
@@ -76,5 +77,13 @@ class Service(private val storage: Storage) {
             log.error("error getting master changes {}", e.message)
         }
         return null
+    }
+
+    fun persistAnalytics(targetResource: PathTargetResource) {
+        try {
+            storage.persistAnalytics(targetResource.workerId, targetResource.workflowId, targetResource.deploymentId, Instant.now().epochSecond)
+        } catch (e: Exception) {
+            log.warn("unable to persist analytics data {}", e.message)
+        }
     }
 }

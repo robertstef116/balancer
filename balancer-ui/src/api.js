@@ -38,3 +38,11 @@ export const saveConfigs = async ({ configs }) => {
     throw new Error('Failed to save configs!');
   }
 };
+
+export const getAnalyticsData = async ({ from }) => {
+  const res = await axios.get(`${API_URL}/analytics?from=${from}`);
+  if (res.status === 200) {
+    return res.data;
+  }
+  throw new Error('Failed to load configs!');
+};

@@ -57,7 +57,7 @@ class Storage {
 
     fun getPathsMapping(): Map<WorkflowPath, List<PathTargetResource>> {
         val query = """
-            SELECT wm.path, w.host, worker_port, w2.algorithm FROM deployment_mappings
+            SELECT d.id, d.worker_id, d.workflow_id, wm.path, w.host, worker_port, w2.algorithm FROM deployment_mappings
                 INNER JOIN deployments d ON d.id = deployment_mappings.deployment_id
                 INNER JOIN workers w ON w.id = d.worker_id
                 INNER JOIN workflow_mappings wm ON d.workflow_id = wm.workflow_id AND deployment_port = wm.port
@@ -84,7 +84,15 @@ class Storage {
                             algorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
                             mappingList = ArrayList()
                         }
-                        mappingList!!.add(PathTargetResource(rs.getString("host"), rs.getInt("worker_port")))
+                        mappingList!!.add(
+                            PathTargetResource(
+                                rs.getString("worker_id"),
+                                rs.getString("workflow_id"),
+                                rs.getString("id"),
+                                rs.getString("host"),
+                                rs.getInt("worker_port")
+                            )
+                        )
                     }
 
                     if (path != null) {
@@ -277,5 +285,16 @@ class Storage {
             }
 
         return configs
+    }
+
+    fun persistAnalytics(workerId: String, workflowId: String, deploymentId: String, timestamp: Long) {
+        DBConnector.getConnection().prepareStatement("INSERT INTO analytics( worker_id, workflow_id, deployment_id, timestamp) VALUES (?, ?, ?, ?)")
+            .use { st ->
+                st.setString(1, workerId)
+                st.setString(2, workflowId)
+                st.setString(3, deploymentId)
+                st.setLong(4, timestamp)
+                StorageUtils.executeUpdate(st)
+            }
     }
 }
