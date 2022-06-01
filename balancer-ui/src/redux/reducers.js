@@ -1,4 +1,4 @@
-import * as types from './types'
+import * as types from './types';
 
 const INITIAL_STATE = {
   isAuthenticated: false,
@@ -10,18 +10,19 @@ const INITIAL_STATE = {
   configs: null,
 };
 
-export default (state = INITIAL_STATE, {type, payload}) => {
+// eslint-disable-next-line default-param-last
+export default (state = INITIAL_STATE, { type, payload }) => {
   switch (type) {
     case types.GET_WORKFLOWS:
-      const {workflows} = payload;
+      const { workflows } = payload;
       return {
         ...state,
-        workflows: workflows.map(workflow => {
+        workflows: workflows.map((workflow) => {
           let mapping = '';
-          for (const path of Object.keys(workflow.pathsMapping)) {
-            mapping += `${path} - ${workflow.pathsMapping[path]}\n`
-          }
-          const algorithm = workflow.algorithm.replaceAll('_', ' ').toLowerCase()
+          Object.keys(workflow.pathsMapping).forEach((path) => {
+            mapping += `${path} - ${workflow.pathsMapping[path]}\n`;
+          });
+          const algorithm = workflow.algorithm.replaceAll('_', ' ').toLowerCase();
           return {
             id: workflow.id,
             image: workflow.image,
@@ -29,31 +30,31 @@ export default (state = INITIAL_STATE, {type, payload}) => {
             minDeployments: workflow.minDeployments,
             maxDeployments: workflow.maxDeployments,
             algorithm: algorithm.charAt(0).toUpperCase() + algorithm.slice(1),
-            mapping
-          }
-        })
-      }
+            mapping,
+          };
+        }),
+      };
     case types.GET_WORKERS:
-      const {workers} = payload;
+      const { workers } = payload;
       return {
         ...state,
-        workers: workers.map(worker => ({
+        workers: workers.map((worker) => ({
           id: worker.id,
           inUse: worker.inUse ? 'bi-play-circle text-success' : 'bi-stop-circle text-danger',
           alias: worker.alias,
           host: worker.host,
-          port: worker.port
-        }))
-      }
+          port: worker.port,
+        })),
+      };
     case types.SAVE_CONFIGS:
-      const {configs} = payload;
+      const { configs } = payload;
       return {
         ...state,
         configs: {
           ...state.configs,
-          ...configs
-        }
-      }
+          ...configs,
+        },
+      };
     case types.GET_CONFIGS:
     case types.SET_CREDENTIALS:
     case types.REMOVE_CREDENTIALS:
@@ -61,9 +62,9 @@ export default (state = INITIAL_STATE, {type, payload}) => {
     case types.LOGIN:
       return {
         ...state,
-        ...payload
+        ...payload,
       };
     default:
       return INITIAL_STATE;
   }
-}
+};

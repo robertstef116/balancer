@@ -1,12 +1,12 @@
-import React, {useState, useEffect, createContext, useContext} from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import React, {
+  useState, useEffect, createContext, useContext,
+} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../redux/actions';
 
 const AuthContext = createContext({});
 
-const useAuth = () => {
-  return useContext(AuthContext);
-}
+const useAuth = () => useContext(AuthContext);
 
 // const fakeAuth = {
 //   load() {
@@ -31,7 +31,7 @@ const useAuth = () => {
 
 const useProvideAuth = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const isAuthenticated = useSelector(state => state.isAuthenticated);
+  const isAuthenticated = useSelector((state) => state.isAuthenticated);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -42,21 +42,21 @@ const useProvideAuth = () => {
 
   return {
     isLoading,
-    isAuthenticated
+    isAuthenticated,
   };
-}
+};
 
-const AuthenticationProvider = ({children}) => {
+function AuthenticationProvider({ children }) {
   const auth = useProvideAuth();
 
   return (
     <AuthContext.Provider value={auth}>
       {children}
     </AuthContext.Provider>
-  )
-};
+  );
+}
 
 export {
   useAuth,
-  AuthenticationProvider
-}
+  AuthenticationProvider,
+};

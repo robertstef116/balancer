@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {useDispatch} from "react-redux";
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 const useWidgetUtils = () => {
   const [error, setError] = useState(null);
@@ -8,21 +8,21 @@ const useWidgetUtils = () => {
 
   const emitError = (err) => {
     setError(err);
-  }
+  };
 
   const dismissError = () => {
     setError(null);
-  }
+  };
 
-  const actionWrapper = ({action, params=[], cb}) => {
+  const actionWrapper = ({ action, params = [], cb }) => {
     dispatch(action(...params, (err) => {
       setIsLoading(false);
       if (err) {
         return setError(err);
       }
-      cb && cb();
-    }))
-  }
+      return cb && cb();
+    }));
+  };
 
   return {
     emitError,
@@ -31,9 +31,9 @@ const useWidgetUtils = () => {
     widgetProps: {
       error,
       isLoading,
-      dismissError
-    }
-  }
+      dismissError,
+    },
+  };
 };
 
 export default useWidgetUtils;
