@@ -77,6 +77,10 @@ $form-label-font-weight: bold;
   height: 400px;
 }
 
+.wh-2 {
+  height: 800px;
+}
+
 .icon-button {
   cursor: pointer;
   -webkit-text-stroke: 1px;
@@ -102,6 +106,31 @@ $form-label-font-weight: bold;
 
 .widget-header .dropdown button {
   padding: 0 10px;
+}
+
+.accordion-list .accordion-button {
+  box-shadow: none;
+  background-color: $light;
+  color: $dark;
+  padding: .25rem;
+  border-radius: $border-radius;
+  height: 32px;
+}
+
+.accordion-list .simple-list-item {
+  cursor: pointer;
+  border-radius: $border-radius;
+  height: 32px;
+}
+
+.accordion-list .accordion-button:hover,
+.accordion-list .simple-list-item:hover {
+  background-color: rgba($primary, .3);
+}
+
+.accordion-list .active-item {
+  font-weight: bold;
+  color: $primary;
 }
 
 //.default-widget {

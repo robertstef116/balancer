@@ -43,7 +43,9 @@ function RangeSelector({ onRangeChange }) {
 }
 
 // https://recharts.org/en-US/api/Line
-function UsageChart({ classname }) {
+function UsageChart({
+  classname, workerId, workflowId, deploymentId,
+}) {
   const { apiWrapper, widgetProps } = useWidgetUtils();
   const chartWrapperRef = useRef(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -63,7 +65,7 @@ function UsageChart({ classname }) {
     const nowTime = Math.round(Date.now() / 1000);
     apiWrapper({
       action: getAnalyticsData,
-      params: [Math.round(nowTime - range.value) - 1],
+      params: [Math.round(nowTime - range.value) - 1, workerId, workflowId, deploymentId],
       cb: (res) => {
         setNow(nowTime);
         setData(res);
@@ -91,12 +93,11 @@ function UsageChart({ classname }) {
 
   useEffect(() => {
     updateSize();
-    fetchData();
   }, [chartWrapperRef.current]);
 
   useEffect(() => {
     fetchData();
-  }, [range]);
+  }, [range, workerId, workflowId, deploymentId]);
 
   useEffect(() => {
     const listener = window.addEventListener('resize', updateSize);

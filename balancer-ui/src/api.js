@@ -24,6 +24,14 @@ export const getWorkflows = async () => {
   throw new Error('Get workflows failed!');
 };
 
+export const getDeployments = async () => {
+  const res = await axios.get(`${API_URL}/deployment`);
+  if (res.status === 200) {
+    return res.data;
+  }
+  throw new Error('Get deployments failed!');
+};
+
 export const getConfigs = async () => {
   const res = await axios.get(`${API_URL}/config`);
   if (res.status === 200) {
@@ -39,8 +47,20 @@ export const saveConfigs = async ({ configs }) => {
   }
 };
 
-export const getAnalyticsData = async ({ from }) => {
-  const res = await axios.get(`${API_URL}/analytics?from=${from}`);
+export const getAnalyticsData = async ({
+  from, workerId, workflowId, deploymentId,
+}) => {
+  let qs = '';
+  if (workerId) {
+    qs += `&workerId=${workerId}`;
+  }
+  if (workflowId) {
+    qs += `&workflowId=${workflowId}`;
+  }
+  if (deploymentId) {
+    qs += `&deploymentId=${deploymentId}`;
+  }
+  const res = await axios.get(`${API_URL}/analytics?from=${from}${qs}`);
   if (res.status === 200) {
     return res.data;
   }

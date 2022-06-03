@@ -7,6 +7,7 @@ const INITIAL_STATE = {
 
   workers: null,
   workflows: null,
+  deployments: null,
   configs: null,
 };
 
@@ -26,6 +27,7 @@ export default (state = INITIAL_STATE, { type, payload }) => {
           return {
             id: workflow.id,
             image: workflow.image,
+            workerId: workflow.workerId,
             memoryLimit: workflow.memoryLimit,
             minDeployments: workflow.minDeployments,
             maxDeployments: workflow.maxDeployments,
@@ -40,10 +42,22 @@ export default (state = INITIAL_STATE, { type, payload }) => {
         ...state,
         workers: workers.map((worker) => ({
           id: worker.id,
-          inUse: worker.inUse ? 'bi-play-circle text-success' : 'bi-stop-circle text-danger',
+          inUse: worker.inUse,
+          inUseIcon: worker.inUse ? 'bi-play-circle text-success' : 'bi-stop-circle text-danger',
           alias: worker.alias,
           host: worker.host,
           port: worker.port,
+        })),
+      };
+    case types.GET_DEPLOYMENTS:
+      const { deployments } = payload;
+      return {
+        ...state,
+        deployments: deployments.map((deployment) => ({
+          id: deployment.id,
+          workerId: deployment.workerId,
+          workflowId: deployment.workflowId,
+          containerId: deployment.containerId,
         })),
       };
     case types.SAVE_CONFIGS:

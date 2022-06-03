@@ -10,11 +10,11 @@ fun Route.analytics(path: String, analyticsService: AnalyticsService) {
     route(path) {
         get {
             val from = call.request.queryParameters["from"]
-            if (from != null) {
-                call.respond(analyticsService.getAnalytics(from.toLong()))
-            } else {
-                call.respond(emptyList<AnalyticsEntry>())
-            }
+            val workerId = call.request.queryParameters["workerId"]
+            val workflowId = call.request.queryParameters["workflowId"]
+            val deploymentId = call.request.queryParameters["deploymentId"]
+
+            call.respond(analyticsService.getAnalytics(from, workerId, workflowId, deploymentId))
         }
     }
 }

@@ -52,35 +52,76 @@ export const loadCredentials = (cb) => (dispatch) => {
   cb();
 };
 
+const _getWorkers = async (token, dispatch) => {
+  const workers = await api.getWorkers(token);
+  dispatch({
+    type: types.GET_WORKERS,
+    payload: {
+      workers,
+    },
+  });
+};
+
 export const getWorkers = (cb) => async (dispatch, getState) => {
   const { token } = getState();
   try {
-    const workers = await api.getWorkers(token);
-    dispatch({
-      type: types.GET_WORKERS,
-      payload: {
-        workers,
-      },
-    });
+    await _getWorkers(token, dispatch);
     cb();
   } catch (e) {
     cb(errors.GET_WORKERS_ERROR);
   }
 };
 
+const _getWorkflows = async (token, dispatch) => {
+  const workflows = await api.getWorkflows(token);
+  dispatch({
+    type: types.GET_WORKFLOWS,
+    payload: {
+      workflows,
+    },
+  });
+};
+
 export const getWorkflows = (cb) => async (dispatch, getState) => {
   const { token } = getState();
   try {
-    const workflows = await api.getWorkflows(token);
-    dispatch({
-      type: types.GET_WORKFLOWS,
-      payload: {
-        workflows,
-      },
-    });
+    await _getWorkflows(token, dispatch);
     cb();
   } catch (e) {
     cb(errors.GET_WORKFLOWS_ERROR);
+  }
+};
+
+const _getDeployments = async (token, dispatch) => {
+  const deployments = await api.getDeployments(token);
+  dispatch({
+    type: types.GET_DEPLOYMENTS,
+    payload: {
+      deployments,
+    },
+  });
+};
+
+export const getResources = (flush, cb) => async (dispatch, getState) => {
+  const {
+    token, workers, workflows, deployments,
+  } = getState();
+
+  try {
+    const promises = [];
+    if (workers === null || flush) {
+      promises.push(_getWorkers(token, dispatch));
+    }
+    if (workflows === null || flush) {
+      promises.push(_getWorkflows(token, dispatch));
+    }
+    if (deployments === null || flush) {
+      promises.push(_getDeployments(token, dispatch));
+    }
+    await Promise.all(promises);
+    cb();
+  } catch (e) {
+    cb(errors.GET_RESOURCES);
   }
 };
 
@@ -116,9 +157,12 @@ export const saveConfigs = (configs, cb) => async (dispatch, getState) => {
   }
 };
 
-export const getAnalyticsData = async (from, cb) => {
+export const getAnalyticsData = async (from, workerId, workflowId, deploymentId, cb) => {
   try {
-    const res = await api.getAnalyticsData({ from });
+    const res = await api.getAnalyticsData({
+      from, workerId, workflowId, deploymentId,
+    });
+
     cb(null, res);
   } catch (e) {
     cb(errors.SAVE_CONFIGS_ERROR);

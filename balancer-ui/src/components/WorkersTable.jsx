@@ -21,7 +21,7 @@ function WorkersTable({ className }) {
       {...widgetProps}
       cols={[
         {
-          header: '', key: 'inUse', type: 'Icon', width: '20px',
+          header: '', key: 'inUseIcon', type: 'Icon', width: '20px',
         },
         { header: 'Alias', key: 'alias' },
         { header: 'Host', key: 'host' },

@@ -3,10 +3,7 @@ package com.robert.plugins
 import com.robert.exceptions.*
 import com.robert.exceptions.NotFoundException
 import com.robert.routes.*
-import com.robert.services.AnalyticsService
-import com.robert.services.ConfigService
-import com.robert.services.WorkerService
-import com.robert.services.WorkflowService
+import com.robert.services.*
 import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -17,6 +14,7 @@ import io.ktor.response.*
 fun Application.configureRouting() {
     val workerService = WorkerService()
     val workflowService = WorkflowService()
+    val deploymentService = DeploymentService()
     val configService = ConfigService()
     val analyticsService = AnalyticsService()
 
@@ -28,6 +26,7 @@ fun Application.configureRouting() {
         config("/config", configService)
         worker("/worker", workerService)
         workflow("/workflow", workflowService)
+        deployment("/deployment", deploymentService)
         analytics("/analytics", analyticsService)
 //        }
 
