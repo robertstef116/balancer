@@ -173,6 +173,18 @@ export const getAnalyticsData = async (from, workerId, workflowId, deploymentId,
 
     cb(null, res);
   } catch (e) {
-    cb(errors.SAVE_CONFIGS_ERROR);
+    cb(errors.GET_ANALYTICS_ERROR);
+  }
+};
+
+export const getWorkflowAnalyticsData = async (from, workerId, workflowId, cb) => {
+  try {
+    const res = await api.getWorkflowAnalyticsData({
+      from, workerId, workflowId,
+    });
+
+    cb(null, res);
+  } catch (e) {
+    cb(errors.GET_WORKFLOW_ANALYTICS_ERROR);
   }
 };

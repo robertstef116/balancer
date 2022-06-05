@@ -30,7 +30,9 @@ function PageWrapper({
         )}
       </div>
       <div className="mx-0 mx-md-1 mx-xl-3 mx-xxl-5">
-        {children}
+        <div className="container-fluid">
+          {children}
+        </div>
       </div>
     </>
   );

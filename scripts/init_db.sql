@@ -77,9 +77,18 @@ CREATE TABLE IF NOT EXISTS config
 
 CREATE TABLE IF NOT EXISTS analytics
 (
+    worker_id     varchar(36) NOT NULL,
     workflow_id   varchar(36) NOT NULL,
     deployment_id varchar(36) NOT NULL,
+    timestamp     numeric     NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS workflow_analytics
+(
     worker_id     varchar(36) NOT NULL,
+    workflow_id   varchar(36) NOT NULL,
+    deployment_id varchar(36) NOT NULL,
+    event         varchar(6)  NOT NULL,
     timestamp     numeric     NOT NULL
 );
 

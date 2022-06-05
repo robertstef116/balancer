@@ -2,6 +2,9 @@ package com.robert.persistance
 
 import com.robert.AnalyticsEntry
 import com.robert.DBConnector
+import com.robert.ImageScalingData
+import com.robert.WorkflowAnalyticsData
+import com.robert.exceptions.WorkflowAnalyticsEvent
 import java.time.Instant
 
 class AnalyticsStorage {
@@ -38,36 +41,120 @@ class AnalyticsStorage {
                 GROUP BY CTS.Series
                 ORDER BY CTS.Series
             """.trimIndent()
-        )
-            .use { st ->
-                st.setLong(1, from)
-                var parameterIdx = 2
+        ).use { st ->
+            st.setLong(1, from)
+            var parameterIdx = 2
 
-                if (workerId != null) {
-                    st.setString(parameterIdx++, workerId)
+            if (workerId != null) {
+                st.setString(parameterIdx++, workerId)
+            }
+
+            if (workflowId != null) {
+                st.setString(parameterIdx++, workflowId)
+            }
+
+            if (deploymentId != null) {
+                st.setString(parameterIdx, deploymentId)
+            }
+
+            st.executeQuery()
+                .use { rs ->
+                    while (rs.next()) {
+                        analytics.add(
+                            AnalyticsEntry(
+                                rs.getLong("value"),
+                                rs.getLong("time")
+                            )
+                        )
+                    }
+                }
+        }
+
+        return analytics
+    }
+
+    fun getWorkflowAnalytics(
+        from: Long,
+        workerId: String?,
+        workflowId: String?
+    ): Pair<MutableMap<String, ImageScalingData>, List<WorkflowAnalyticsData>> {
+        val analytics = ArrayList<WorkflowAnalyticsData>()
+        val workflowMapping = mutableMapOf<String, ImageScalingData>()
+
+        val qs = StringBuilder()
+
+        if (workerId != null) {
+            qs.append("AND worker_id = ?")
+        }
+
+        if (workflowId != null) {
+            qs.append("AND workflow_id = ?")
+        }
+
+        DBConnector.getTransactionConnection().use { conn ->
+            try {
+                conn.prepareStatement(
+                    """
+                        SELECT d.workflow_id, w.image, count('*') as no_of_deployments
+                        FROM deployments d INNER JOIN workflows w on w.id = d.workflow_id ${if (workerId != null) "WHERE worker_id = ?" else ""} 
+                        GROUP BY d.workflow_id, w.image
+                    """.trimIndent()
+                ).use { st ->
+                    if (workerId != null) {
+                        st.setString(1, workerId)
+                    }
+
+                    st.executeQuery().use { rs ->
+                        while (rs.next()) {
+                            workflowMapping[rs.getString("workflow_id")] = ImageScalingData(
+                                rs.getString("image"), rs.getInt("no_of_deployments")
+                            )
+                        }
+                    }
                 }
 
-                if (workflowId != null) {
-                    st.setString(parameterIdx++, workflowId)
-                }
+                conn.prepareStatement(
+                    """
+                        SELECT wa.workflow_id, w.image, wa.event, wa.timestamp 
+                        FROM workflow_analytics wa INNER JOIN workflows w on w.id = wa.workflow_id
+                        WHERE timestamp > ? $qs
+                        ORDER BY wa.timestamp ASC
+                    """.trimIndent()
+                ).use { st ->
+                    st.setLong(1, from)
 
-                if (deploymentId != null) {
-                    st.setString(parameterIdx, deploymentId)
-                }
+                    var parameterIdx = 2
 
-                st.executeQuery()
-                    .use { rs ->
+                    if (workerId != null) {
+                        st.setString(parameterIdx++, workerId)
+                    }
+
+                    if (workflowId != null) {
+                        st.setString(parameterIdx, workflowId)
+                    }
+
+                    st.executeQuery().use { rs ->
                         while (rs.next()) {
                             analytics.add(
-                                AnalyticsEntry(
-                                    rs.getLong("value"),
-                                    rs.getLong("time")
+                                WorkflowAnalyticsData(
+                                    rs.getString("workflow_id"),
+                                    rs.getString("image"),
+                                    WorkflowAnalyticsEvent.valueOf(rs.getString("event")),
+                                    rs.getLong("timestamp")
                                 )
                             )
                         }
                     }
-            }
+                }
 
-        return analytics
+                conn.commit()
+
+                return Pair(workflowMapping, analytics)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                conn.rollback()
+                return Pair(mutableMapOf(), emptyList())
+            }
+        }
     }
 }

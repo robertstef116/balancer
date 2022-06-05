@@ -4,3 +4,5 @@ export const GET_WORKFLOWS_ERROR = 'Unable to fetch workflows';
 export const GET_CONFIGS_ERROR = 'Unable to fetch configs';
 export const GET_RESOURCES = 'Unable to fetch resources';
 export const SAVE_CONFIGS_ERROR = 'Unable to save the configs';
+export const GET_ANALYTICS_ERROR = 'Unable to fetch the analytics data';
+export const GET_WORKFLOW_ANALYTICS_ERROR = 'Unable to fetch the workflow analytics data';

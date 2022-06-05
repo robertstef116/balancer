@@ -1,8 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { LineChart } from 'recharts';
+import {
+  CartesianGrid, LineChart, Tooltip, XAxis, YAxis,
+} from 'recharts';
 import WidgetWrapper from './WidgetWrapper';
 import { defaultRange, ranges } from '../constants';
+
+const tickStyle = { fill: '#6264A7', fontWeight: 'bold' };
 
 function RangeSelector({ onRangeChange }) {
   const [range, setRange] = useState(defaultRange);
@@ -26,9 +30,11 @@ function RangeSelector({ onRangeChange }) {
 }
 
 function LineChartWrapper({
-  children, title, classname, onRefresh, onRangeChanged, data, error, isLoading, dismissError,
+  children, title, className, now, onRefresh, onRangeChanged, data, error, isLoading, dismissError,
 }) {
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const [xAxisLimits, setXAxisLimits] = useState({ min: 0, max: 0 });
+  const [range, setRange] = useState(defaultRange);
   const chartWrapperRef = useRef(null);
 
   const updateSize = () => {
@@ -37,6 +43,28 @@ function LineChartWrapper({
       height: chartWrapperRef.current.clientHeight,
     });
   };
+
+  const xAxisTickFormatter = (val) => {
+    switch (range.unit) {
+      case 'm':
+        return Math.round((now - val) / 60);
+      case 'h':
+        return Math.round((now - val) / (60 * 60));
+      case 'd':
+        return Math.round((now - val) / (24 * 60 * 60));
+      case 'w':
+        return Math.round((now - val) / (7 * 24 * 60 * 60));
+      default:
+        return val;
+    }
+  };
+
+  const internalOnRangeChange = (rangeConfig) => {
+    setRange(rangeConfig);
+    onRangeChanged(rangeConfig);
+  };
+
+  const tooltipLabelFormatter = (val) => new Date(val * 1000).toLocaleString();
 
   useEffect(() => {
     window.addEventListener('resize', updateSize);
@@ -47,14 +75,18 @@ function LineChartWrapper({
 
   useEffect(() => {
     updateSize();
-  }, [chartWrapperRef]);
+  }, [chartWrapperRef.current, error]);
+
+  useEffect(() => {
+    setXAxisLimits({ min: now - range.value, max: now });
+  }, [now, range]);
 
   return (
     <WidgetWrapper
-      className={classname}
+      className={className}
       title={title}
       onRefresh={onRefresh}
-      customAction={<RangeSelector onRangeChange={(rangeConfig) => onRangeChanged(rangeConfig)} />}
+      customAction={onRangeChanged && <RangeSelector onRangeChange={(rangeConfig) => internalOnRangeChange(rangeConfig)} />}
       error={error}
       isLoading={isLoading}
       dismissError={dismissError}
@@ -69,6 +101,19 @@ function LineChartWrapper({
             }}
             data={data}
           >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              type="number"
+              dataKey="timestamp"
+              interval="preserveStartEnd"
+              domain={[xAxisLimits.min, xAxisLimits.max]}
+              tickFormatter={xAxisTickFormatter}
+              unit={range.unit}
+              tickCount={6}
+              tick={tickStyle}
+            />
+            <Tooltip labelFormatter={tooltipLabelFormatter} />
+            <YAxis domain={[0, 'dataMax + 1']} tick={tickStyle} />
             {children}
           </LineChart>
         </div>

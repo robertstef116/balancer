@@ -60,9 +60,30 @@ export const getAnalyticsData = async ({
   if (deploymentId) {
     qs += `&deploymentId=${deploymentId}`;
   }
-  const res = await axios.get(`${API_URL}/analytics?from=${from}${qs}`);
+
+  const res = await axios.get(`${API_URL}/analytics/requests?from=${from}${qs}`);
   if (res.status === 200) {
     return res.data;
   }
-  throw new Error('Failed to load configs!');
+
+  throw new Error('Failed to analytics data!');
+};
+
+export const getWorkflowAnalyticsData = async ({
+  from, workerId, workflowId,
+}) => {
+  let qs = '';
+  if (workerId) {
+    qs += `&workerId=${workerId}`;
+  }
+  if (workflowId) {
+    qs += `&workflowId=${workflowId}`;
+  }
+
+  const res = await axios.get(`${API_URL}/analytics/scaling?from=${from}${qs}`);
+  if (res.status === 200) {
+    return res.data;
+  }
+
+  throw new Error('Failed to load workflow analytics data!');
 };
