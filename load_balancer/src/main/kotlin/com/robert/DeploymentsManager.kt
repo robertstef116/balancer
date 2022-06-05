@@ -2,6 +2,7 @@ package com.robert
 
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import java.time.Instant
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.properties.Delegates
@@ -12,6 +13,8 @@ private data class WorkersResources(
     val totalAvailableCpu: Double, val totalAvailableMemory: Double, val workersResources: List<WorkerResource>
 )
 
+class WaitResourceInfoUpdate : RuntimeException()
+
 class DeploymentsManager(private val resourcesManager: ResourcesManager, private val service: Service) :
     UpdateAwareManager(Constants.WORKFLOW_SERVICE_KEY), BackgroundService {
 
@@ -21,6 +24,7 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
     }
 
     private val weightsLock = ReentrantLock()
+    private var lastDeploymentsChange = Instant.now().epochSecond
 
     private var cpuWeight by Delegates.notNull<Float>()
     private var memoryWeight by Delegates.notNull<Float>()
@@ -54,7 +58,15 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
             while (true) {
                 log.debug("processing deployments")
                 try {
-                    val deploymentsPerformancePerWorker = resourcesManager.healthChecks
+                    val healthChecks = resourcesManager.healthChecks
+
+                    for(healthCheck in healthChecks) {
+                        if (healthCheck.lastCheckTimestamp < lastDeploymentsChange) {
+                            throw WaitResourceInfoUpdate()
+                        }
+                    }
+
+                    val deploymentsPerformancePerWorker = healthChecks
                         .associate { it.worker to it.deploymentsPerformance }
 
                     val deploymentsPerformanceList = deploymentsPerformancePerWorker.values.flatten()
@@ -66,6 +78,10 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
                                 it.id == deploymentPerformance.deploymentId
                             }
                             if (deployment == null) {
+                                log.debug(
+                                    "remove registered containers which are not part of a registered deployment, deploymentId={}",
+                                    deploymentPerformance.deploymentId
+                                )
                                 service.removeDeployment(
                                     worker,
                                     deploymentPerformance.deploymentId,
@@ -81,38 +97,42 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
                         val workflowDeployments = deployments.filter { it.workflowId == workflow.id }
                         var currentNumberOfDeployments = workflowDeployments.size
 
-                        // undeploy additional containers
+                        // remove additional containers
                         if (currentNumberOfDeployments > (workflow.maxDeployments ?: Int.MAX_VALUE)) {
+                            log.debug("remove additional deployments, workflowId={}", workflow.id)
                             val deployment = undeployWorkflow(workflowDeployments)
                             if (deployment != null) {
                                 removedDeployments.add(deployment)
+                                currentNumberOfDeployments--
                             }
                         }
 
-                        // redeploy containers which are not running
-                        for (deployment in deployments) {
+                        // remove containers which are not running
+                        for (deployment in workflowDeployments) {
                             val deploymentPerformance = deploymentsPerformanceList.find {
                                 it.containerId == deployment.containerId
                             }
 
                             if (deploymentPerformance == null) {
-
                                 val worker = resourcesManager.workers.find { it.id == deployment.workerId }!!
+                                log.debug("remove unhealthy deployment {}", deployment.id)
                                 service.removeDeployment(worker, deployment.id, deployment.containerId)
                                 removedDeployments.add(deployment)
-                                val newDeployment = deployWorkflow(workflow)
-                                if (newDeployment != null) { // if successfully deployed
-                                    addedDeployments.add(newDeployment)
-                                } else {
-                                    currentNumberOfDeployments--
-                                }
+//                                val newDeployment = deployWorkflow(workflow)
+//                                if (newDeployment != null) { // if successfully deployed
+//                                    addedDeployments.add(newDeployment)
+//                                } else {
+                                currentNumberOfDeployments--
+//                                }
                             }
                         }
 
                         // deploy containers up to the lower limit
                         if (currentNumberOfDeployments < (workflow.minDeployments ?: 1)) {
+                            log.debug("less deployments than expected, {} < {}", currentNumberOfDeployments, workflow.minDeployments ?: 1)
                             val deployment = deployWorkflow(workflow)
                             if (deployment != null) { // if successfully deployed
+                                log.debug("add deployments up to the lower limit, deploymentId={}", deployment.id)
                                 addedDeployments.add(deployment)
                             }
                         }
@@ -122,12 +142,17 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
 
                     // TO DO: apply changes instead of reload
                     if (removedDeployments.size > 0 || addedDeployments.size > 0) {
+                        log.debug("deployments changed, reload resources")
                         resourcesManager.pathsMappingChanged()
+                        lastDeploymentsChange = Instant.now().epochSecond
                     }
+                } catch (e: WaitResourceInfoUpdate) {
+                    log.debug("skip check, no resource info date received since the last update")
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
 
+                log.debug("processing deployments done, next check in {} ms", deploymentsCheckInterval)
                 delay(deploymentsCheckInterval)
             }
         }
@@ -162,6 +187,7 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
         val randIdx = kotlin.random.Random.nextInt(workflowDeployments.size)
         val deployment = workflowDeployments[randIdx]
         val worker = resourcesManager.workers.find { it.id == deployment.workerId }!!
+        log.debug("remove additional deployments, deploymentId={}", deployment.id)
         if (service.removeDeployment(worker, deployment.id, deployment.containerId)) {
             return deployment
         }

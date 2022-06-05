@@ -97,14 +97,16 @@ function ConfigurationPage() {
 
   return (
     <PageWrapper onRefresh={onRefresh} {...widgetProps}>
-      <ConfigWidget className="col-6 wh-1" title="Balancing configs" configs={balancingConfigs} isLoading={widgetProps.isLoading} />
-      <ConfigWidget
-        className="col-6 wh-1"
-        title="Algorithms configs"
-        configs={algorithmConfigs}
-        isLoading={widgetProps.isLoading}
-        validators={[cpuMemWeightValidator]}
-      />
+      <div className="row">
+        <ConfigWidget className="col-6 wh-1" title="Balancing configs" configs={balancingConfigs} isLoading={widgetProps.isLoading} />
+        <ConfigWidget
+          className="col-6 wh-1"
+          title="Algorithms configs"
+          configs={algorithmConfigs}
+          isLoading={widgetProps.isLoading}
+          validators={[cpuMemWeightValidator]}
+        />
+      </div>
     </PageWrapper>
   );
 }

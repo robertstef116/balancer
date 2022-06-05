@@ -2,6 +2,7 @@ package com.robert
 
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import java.time.Instant
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -38,6 +39,8 @@ class HealthChecker(
     private val latestAvailableMemories = ConcurrentLinkedQueue<Long>()
 
     val initialized = AtomicBoolean(false)
+    var lastCheckTimestamp = 0L
+        private set
 
     var deploymentsPerformance: List<DeploymentPerformance> = listOf()
         get() = resourcesLock.read { field }
@@ -61,6 +64,7 @@ class HealthChecker(
             while (true) {
                 try {
                     log.debug("Health check {}:{}", worker.host, worker.port)
+                    val timestamp = Instant.now().epochSecond
                     val res = HttpClient.get<WorkerResourceResponse>(url, checkTimeout)
                     addMetric(latestAvailableCpus, 100 - res.resourcesInfo.cpuLoad, numberOfRelevantPerformanceMetrics)
                     addMetric(latestAvailableMemories, res.resourcesInfo.availableMemory, numberOfRelevantPerformanceMetrics)
@@ -89,20 +93,21 @@ class HealthChecker(
                         }
 
                         // update deploymentPerformance data
-                            addMetric(
-                                deploymentPerformance.latestAvailableCpus,
-                                100 - containerStats.cpuLoad,
-                                numberOfRelevantPerformanceMetrics
-                            )
-                            addMetric(
-                                deploymentPerformance.latestAvailableMemories,
-                                containerStats.availableMemory,
-                                numberOfRelevantPerformanceMetrics
-                            )
+                        addMetric(
+                            deploymentPerformance.latestAvailableCpus,
+                            100 - containerStats.cpuLoad,
+                            numberOfRelevantPerformanceMetrics
+                        )
+                        addMetric(
+                            deploymentPerformance.latestAvailableMemories,
+                            containerStats.availableMemory,
+                            numberOfRelevantPerformanceMetrics
+                        )
                     }
 
                     deploymentsPerformance = deploymentsPerformance + deploymentsPerformanceToAdd
                     nrOfFailures = 0
+                    lastCheckTimestamp = Instant.now().epochSecond
                     if (initialized.compareAndSet(false, true)) {
                         onInitialize()
                     }
@@ -116,6 +121,7 @@ class HealthChecker(
                         onFailure(currentHealthChecker)
                     }
                 }
+                log.debug("Health check {}:{} done, next check in {} ms", worker.host, worker.port, checkInterval)
                 delay(checkInterval)
             }
         }

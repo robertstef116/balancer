@@ -24,6 +24,7 @@ class MasterChangesManager(private val service: Service, private val managers: L
         log.debug("master changes detector started")
         CoroutineScope(context).launch {
             while (true) {
+                log.debug("detect master changes")
                 val newChanges = service.getMasterChanges(MASTER_HOST, MASTER_PORT)
                 if (newChanges != null) {
                     val newHash = newChanges[Constants.HASH_KEY]!!
@@ -47,6 +48,7 @@ class MasterChangesManager(private val service: Service, private val managers: L
                 } else {
                     log.warn("skipping changes comparison, unable to fetch changes")
                 }
+                log.debug("detect master changes done, next check in {} ms", masterChangesCheckInterval)
                 delay(masterChangesCheckInterval)
             }
         }

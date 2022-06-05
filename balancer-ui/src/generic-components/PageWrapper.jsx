@@ -29,7 +29,7 @@ function PageWrapper({
           </div>
         )}
       </div>
-      <div className="row mx-0 mx-md-1 mx-xl-3 mx-xxl-5">
+      <div className="mx-0 mx-md-1 mx-xl-3 mx-xxl-5">
         {children}
       </div>
     </>

@@ -58,6 +58,7 @@ export default (state = INITIAL_STATE, { type, payload }) => {
           workerId: deployment.workerId,
           workflowId: deployment.workflowId,
           containerId: deployment.containerId,
+          timestamp: deployment.timestamp,
         })),
       };
     case types.SAVE_CONFIGS:

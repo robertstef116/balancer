@@ -47,12 +47,13 @@ class Service(private val storage: Storage) {
 
     fun removeDeployment(worker: WorkerNode, id: String, containerId: String): Boolean {
         return runBlocking {
+            var response = false
             val url = "http://${worker.host}:${worker.port}/docker/$containerId"
             try {
                 val res = HttpClient.delete<String>(url)
                 if (res == "OK") {
-                    storage.deleteDeployment(containerId)
-                    return@runBlocking true
+                    storage.deleteDeployment(id)
+                    response = true
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -64,7 +65,7 @@ class Service(private val storage: Storage) {
                 e.printStackTrace()
                 log.error("error removing deployment from db {}", e.message)
             }
-            return@runBlocking false
+            return@runBlocking response
         }
     }
 

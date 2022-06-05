@@ -1,6 +1,8 @@
 package com.robert
 
+import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ServerException
+import com.robert.exceptions.WorkflowAnalyticsEvent
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
@@ -251,6 +253,15 @@ class Storage {
                             StorageUtils.executeInsert(st)
                         }
                 }
+                conn.prepareStatement("INSERT INTO workflow_analytics(worker_id, workflow_id, deployment_id, event, timestamp) VALUES (?, ?, ?, ?, ?)")
+                    .use { st ->
+                        st.setString(1, workerId)
+                        st.setString(2, workflowId)
+                        st.setString(3, deploymentId)
+                        st.setString(4, WorkflowAnalyticsEvent.ADD.value)
+                        st.setLong(5, timestamp)
+                        StorageUtils.executeInsert(st)
+                    }
                 conn.commit()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -263,11 +274,49 @@ class Storage {
     }
 
     fun deleteDeployment(id: String) {
-        DBConnector.getConnection().prepareStatement("DELETE FROM deployments WHERE id = ?")
-            .use { st ->
-                st.setString(1, id)
-                StorageUtils.executeUpdate(st)
+        DBConnector.getTransactionConnection().use { conn ->
+            val timestamp = Instant.now().epochSecond
+            log.debug("delete deployment with id {}", id)
+            try {
+                val workerId: String
+                val workflowId: String
+                conn.prepareStatement("SELECT worker_id, workflow_id FROM deployments WHERE id = ?")
+                    .use { st ->
+                        st.setString(1, id)
+                        st.executeQuery().use { rs ->
+                            if (rs.next()) {
+                                workerId = rs.getString("worker_id")
+                                workflowId = rs.getString("workflow_id")
+                            } else {
+                                throw NotFoundException()
+                            }
+                        }
+                    }
+
+                conn.prepareStatement("DELETE FROM deployments WHERE id = ?")
+                    .use { st ->
+                        st.setString(1, id)
+                        StorageUtils.executeUpdate(st)
+                    }
+
+                conn.prepareStatement("INSERT INTO workflow_analytics(worker_id, workflow_id, deployment_id, event, timestamp) VALUES (?, ?, ?, ?, ?)")
+                    .use { st ->
+                        st.setString(1, workerId)
+                        st.setString(2, workflowId)
+                        st.setString(3, id)
+                        st.setString(4, WorkflowAnalyticsEvent.REMOVE.value)
+                        st.setLong(5, timestamp)
+                        StorageUtils.executeInsert(st)
+                    }
+                conn.commit()
+            } catch (e: NotFoundException) {
+                throw e
+            } catch (e: Exception) {
+                e.printStackTrace()
+                conn.rollback()
+                throw ServerException()
             }
+        }
     }
 
     fun getConfigs(): Map<String, String> {
