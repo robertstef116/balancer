@@ -30,7 +30,7 @@ function RangeSelector({ onRangeChange }) {
   };
 
   return (
-    <Dropdown>
+    <Dropdown className="ps-1">
       <Dropdown.Toggle>
         {range.text}
       </Dropdown.Toggle>
@@ -107,7 +107,13 @@ function UsageChart({
   }, []);
 
   return (
-    <WidgetWrapper className={classname} title="System usage" customAction={<RangeSelector onRangeChange={(rangeConfig) => setRange(rangeConfig)} />} {...widgetProps}>
+    <WidgetWrapper
+      className={classname}
+      title="System usage"
+      onRefresh={fetchData}
+      customAction={<RangeSelector onRangeChange={(rangeConfig) => setRange(rangeConfig)} />}
+      {...widgetProps}
+    >
       <div className="pt-3 pe-3 w-100 h-100">
         <div className="w-100 h-100" ref={chartWrapperRef}>
           <LineChart

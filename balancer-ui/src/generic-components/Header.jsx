@@ -22,7 +22,7 @@ function Header({ menus, activeMenuPath }) {
   return (
     <Navbar collapseOnSelect expand="sm" bg="dark" variant="dark">
       <Container fluid>
-        <Navbar.Brand className="logo"><img src={`${window.location.origin}/balancer-logo.png`} alt="BL" /></Navbar.Brand>
+        <Navbar.Brand className="logo"><img key="logo" src={`${window.location.origin}/balancer-logo.png`} alt="BL" /></Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto" activeKey={activeMenuPath}>

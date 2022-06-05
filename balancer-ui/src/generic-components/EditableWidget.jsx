@@ -13,7 +13,7 @@ function EditableWidget({
       dismissError={dismissError}
       actions={[
         {
-          title: 'Save', icon: 'bi-check', onClick: onSave, hide: !changed,
+          title: 'Save', icon: 'bi-check-lg', onClick: onSave, hide: !changed,
         },
       ]}
     >

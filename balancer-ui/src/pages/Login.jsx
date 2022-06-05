@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_NAME } from '../constants';
 import * as actions from '../redux/actions';
-import Spinner from '../generic-components/Spinner';
+import Spinner from '../components/Spinner';
 
 function LoginPage() {
   const [error, setError] = useState(null);

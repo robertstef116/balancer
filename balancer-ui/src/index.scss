@@ -40,11 +40,28 @@ $form-label-font-weight: bold;
   border-width: medium !important;
 }
 
+.page-error {
+  border-bottom-right-radius: 15px;
+}
+
+.page-header {
+  height: 24px;
+}
+
+.page-action-wrapper {
+  border-bottom-left-radius: 15px;
+}
+
+.page-action,
 .widget-action {
-  font-size: 30px;
+  font-size: 20px;
   line-height: 0;
   color: $primary;
-  margin-right: -8px;
+}
+
+.page-action:hover {
+  color: $light;
+  text-shadow: 0 0 3px;
 }
 
 .widget-action:hover {

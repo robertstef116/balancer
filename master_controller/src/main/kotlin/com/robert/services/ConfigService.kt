@@ -14,9 +14,7 @@ class ConfigService : UpdateAwareService(Constants.CONFIG_SERVICE_KEY) {
     }
 
     fun setConfig(configs: Map<String, String>) {
-        for ((key, value) in configs.entries) {
-            configStorage.setConfig(key, value)
-        }
+        configStorage.setConfig(configs)
         markChange()
     }
 }

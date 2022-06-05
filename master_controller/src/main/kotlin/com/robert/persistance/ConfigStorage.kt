@@ -2,8 +2,13 @@ package com.robert.persistance
 
 import com.robert.DBConnector
 import com.robert.StorageUtils
+import org.slf4j.LoggerFactory
 
 class ConfigStorage {
+    companion object {
+        private val log = LoggerFactory.getLogger(ConfigStorage::class.java)
+    }
+
     fun getConfigs(): Map<String, String> {
         val query = "SELECT key, value FROM config"
         val configs = HashMap<String, String>()
@@ -21,12 +26,25 @@ class ConfigStorage {
         return configs
     }
 
-    fun setConfig(key: String, value: String) {
-        DBConnector.getConnection().prepareStatement("UPDATE config SET value = ? WHERE key = ?")
-            .use { st ->
-                st.setString(2, key)
-                st.setString(1, value)
-                StorageUtils.executeUpdate(st)
+    fun setConfig(configs: Map<String, String>) {
+        DBConnector.getTransactionConnection().use { conn ->
+            for ((key, value) in configs.entries) {
+                conn.prepareStatement("UPDATE config SET value = ? WHERE key = ?")
+                    .use { st ->
+                        st.setString(2, key)
+                        st.setString(1, value)
+                        try {
+                            StorageUtils.executeUpdate(st)
+                        } catch (e: Exception) {
+                            log.error(e.message)
+                            conn.rollback()
+                            throw e
+                        }
+                        log.debug("updated {} to {}", key, value)
+                    }
             }
+
+            conn.commit()
+        }
     }
 }

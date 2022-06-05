@@ -19,7 +19,7 @@ function ConfigWidget({
 
   useEffect(() => {
     setIsLoading(_isLoading);
-  }, [_isLoading, setIsLoading]);
+  }, [_isLoading]);
 
   useEffect(() => {
     if (!valuesChanged && savedConfigs) {

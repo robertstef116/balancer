@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import TableWidget from '../generic-components/TableWidget';
 import { getWorkflows } from '../redux/actions';
@@ -7,17 +7,19 @@ import useWidgetUtils from '../custom-hooks/useWidgetUtils';
 function WorkflowsTable({ className }) {
   const { widgetProps, actionWrapper } = useWidgetUtils();
   const workflows = useSelector((state) => state.workflows);
-  const workflowsRef = useRef(workflows);
+
+  const onRefresh = () => {
+    actionWrapper({ action: getWorkflows, params: [true] });
+  };
 
   useEffect(() => {
-    if (!workflowsRef.current) {
-      actionWrapper({ action: getWorkflows });
-    }
+    actionWrapper({ action: getWorkflows, params: [false] });
   }, []);
 
   return (
     <TableWidget
       className={className}
+      onRefresh={onRefresh}
       {...widgetProps}
       cols={[
         { header: 'Image', key: 'image', maxWidth: '200px' },

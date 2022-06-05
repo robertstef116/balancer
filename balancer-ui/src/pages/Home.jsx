@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import UsageChart from '../components/UsageChart';
 import ResourcesList from '../components/ResourcesList';
+import PageWrapper from '../generic-components/PageWrapper';
 
 function HomePage() {
   const [workerId, setWorkerId] = useState(null);
@@ -28,10 +29,10 @@ function HomePage() {
   };
 
   return (
-    <div className="row mx-0 mx-md-1 mx-xl-3 mx-xxl-5">
+    <PageWrapper>
       <ResourcesList classname="col-4 wh-2" onSelectionChanged={selectedResourcePathChanged} />
       <UsageChart classname="col-8 wh-1" workerId={workerId} workflowId={workflowId} deploymentId={deploymentId} />
-    </div>
+    </PageWrapper>
   );
 }
 

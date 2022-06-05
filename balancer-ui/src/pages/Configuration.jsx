@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
 import ConfigWidget from '../generic-components/ConfigWidget';
 import { getConfigs } from '../redux/actions';
+import PageWrapper from '../generic-components/PageWrapper';
+import useWidgetUtils from '../custom-hooks/useWidgetUtils';
 
 const positiveNumberValidator = (value) => {
   if (parseFloat(value) < 0) {
@@ -77,20 +78,11 @@ const algorithmConfigs = [
 ];
 
 function ConfigurationPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const configs = useSelector((state) => state.configs);
-  const dispatch = useDispatch();
-  const configsRef = useRef(configs);
+  const { widgetProps, actionWrapper } = useWidgetUtils();
 
-  useEffect(() => {
-    if (!configsRef.current) {
-      setIsLoading(true);
-      // eslint-disable-next-line no-unused-vars
-      dispatch(getConfigs((err) => {
-        setIsLoading(false);
-      }));
-    }
-  }, [dispatch]);
+  const onRefresh = () => {
+    actionWrapper({ action: getConfigs, params: [true] });
+  };
 
   const cpuMemWeightValidator = (values) => {
     if (parseFloat(values.CPU_WEIGHT) + parseFloat(values.MEMORY_WEIGHT) !== 1) {
@@ -99,17 +91,21 @@ function ConfigurationPage() {
     return null;
   };
 
+  useEffect(() => {
+    actionWrapper({ action: getConfigs, params: [false] });
+  }, []);
+
   return (
-    <div className="row mx-0 mx-md-1 mx-xl-3 mx-xxl-5">
-      <ConfigWidget className="col-6 wh-1" title="Balancing configs" configs={balancingConfigs} isLoading={isLoading} />
+    <PageWrapper onRefresh={onRefresh} {...widgetProps}>
+      <ConfigWidget className="col-6 wh-1" title="Balancing configs" configs={balancingConfigs} isLoading={widgetProps.isLoading} />
       <ConfigWidget
         className="col-6 wh-1"
         title="Algorithms configs"
         configs={algorithmConfigs}
-        isLoading={isLoading}
+        isLoading={widgetProps.isLoading}
         validators={[cpuMemWeightValidator]}
       />
-    </div>
+    </PageWrapper>
   );
 }
 export default ConfigurationPage;

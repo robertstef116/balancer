@@ -3,7 +3,7 @@ import { Table } from 'react-bootstrap';
 import WidgetWrapper from './WidgetWrapper';
 
 function TableWidget({
-  className, cols, rows, isLoading,
+  className, cols, rows, isLoading, onRefresh,
 }) {
   const onAddClick = () => {
   };
@@ -14,7 +14,7 @@ function TableWidget({
         return <td key={col.key} style={{ width: col.width }}><i className={data[col.key]} /></td>;
       case 'InfoIcon':
         return (
-          <td key={col.key} className="text-center" style={{ width: col.width }}>
+          <td key={col.key} style={{ width: col.width }}>
             <i className="bi bi-info-circle text-secondary" title={data[col.key]} />
           </td>
         );
@@ -31,8 +31,9 @@ function TableWidget({
       title="Workers List"
       isLoading={isLoading}
       className={className}
+      onRefresh={onRefresh}
       actions={[
-        { title: 'Add worker', icon: 'bi-plus', onClick: onAddClick },
+        { title: 'Add worker', icon: 'bi-plus-lg', onClick: onAddClick },
       ]}
     >
       <div className="scrollable-table overflow-auto w-100 h-100">

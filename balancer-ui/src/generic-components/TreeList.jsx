@@ -58,10 +58,17 @@ function List({
 }
 
 function TreeList({
-  classname, data, isLoading, error, dismissError, onSelectionChanged,
+  classname, data, isLoading, error, dismissError, onSelectionChanged, onRefresh,
 }) {
   return (
-    <WidgetWrapper className={classname} title="Resources" isLoading={isLoading} error={error} dismissError={dismissError}>
+    <WidgetWrapper
+      className={classname}
+      title="Resources"
+      isLoading={isLoading}
+      error={error}
+      dismissError={dismissError}
+      onRefresh={onRefresh}
+    >
       <div className="p-2">
         <List data={data} onSelectionChanged={onSelectionChanged} />
       </div>

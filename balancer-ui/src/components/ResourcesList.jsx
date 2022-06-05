@@ -23,6 +23,10 @@ function ResourcesList({ classname, onSelectionChanged }) {
     return converted;
   };
 
+  const onRefresh = () => {
+    actionWrapper({ action: getResources, params: [true] });
+  };
+
   useEffect(() => {
     actionWrapper({ action: getResources, params: [false] });
   }, []);
@@ -62,7 +66,7 @@ function ResourcesList({ classname, onSelectionChanged }) {
   }, [workers, workflows, deployments]);
 
   return (
-    <TreeList classname={classname} data={resourcesData} onSelectionChanged={onSelectionChanged} {...widgetProps} />
+    <TreeList classname={classname} data={resourcesData} onSelectionChanged={onSelectionChanged} onRefresh={onRefresh} {...widgetProps} />
   );
 }
 

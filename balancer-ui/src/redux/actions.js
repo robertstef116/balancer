@@ -62,10 +62,12 @@ const _getWorkers = async (token, dispatch) => {
   });
 };
 
-export const getWorkers = (cb) => async (dispatch, getState) => {
-  const { token } = getState();
+export const getWorkers = (reload, cb) => async (dispatch, getState) => {
+  const { workers, token } = getState();
   try {
-    await _getWorkers(token, dispatch);
+    if (workers === null || reload) {
+      await _getWorkers(token, dispatch);
+    }
     cb();
   } catch (e) {
     cb(errors.GET_WORKERS_ERROR);
@@ -82,10 +84,12 @@ const _getWorkflows = async (token, dispatch) => {
   });
 };
 
-export const getWorkflows = (cb) => async (dispatch, getState) => {
-  const { token } = getState();
+export const getWorkflows = (reload, cb) => async (dispatch, getState) => {
+  const { workflows, token } = getState();
   try {
-    await _getWorkflows(token, dispatch);
+    if (workflows === null || reload) {
+      await _getWorkflows(token, dispatch);
+    }
     cb();
   } catch (e) {
     cb(errors.GET_WORKFLOWS_ERROR);
@@ -102,20 +106,20 @@ const _getDeployments = async (token, dispatch) => {
   });
 };
 
-export const getResources = (flush, cb) => async (dispatch, getState) => {
+export const getResources = (reload, cb) => async (dispatch, getState) => {
   const {
     token, workers, workflows, deployments,
   } = getState();
 
   try {
     const promises = [];
-    if (workers === null || flush) {
+    if (workers === null || reload) {
       promises.push(_getWorkers(token, dispatch));
     }
-    if (workflows === null || flush) {
+    if (workflows === null || reload) {
       promises.push(_getWorkflows(token, dispatch));
     }
-    if (deployments === null || flush) {
+    if (deployments === null || reload) {
       promises.push(_getDeployments(token, dispatch));
     }
     await Promise.all(promises);
@@ -125,16 +129,19 @@ export const getResources = (flush, cb) => async (dispatch, getState) => {
   }
 };
 
-export const getConfigs = (cb) => async (dispatch, getState) => {
-  const { token } = getState();
+export const getConfigs = (reload, cb) => async (dispatch, getState) => {
+  const { configs, token } = getState();
   try {
-    const configs = await api.getConfigs(token);
-    dispatch({
-      type: types.GET_CONFIGS,
-      payload: {
-        configs,
-      },
-    });
+    if (configs === null || reload) {
+      const newConfigs = await api.getConfigs(token);
+
+      dispatch({
+        type: types.GET_CONFIGS,
+        payload: {
+          configs: newConfigs,
+        },
+      });
+    }
     cb();
   } catch (e) {
     cb(errors.GET_CONFIGS_ERROR);
@@ -145,6 +152,7 @@ export const saveConfigs = (configs, cb) => async (dispatch, getState) => {
   const { token } = getState();
   try {
     await api.saveConfigs({ token, configs });
+
     dispatch({
       type: types.SAVE_CONFIGS,
       payload: {
