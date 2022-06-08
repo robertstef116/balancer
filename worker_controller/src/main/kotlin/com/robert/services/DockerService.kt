@@ -1,5 +1,6 @@
 package com.robert.services
 
+import DockerContainerPorts
 import com.robert.*
 import com.robert.exceptions.NotFoundException
 import com.spotify.docker.client.DefaultDockerClient
@@ -43,7 +44,7 @@ class DockerService {
         memoryLimit: Long?,
         ports: List<Int>
     ): DockerCreateContainerResponse {
-        // TO DO: test image has tag, e.g. latest
+        // TODO: test image has tag, e.g. latest
 
         val portBindings = HashMap<String, List<PortBinding>>()
         ports.forEach {
@@ -54,7 +55,7 @@ class DockerService {
         log.debug("pulling image", image)
         docker.pull(image, registry)
 
-        // TO DO: set docker registry
+        // TODO: set docker registry
         val hostConfig = HostConfig.builder()
             .restartPolicy(HostConfig.RestartPolicy.unlessStopped())
             .portBindings(portBindings)
@@ -119,6 +120,19 @@ class DockerService {
                 memoryStats.limit()?.minus((memoryStats.usage() ?: 0)) ?: 0,
                 memoryStats.limit() ?: 0
             )
+        }
+    }
+
+    fun managedContainersPorts(): List<DockerContainerPorts> {
+        log.debug("get managed containers ports")
+
+        return docker.listContainers(managedContainersFilter).map { container ->
+            val deploymentId = container.labels()?.get(Constants.DEPLOYMENT_ID_KEY_LABEL)!!
+            val containerPorts = container.ports()?.associate {
+                it.publicPort() to it.privatePort()
+            } ?: emptyMap<Int, Int>()
+
+            DockerContainerPorts(deploymentId, containerPorts)
         }
     }
 }

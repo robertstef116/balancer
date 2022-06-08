@@ -16,6 +16,10 @@ fun Route.docker() {
             call.respond(dockerService.getManagedContainers())
         }
 
+        get("/ports") {
+            call.respond(dockerService.managedContainersPorts())
+        }
+
         post {
             val req = call.receive(DockerCreateContainerRequest::class)
             call.respond(dockerService.startContainer(req.deploymentId, req.image, req.memoryLimit, req.ports))

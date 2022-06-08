@@ -273,6 +273,27 @@ class Storage {
         return Deployment(deploymentId, workerId, workflowId, containerId, timestamp, portsMapping)
     }
 
+    fun updateDeploymentMapping(id: String?, portsMapping: Map<Int, Int>) {
+        DBConnector.getTransactionConnection().use { conn ->
+            try {
+                for (mapping in portsMapping.entries) {
+                    conn.prepareStatement("UPDATE deployment_mappings SET worker_port = ? WHERE deployment_id = ? AND deployment_port = ?")
+                        .use { st ->
+                            st.setString(2, id)
+                            st.setInt(3, mapping.value)
+                            st.setInt(1, mapping.key)
+                            StorageUtils.executeUpdate(st)
+                        }
+                }
+                conn.commit()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                conn.rollback()
+                throw ServerException()
+            }
+        }
+    }
+
     fun deleteDeployment(id: String) {
         DBConnector.getTransactionConnection().use { conn ->
             val timestamp = Instant.now().epochSecond

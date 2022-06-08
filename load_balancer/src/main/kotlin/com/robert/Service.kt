@@ -1,6 +1,7 @@
 package com.robert
 
-import kotlinx.coroutines.runBlocking
+import DockerContainerPorts
+import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
@@ -85,6 +86,36 @@ class Service(private val storage: Storage) {
             storage.persistAnalytics(targetResource.workerId, targetResource.workflowId, targetResource.deploymentId, Instant.now().epochSecond)
         } catch (e: Exception) {
             log.warn("unable to persist analytics data {}", e.message)
+        }
+    }
+
+    @Synchronized
+    fun syncWorkers() {
+        val workers = storage.getWorkers()
+        runBlocking {
+            for (worker in workers) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    for (i in 1..10) {
+                        try {
+                            syncWorker(worker)
+                            break;
+                        } catch (e: Exception) {
+                            log.warn("unable to sync worker {} {}, try again...", worker, e.message)
+                            delay(i * 5000L)
+                        }
+                    }
+                }
+            }
+        }
+        log.debug("workers synced")
+    }
+
+    private suspend fun syncWorker(worker: WorkerNode) {
+        log.debug("syncing worker {}", worker)
+        val url = "http://${worker.host}:${worker.port}/docker/ports"
+        val res = HttpClient.get<List<DockerContainerPorts>>(url, 60000)
+        for (deployment in res) {
+            storage.updateDeploymentMapping(deployment.deploymentId, deployment.ports)
         }
     }
 }
