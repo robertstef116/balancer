@@ -6,7 +6,7 @@ import { defaultRange } from '../constants';
 import useWidgetUtils from '../custom-hooks/useWidgetUtils';
 
 function DeploymentsHistoryChart({ classNames, workerId, workflowId }) {
-  const { apiWrapper, widgetProps } = useWidgetUtils();
+  const { apiWrapper, widgetProps } = useWidgetUtils({ withCancellation: true });
   const [range, setRange] = useState(defaultRange);
   const [now, setNow] = useState(0);
   const [data, setData] = useState([]);

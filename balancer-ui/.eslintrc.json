@@ -27,6 +27,7 @@
         "jsx-a11y/anchor-is-valid": 0, // test
         "max-len": 0,
         "no-underscore-dangle": 0,
-        "no-continue": 0
+        "no-continue": 0,
+        "no-plusplus": 0
     }
 }

@@ -28,8 +28,6 @@ class AnalyticsService {
         val workflowCurrentScaling = mutableMapOf<String, ImageScalingData>()
         val workflowAnalytics = LinkedList<WorkflowAnalyticsEntry>()
 
-        println(workflowMapping)
-
         for((key, imageScalingData) in workflowMapping) {
             workflowCurrentScaling[key] = ImageScalingData(imageScalingData.image, imageScalingData.numberOfDeployments)
         }

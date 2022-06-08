@@ -1,6 +1,19 @@
+import { Cancel } from 'axios';
 import * as types from './types';
 import * as errors from './errorTypes';
 import * as api from '../api';
+
+const errorWrapper = async (action, defaultError, cb) => {
+  try {
+    await action();
+  } catch (e) {
+    if (e instanceof Cancel) {
+      cb(e);
+    } else {
+      cb(errors.GET_ANALYTICS_ERROR);
+    }
+  }
+};
 
 export const login = (username, password, cb) => async (dispatch) => {
   try {
@@ -165,26 +178,18 @@ export const saveConfigs = (configs, cb) => async (dispatch, getState) => {
   }
 };
 
-export const getAnalyticsData = async (from, workerId, workflowId, deploymentId, cb) => {
-  try {
-    const res = await api.getAnalyticsData({
-      from, workerId, workflowId, deploymentId,
-    });
+export const getAnalyticsData = (from, workerId, workflowId, deploymentId, cancelToken, cb) => errorWrapper(async () => {
+  const res = await api.getAnalyticsData({
+    from, workerId, workflowId, deploymentId, cancelToken,
+  });
 
-    cb(null, res);
-  } catch (e) {
-    cb(errors.GET_ANALYTICS_ERROR);
-  }
-};
+  cb(null, res);
+}, errors.GET_ANALYTICS_ERROR, cb);
 
-export const getWorkflowAnalyticsData = async (from, workerId, workflowId, cb) => {
-  try {
-    const res = await api.getWorkflowAnalyticsData({
-      from, workerId, workflowId,
-    });
+export const getWorkflowAnalyticsData = async (from, workerId, workflowId, cancelToken, cb) => errorWrapper(async () => {
+  const res = await api.getWorkflowAnalyticsData({
+    from, workerId, workflowId, cancelToken,
+  });
 
-    cb(null, res);
-  } catch (e) {
-    cb(errors.GET_WORKFLOW_ANALYTICS_ERROR);
-  }
-};
+  cb(null, res);
+}, errors.GET_WORKFLOW_ANALYTICS_ERROR, cb);

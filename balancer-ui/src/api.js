@@ -48,7 +48,7 @@ export const saveConfigs = async ({ configs }) => {
 };
 
 export const getAnalyticsData = async ({
-  from, workerId, workflowId, deploymentId,
+  from, workerId, workflowId, deploymentId, cancelToken,
 }) => {
   let qs = '';
   if (workerId) {
@@ -61,7 +61,9 @@ export const getAnalyticsData = async ({
     qs += `&deploymentId=${deploymentId}`;
   }
 
-  const res = await axios.get(`${API_URL}/analytics/requests?from=${from}${qs}`);
+  const res = await axios.get(`${API_URL}/analytics/requests?from=${from}${qs}`, {
+    cancelToken,
+  });
   if (res.status === 200) {
     return res.data;
   }
@@ -70,7 +72,7 @@ export const getAnalyticsData = async ({
 };
 
 export const getWorkflowAnalyticsData = async ({
-  from, workerId, workflowId,
+  from, workerId, workflowId, cancelToken,
 }) => {
   let qs = '';
   if (workerId) {
@@ -80,7 +82,9 @@ export const getWorkflowAnalyticsData = async ({
     qs += `&workflowId=${workflowId}`;
   }
 
-  const res = await axios.get(`${API_URL}/analytics/scaling?from=${from}${qs}`);
+  const res = await axios.get(`${API_URL}/analytics/scaling?from=${from}${qs}`, {
+    cancelToken,
+  });
   if (res.status === 200) {
     return res.data;
   }

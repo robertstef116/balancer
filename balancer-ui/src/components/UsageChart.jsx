@@ -9,7 +9,7 @@ import { defaultRange } from '../constants';
 function UsageChart({
   classname, workerId, workflowId, deploymentId,
 }) {
-  const { apiWrapper, widgetProps } = useWidgetUtils();
+  const { apiWrapper, widgetProps } = useWidgetUtils({ withCancellation: true });
   const [range, setRange] = useState(defaultRange);
   const [now, setNow] = useState(0);
   const [data, setData] = useState([]);
