@@ -58,13 +58,13 @@ class HealthChecker(
     }
 
     fun start() {
+        log.debug("starting health check {} {}", worker.host, worker.port)
         val currentHealthChecker = this
 
         healthCheckerFn = CoroutineScope(context).launch {
             while (true) {
                 try {
                     log.debug("Health check {}:{}", worker.host, worker.port)
-                    val timestamp = Instant.now().epochSecond
                     val res = HttpClient.get<WorkerResourceResponse>(url, checkTimeout)
                     addMetric(latestAvailableCpus, 100 - res.resourcesInfo.cpuLoad, numberOfRelevantPerformanceMetrics)
                     addMetric(latestAvailableMemories, res.resourcesInfo.availableMemory, numberOfRelevantPerformanceMetrics)

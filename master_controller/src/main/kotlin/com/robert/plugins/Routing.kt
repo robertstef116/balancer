@@ -22,7 +22,6 @@ fun Application.configureRouting() {
         login()
 
 //        authenticate("auth-jwt") {
-        changes("/change", listOf(configService, workerService, workflowService))
         config("/config", configService)
         worker("/worker", workerService)
         workflow("/workflow", workflowService)

@@ -92,6 +92,12 @@ CREATE TABLE IF NOT EXISTS workflow_analytics
     timestamp     numeric     NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS metadata
+(
+    key     varchar(36) PRIMARY KEY,
+    value   varchar(36) NOT NULL
+);
+
 INSERT INTO config(key, value)
 VALUES ('PROCESSING_SOCKET_BUFFER_LENGTH', 2048),
        ('COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL', 10), -- recompute weight every 10 requests, used by weighted response time algorithm

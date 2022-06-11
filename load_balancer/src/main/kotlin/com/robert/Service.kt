@@ -11,6 +11,8 @@ class Service(private val storage: Storage) {
         private val log = LoggerFactory.getLogger(DeploymentsManager::class.java)
     }
 
+    private lateinit var updateAwareServicesMetadata: Map<String, Long>
+
     fun deployWorkflow(worker: WorkerNode, workflow: Workflow): Deployment? {
         return runBlocking {
             val url = "http://${worker.host}:${worker.port}/docker"
@@ -70,13 +72,23 @@ class Service(private val storage: Storage) {
         }
     }
 
-    suspend fun getMasterChanges(host: String, port: Int): Map<String, Any>? {
-        val url = "http://$host:$port/change"
+    @Synchronized
+    fun getUpdatedServicesConfig(): List<String>? {
         try {
-            return HttpClient.get(url)
+            val newMetadata = storage.getConfigChangeTimestampMetadata()
+            val updatedServicesKeys = mutableListOf<String>()
+            if (this::updateAwareServicesMetadata.isInitialized) {
+                for ((key, value) in newMetadata.entries) {
+                    if (updateAwareServicesMetadata[key] != value) {
+                        updatedServicesKeys.add(key)
+                    }
+                }
+            }
+            updateAwareServicesMetadata = newMetadata
+            return updatedServicesKeys
         } catch (e: Exception) {
             e.printStackTrace()
-            log.error("error getting master changes {}", e.message)
+            log.error("error getting updated services config timestamps")
         }
         return null
     }
@@ -93,15 +105,18 @@ class Service(private val storage: Storage) {
     fun syncWorkers() {
         val workers = storage.getWorkers()
         runBlocking {
-            for (worker in workers) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    for (i in 1..10) {
-                        try {
-                            syncWorker(worker)
-                            break;
-                        } catch (e: Exception) {
-                            log.warn("unable to sync worker {} {}, try again...", worker, e.message)
-                            delay(i * 5000L)
+            withContext(Dispatchers.IO) {// waits for all child coroutines to finish
+                for (worker in workers) {
+                    launch {
+                        for (i in 1..10) {
+                            try {
+                                delay(1000)
+                                syncWorker(worker)
+                                break;
+                            } catch (e: Exception) {
+                                log.warn("unable to sync worker {} {}, try again...", worker, e.message)
+                                delay(i * 5000L)
+                            }
                         }
                     }
                 }
@@ -117,5 +132,6 @@ class Service(private val storage: Storage) {
         for (deployment in res) {
             storage.updateDeploymentMapping(deployment.deploymentId, deployment.ports)
         }
+        log.debug("done syncing worker {}", worker)
     }
 }

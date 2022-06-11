@@ -110,6 +110,7 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     }
 
     private fun initWorkerHealthChecks(worker: WorkerNode): HealthChecker {
+        log.debug("init workers health checks")
         // TO DO: recover worker mechanism
         val healthCheck = HealthChecker(
             worker,

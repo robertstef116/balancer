@@ -1,11 +1,11 @@
 package com.robert
 
-import java.util.concurrent.atomic.AtomicInteger
+import java.time.Instant
 
 open class UpdateAwareService(val key: String) {
-    private val version = AtomicInteger(0)
+    protected fun markChange() {
+        val now = Instant.now().epochSecond
 
-    fun getVersion() = version.get()
-
-    protected fun markChange() = version.incrementAndGet()
+        StorageUtils.executeInsert("INSERT INTO metadata(key, value) VALUES ('$key', '$now') ON CONFLICT (key) DO UPDATE SET value = '$now'")
+    }
 }

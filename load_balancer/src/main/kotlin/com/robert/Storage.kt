@@ -15,6 +15,7 @@ class Storage {
     }
 
     fun getWorkers(inUse: Boolean = true): List<WorkerNode> {
+        log.debug("get workers")
         val query = "SELECT id, alias, host, port FROM workers where in_use = $inUse"
         val workerNodes = ArrayList<WorkerNode>()
 
@@ -39,6 +40,7 @@ class Storage {
     }
 
     fun disableWorker(id: String) {
+        log.debug("disable worker")
         DBConnector.getTransactionConnection().use { conn ->
             try {
                 conn.prepareStatement("UPDATE workers set in_use = false WHERE id = ?").use { st ->
@@ -58,6 +60,7 @@ class Storage {
     }
 
     fun getPathsMapping(): Map<WorkflowPath, List<PathTargetResource>> {
+        log.debug("get paths mapping")
         val query = """
             SELECT d.id, d.worker_id, d.workflow_id, wm.path, w.host, worker_port, w2.algorithm FROM deployment_mappings
                 INNER JOIN deployments d ON d.id = deployment_mappings.deployment_id
@@ -107,6 +110,7 @@ class Storage {
     }
 
     fun getWorkflows(): List<Workflow> {
+        log.debug("get workflows")
         val query = """
             SELECT id, image, memory_limit, min_deployments, max_deployments, algorithm, wm.path, wm.port FROM workflows 
             INNER JOIN workflow_mappings wm on workflows.id = wm.workflow_id order by id
@@ -170,6 +174,7 @@ class Storage {
     }
 
     fun getDeployments(): List<Deployment> {
+        log.debug("get deployments")
         val query = """
             SELECT id, worker_id, workflow_id, container_id, timestamp, dm.worker_port, dm.deployment_port FROM deployments 
             INNER JOIN deployment_mappings dm on deployments.id = dm.deployment_id order by id
@@ -230,6 +235,7 @@ class Storage {
     }
 
     fun addDeployment(id: String?, workerId: String, workflowId: String, containerId: String, portsMapping: Map<Int, Int>): Deployment {
+        log.debug("add deployment")
         val deploymentId = id ?: UUID.randomUUID().toString()
         val timestamp = Instant.now().epochSecond
 
@@ -274,6 +280,7 @@ class Storage {
     }
 
     fun updateDeploymentMapping(id: String?, portsMapping: Map<Int, Int>) {
+        log.debug("update deployment data")
         DBConnector.getTransactionConnection().use { conn ->
             try {
                 for (mapping in portsMapping.entries) {
@@ -295,6 +302,7 @@ class Storage {
     }
 
     fun deleteDeployment(id: String) {
+        log.debug("delete deployment")
         DBConnector.getTransactionConnection().use { conn ->
             val timestamp = Instant.now().epochSecond
             log.debug("delete deployment with id {}", id)
@@ -341,6 +349,7 @@ class Storage {
     }
 
     fun getConfigs(): Map<String, String> {
+        log.debug("get configs")
         val query = "SELECT key, value FROM config"
         val configs = HashMap<String, String>()
 
@@ -358,6 +367,7 @@ class Storage {
     }
 
     fun persistAnalytics(workerId: String, workflowId: String, deploymentId: String, timestamp: Long) {
+        log.debug("persist analytics")
         DBConnector.getConnection().prepareStatement("INSERT INTO analytics( worker_id, workflow_id, deployment_id, timestamp) VALUES (?, ?, ?, ?)")
             .use { st ->
                 st.setString(1, workerId)
@@ -366,5 +376,20 @@ class Storage {
                 st.setLong(4, timestamp)
                 StorageUtils.executeUpdate(st)
             }
+    }
+
+    fun getConfigChangeTimestampMetadata(): Map<String, Long> {
+        log.debug("get config changes timestamp")
+        val res = mutableMapOf<String, Long>()
+
+        DBConnector.getConnection().createStatement().use { st ->
+            st.executeQuery("SELECT key, value FROM metadata WHERE key like '%${Constants.UPDATE_AWARE_SERVICE_SUFFIX}'").use { rs ->
+                while (rs.next()) {
+                    res[rs.getString("key")] = rs.getLong("value")
+                }
+            }
+        }
+
+        return res
     }
 }

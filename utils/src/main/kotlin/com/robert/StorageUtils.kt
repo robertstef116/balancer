@@ -26,4 +26,17 @@ object StorageUtils {
             throw ServerException()
         }
     }
+
+    fun executeInsert(query: String) {
+        DBConnector.getConnection().createStatement().use { st ->
+            println(query)
+            val res = st.executeUpdate(query)
+
+            log.debug("execute insert, {} rows added", res)
+
+            if (res < 1) {
+                throw ServerException()
+            }
+        }
+    }
 }
