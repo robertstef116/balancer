@@ -57,7 +57,7 @@ function DeploymentsHistoryChart({ classNames, workerId, workflowId }) {
     const nowTime = Math.round(Date.now() / 1000);
     apiWrapper({
       action: getWorkflowAnalyticsData,
-      params: [Math.round(nowTime - range.value) - 1, workerId, workflowId],
+      params: { from: Math.round(nowTime - range.value) - 1, workerId, workflowId },
       cb: (res) => {
         setNow(nowTime);
         squashData(nowTime, res);

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import classNames from 'classnames';
 import EditableWidget from './EditableWidget';
 import { saveConfigs } from '../redux/actions';
 import useWidgetUtils from '../custom-hooks/useWidgetUtils';
+import FormRow from './FormRow';
 
 function ConfigWidget({
   className, title, configs, isLoading: _isLoading, validators = [],
@@ -68,7 +67,7 @@ function ConfigWidget({
     setIsLoading(true);
     actionWrapper({
       action: saveConfigs,
-      params: [configValues],
+      params: { configs: configValues },
       cb: () => {
         setValuesChanged(false);
       },
@@ -85,25 +84,14 @@ function ConfigWidget({
     >
       <div className="container">
         {configs.map((config) => (
-          <div className="row pt-3" key={config.key}>
-            <div className="col-5">
-              <Form.Label>{config.label}</Form.Label>
-            </div>
-            <div className={classNames('col-7', { 'has-error': !!errors[config.key] })}>
-              <div className="d-flex align-items-center">
-                <Form.Control
-                  className="w-100"
-                  type="text"
-                  value={configValues[config.key] || ''}
-                  onChange={({ target }) => onValueChanged(config.key, target.value)}
-                />
-                <i className="bi bi-info-circle text-primary ms-2" title={config.info} />
-              </div>
-              <div className="input-error">
-                {errors[config.key]}
-              </div>
-            </div>
-          </div>
+          <FormRow
+            key={config.key}
+            label={config.label}
+            error={errors[config.key]}
+            value={configValues[config.key]}
+            info={config.info}
+            onChange={({ target }) => onValueChanged(config.key, target.value)}
+          />
         ))}
       </div>
     </EditableWidget>

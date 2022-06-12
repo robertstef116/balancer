@@ -18,7 +18,7 @@ function UsageChart({
     const nowTime = Math.round(Date.now() / 1000);
     apiWrapper({
       action: getAnalyticsData,
-      params: [Math.round(nowTime - range.value) - 1, workerId, workflowId, deploymentId],
+      params: { from: Math.round(nowTime - range.value) - 1, workerId, workflowId, deploymentId },
       cb: (res) => {
         setNow(nowTime);
         setData(res);

@@ -75,7 +75,7 @@ const _getWorkers = async (token, dispatch) => {
   });
 };
 
-export const getWorkers = (reload, cb) => async (dispatch, getState) => {
+export const getWorkers = ({ reload }, cb) => async (dispatch, getState) => {
   const { workers, token } = getState();
   try {
     if (workers === null || reload) {
@@ -84,6 +84,54 @@ export const getWorkers = (reload, cb) => async (dispatch, getState) => {
     cb();
   } catch (e) {
     cb(errors.GET_WORKERS_ERROR);
+  }
+};
+
+export const addWorker = ({ alias, host, port }, cb) => async (dispatch, getState) => {
+  const { token } = getState();
+  try {
+    const worker = await api.addWorker(token, { alias, host, port });
+    dispatch({
+      type: types.ADD_WORKER,
+      payload: {
+        worker,
+      },
+    });
+    cb();
+  } catch (e) {
+    cb(errors.ADD_WORKERS_ERROR);
+  }
+};
+
+export const updateWorker = ({ id, alias, port }, cb) => async (dispatch, getState) => {
+  const { token } = getState();
+  try {
+    await api.updateWorker(token, { id, alias, port });
+    dispatch({
+      type: types.UPDATE_WORKER,
+      payload: {
+        id, alias, port,
+      },
+    });
+    cb();
+  } catch (e) {
+    cb(errors.UPDATE_WORKERS_ERROR);
+  }
+};
+
+export const deleteWorker = ({ id }, cb) => async (dispatch, getState) => {
+  const { token } = getState();
+  try {
+    await api.deleteWorker(token, { id });
+    dispatch({
+      type: types.DELETE_WORKER,
+      payload: {
+        id,
+      },
+    });
+    cb();
+  } catch (e) {
+    cb(errors.DELETE_WORKERS_ERROR);
   }
 };
 
@@ -97,7 +145,7 @@ const _getWorkflows = async (token, dispatch) => {
   });
 };
 
-export const getWorkflows = (reload, cb) => async (dispatch, getState) => {
+export const getWorkflows = ({ reload }, cb) => async (dispatch, getState) => {
   const { workflows, token } = getState();
   try {
     if (workflows === null || reload) {
@@ -119,7 +167,7 @@ const _getDeployments = async (token, dispatch) => {
   });
 };
 
-export const getResources = (reload, cb) => async (dispatch, getState) => {
+export const getResources = ({ reload }, cb) => async (dispatch, getState) => {
   const {
     token, workers, workflows, deployments,
   } = getState();
@@ -142,7 +190,7 @@ export const getResources = (reload, cb) => async (dispatch, getState) => {
   }
 };
 
-export const getConfigs = (reload, cb) => async (dispatch, getState) => {
+export const getConfigs = ({ reload }, cb) => async (dispatch, getState) => {
   const { configs, token } = getState();
   try {
     if (configs === null || reload) {
@@ -161,7 +209,7 @@ export const getConfigs = (reload, cb) => async (dispatch, getState) => {
   }
 };
 
-export const saveConfigs = (configs, cb) => async (dispatch, getState) => {
+export const saveConfigs = ({ configs }, cb) => async (dispatch, getState) => {
   const { token } = getState();
   try {
     await api.saveConfigs({ token, configs });
@@ -178,7 +226,7 @@ export const saveConfigs = (configs, cb) => async (dispatch, getState) => {
   }
 };
 
-export const getAnalyticsData = (from, workerId, workflowId, deploymentId, cancelToken, cb) => errorWrapper(async () => {
+export const getAnalyticsData = ({ from, workerId, workflowId, deploymentId, cancelToken }, cb) => errorWrapper(async () => {
   const res = await api.getAnalyticsData({
     from, workerId, workflowId, deploymentId, cancelToken,
   });
@@ -186,7 +234,7 @@ export const getAnalyticsData = (from, workerId, workflowId, deploymentId, cance
   cb(null, res);
 }, errors.GET_ANALYTICS_ERROR, cb);
 
-export const getWorkflowAnalyticsData = async (from, workerId, workflowId, cancelToken, cb) => errorWrapper(async () => {
+export const getWorkflowAnalyticsData = async ({ from, workerId, workflowId, cancelToken }, cb) => errorWrapper(async () => {
   const res = await api.getWorkflowAnalyticsData({
     from, workerId, workflowId, cancelToken,
   });

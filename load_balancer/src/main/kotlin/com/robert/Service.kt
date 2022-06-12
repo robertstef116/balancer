@@ -110,7 +110,6 @@ class Service(private val storage: Storage) {
                     launch {
                         for (i in 1..10) {
                             try {
-                                delay(1000)
                                 syncWorker(worker)
                                 break;
                             } catch (e: Exception) {

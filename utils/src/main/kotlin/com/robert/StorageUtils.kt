@@ -29,7 +29,6 @@ object StorageUtils {
 
     fun executeInsert(query: String) {
         DBConnector.getConnection().createStatement().use { st ->
-            println(query)
             val res = st.executeUpdate(query)
 
             log.debug("execute insert, {} rows added", res)

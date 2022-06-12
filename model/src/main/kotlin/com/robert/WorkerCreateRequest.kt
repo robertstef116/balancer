@@ -4,5 +4,4 @@ data class WorkerCreateRequest(
     val alias: String,
     val host: String,
     val port: Int,
-    val inUse: Boolean
 )

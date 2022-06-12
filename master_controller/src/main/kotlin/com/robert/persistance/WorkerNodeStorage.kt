@@ -10,7 +10,7 @@ import kotlin.collections.ArrayList
 
 class WorkerNodeStorage {
     fun get(id: String): WorkerNode {
-        DBConnector.getConnection().prepareStatement("SELECT id, alias, host, in_use FROM workers WHERE id = ?")
+        DBConnector.getConnection().prepareStatement("SELECT id, alias, host, port, in_use FROM workers WHERE id = ?")
             .use { st ->
                 st.setString(1, id)
                 st.executeQuery()
@@ -55,22 +55,22 @@ class WorkerNodeStorage {
         return workerNodes
     }
 
-    fun add(alias: String, host: String, port: Int, inUse: Boolean): WorkerNode {
+    fun add(alias: String, host: String, port: Int): WorkerNode {
         val id = UUID.randomUUID().toString()
 
         DBConnector.getConnection()
-            .prepareStatement("INSERT INTO workers(id, alias, host, port, in_use) VALUES (?, ?, ?, ?)")
+            .prepareStatement("INSERT INTO workers(id, alias, host, port, in_use) VALUES (?, ?, ?, ?, ?)")
             .use { st ->
 
                 st.setString(1, id)
                 st.setString(2, alias)
                 st.setString(3, host)
                 st.setInt(4, port)
-                st.setBoolean(5, inUse)
+                st.setBoolean(5, false)
                 val res = st.executeUpdate()
 
                 if (res > 0) {
-                    return WorkerNode(id, alias, host, port, inUse)
+                    return WorkerNode(id, alias, host, port, false)
                 }
             }
 

@@ -11,6 +11,15 @@ const INITIAL_STATE = {
   configs: null,
 };
 
+const createWorkerData = (worker) => ({
+  id: worker.id,
+  inUse: worker.inUse,
+  inUseIcon: worker.inUse ? 'bi-play-circle text-success' : 'bi-stop-circle text-danger',
+  alias: worker.alias,
+  host: worker.host,
+  port: worker.port,
+});
+
 // eslint-disable-next-line default-param-last
 export default (state = INITIAL_STATE, { type, payload }) => {
   switch (type) {
@@ -40,14 +49,31 @@ export default (state = INITIAL_STATE, { type, payload }) => {
       const { workers } = payload;
       return {
         ...state,
-        workers: workers.map((worker) => ({
-          id: worker.id,
-          inUse: worker.inUse,
-          inUseIcon: worker.inUse ? 'bi-play-circle text-success' : 'bi-stop-circle text-danger',
-          alias: worker.alias,
-          host: worker.host,
-          port: worker.port,
-        })),
+        workers: workers.map(createWorkerData),
+      };
+    case types.ADD_WORKER:
+      return {
+        ...state,
+        workers: [
+          ...state.workers,
+          createWorkerData(payload.worker),
+        ],
+      };
+    case types.UPDATE_WORKER:
+      const updWorker = state.workers.find((w) => w.id === payload.id);
+      updWorker.alias = payload.alias;
+      updWorker.port = payload.port;
+      return {
+        ...state,
+        workers: [
+          ...state.workers,
+        ],
+      };
+    case types.DELETE_WORKER:
+      const newWorkers = state.workers.filter((w) => w.id !== payload.id);
+      return {
+        ...state,
+        workers: newWorkers,
       };
     case types.GET_DEPLOYMENTS:
       const { deployments } = payload;

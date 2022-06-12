@@ -38,7 +38,7 @@ $form-label-font-weight: bold;
   padding: 0;
 }
 
-.logo.navbar-brand img{
+.logo.navbar-brand img {
   width: 40px;
   height: 40px;
 }
@@ -159,6 +159,16 @@ $form-label-font-weight: bold;
 .accordion-list .active-item {
   font-weight: bold;
   color: $primary;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+tr.active {
+  background-color: lighten($primary, 30%);
+  --bs-table-striped-color: lighten(red, 30%);
 }
 
 //.default-widget {

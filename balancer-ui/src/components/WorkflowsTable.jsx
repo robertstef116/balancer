@@ -9,11 +9,11 @@ function WorkflowsTable({ className }) {
   const workflows = useSelector((state) => state.workflows);
 
   const onRefresh = () => {
-    actionWrapper({ action: getWorkflows, params: [true] });
+    actionWrapper({ action: getWorkflows, reload: true });
   };
 
   useEffect(() => {
-    actionWrapper({ action: getWorkflows, params: [false] });
+    actionWrapper({ action: getWorkflows });
   }, []);
 
   return (

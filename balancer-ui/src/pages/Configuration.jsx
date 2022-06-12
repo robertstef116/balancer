@@ -81,7 +81,7 @@ function ConfigurationPage() {
   const { widgetProps, actionWrapper } = useWidgetUtils();
 
   const onRefresh = () => {
-    actionWrapper({ action: getConfigs, params: [true] });
+    actionWrapper({ action: getConfigs, reload: true });
   };
 
   const cpuMemWeightValidator = (values) => {
@@ -92,7 +92,7 @@ function ConfigurationPage() {
   };
 
   useEffect(() => {
-    actionWrapper({ action: getConfigs, params: [false] });
+    actionWrapper({ action: getConfigs });
   }, []);
 
   return (

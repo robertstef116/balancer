@@ -8,12 +8,37 @@ export const login = async ({ username, password }) => {
   }
   throw new Error('Login failed!');
 };
+
 export const getWorkers = async () => {
   const res = await axios.get(`${API_URL}/worker`);
   if (res.status === 200) {
     return res.data;
   }
   throw new Error('Get workers failed!');
+};
+
+export const addWorker = async (token, { alias, host, port }) => {
+  const res = await axios.post(`${API_URL}/worker`, { alias, host, port });
+  if (res.status === 200) {
+    return res.data;
+  }
+  throw new Error('Add worker failed!');
+};
+
+export const updateWorker = async (token, { id, alias, port }) => {
+  const res = await axios.put(`${API_URL}/worker/${id}`, { alias, port });
+  if (res.status === 200) {
+    return res.data;
+  }
+  throw new Error('Update worker failed!');
+};
+
+export const deleteWorker = async (token, { id }) => {
+  const res = await axios.delete(`${API_URL}/worker/${id}`);
+  if (res.status === 200) {
+    return;
+  }
+  throw new Error('Delete worker failed!');
 };
 
 export const getWorkflows = async () => {

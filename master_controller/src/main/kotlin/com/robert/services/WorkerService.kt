@@ -7,9 +7,9 @@ import com.robert.exceptions.ValidationException
 import com.robert.persistance.WorkerNodeStorage
 import org.apache.commons.validator.routines.InetAddressValidator
 
-class WorkerService: UpdateAwareService(Constants.WORKER_SERVICE_KEY) {
+class WorkerService : UpdateAwareService(Constants.WORKER_SERVICE_KEY) {
     companion object {
-        fun validateWorkerAlias(alias: String) = Regex("[a-zA-Z][a-z-A-Z0-9_]{2,}").matches(alias)
+        fun validateWorkerAlias(alias: String) = alias.length in 1..50
     }
 
     private val workerNodeStorage = WorkerNodeStorage()
@@ -22,20 +22,20 @@ class WorkerService: UpdateAwareService(Constants.WORKER_SERVICE_KEY) {
         return workerNodeStorage.getAll()
     }
 
-    fun add(alias: String, host: String, port: Int, inUse: Boolean): WorkerNode {
+    fun add(alias: String, host: String, port: Int): WorkerNode {
         if (!validateWorkerAlias(alias)) {
             throw ValidationException("Invalid alias")
         }
-        val res = workerNodeStorage.add(alias, host, port, inUse)
+        val res = workerNodeStorage.add(alias, host, port)
         markChange()
         return res
     }
 
-    fun update(id: String, alias: String?, port: Int?, inUse: Boolean?) {
+    fun update(id: String, alias: String?, port: Int?) {
         if (alias != null && !validateWorkerAlias(alias)) {
             throw ValidationException("Invalid alias")
         }
-        workerNodeStorage.update(id, alias, port, inUse)
+        workerNodeStorage.update(id, alias, port, null)
         markChange()
     }
 

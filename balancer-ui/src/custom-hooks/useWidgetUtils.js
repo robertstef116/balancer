@@ -15,8 +15,12 @@ const useWidgetUtils = ({ withCancellation } = { withCancellation: false }) => {
         cancellationToken.current.cancel();
       }
       cancellationToken.current = CancelToken.source();
-      params.push(cancellationToken.current.token);
+      return {
+        ...params,
+        cancelToken: cancellationToken.current.token,
+      };
     }
+    return params;
   };
 
   const startLoading = () => {
@@ -39,10 +43,10 @@ const useWidgetUtils = ({ withCancellation } = { withCancellation: false }) => {
     setError(null);
   };
 
-  const apiWrapper = ({ action, params, cb = null }) => {
+  const apiWrapper = ({ action, params = {}, cb = null }) => {
     startLoading();
-    handleCancellation(params);
-    action(...params, (err, data) => {
+    const actionParams = handleCancellation(params);
+    action(actionParams, (err, data) => {
       stopLoading();
       if (err) {
         if (isCancel(err)) {
@@ -50,16 +54,16 @@ const useWidgetUtils = ({ withCancellation } = { withCancellation: false }) => {
         }
         setError(err);
       } else if (cb) {
-        setError(null);
         cb(data);
       }
+      setError(null);
     });
   };
 
-  const actionWrapper = ({ action, params = [], cb = null }) => {
+  const actionWrapper = ({ action, params = {}, reload = false, cb = null }) => {
     startLoading();
-    handleCancellation(params);
-    dispatch(action(...params, (err) => {
+    const actionParams = handleCancellation({ ...params, reload });
+    dispatch(action(actionParams, (err) => {
       stopLoading();
       if (err) {
         if (isCancel(err)) {
@@ -69,6 +73,7 @@ const useWidgetUtils = ({ withCancellation } = { withCancellation: false }) => {
       } else if (cb) {
         cb();
       }
+      setError(null);
     }));
   };
 

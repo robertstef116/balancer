@@ -1,13 +1,11 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
+import classNames from 'classnames';
 import WidgetWrapper from './WidgetWrapper';
 
 function TableWidget({
-  className, cols, rows, isLoading, onRefresh,
+  className, cols, rows, isLoading, onRefresh, actions, error, dismissError, activeRowKey, onRowClick,
 }) {
-  const onAddClick = () => {
-  };
-
   const renderCell = (data, col) => {
     switch (col.type) {
       case 'Icon':
@@ -32,9 +30,9 @@ function TableWidget({
       isLoading={isLoading}
       className={className}
       onRefresh={onRefresh}
-      actions={[
-        { title: 'Add worker', icon: 'bi-plus-lg', onClick: onAddClick },
-      ]}
+      actions={actions}
+      error={error}
+      dismissError={dismissError}
     >
       <div className="scrollable-table overflow-auto w-100 h-100">
         <Table striped borderless hover>
@@ -45,7 +43,11 @@ function TableWidget({
           </thead>
           <tbody>
             {rows && rows.map((data) => (
-              <tr key={data.id}>
+              <tr
+                key={data.id}
+                className={classNames({ active: activeRowKey === data.id })}
+                {...onRowClick && { onClick: () => onRowClick(data.id) }}
+              >
                 {cols.map((col) => renderCell(data, col))}
               </tr>
             ))}

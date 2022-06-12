@@ -24,11 +24,11 @@ function ResourcesList({ classname, onSelectionChanged }) {
   };
 
   const onRefresh = () => {
-    actionWrapper({ action: getResources, params: [true] });
+    actionWrapper({ action: getResources, reload: true });
   };
 
   useEffect(() => {
-    actionWrapper({ action: getResources, params: [false] });
+    actionWrapper({ action: getResources });
   }, []);
 
   useEffect(() => {
