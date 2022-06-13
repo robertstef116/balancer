@@ -20,6 +20,29 @@ const createWorkerData = (worker) => ({
   port: worker.port,
 });
 
+const getAlgorithmDisplay = (alg) => {
+  const algorithm = alg.replaceAll('_', ' ').toLowerCase();
+  return algorithm.charAt(0).toUpperCase() + algorithm.slice(1);
+};
+
+const createWorkflowData = (workflow) => {
+  let mapping = '';
+  Object.keys(workflow.pathsMapping).forEach((path) => {
+    mapping += `${path} - ${workflow.pathsMapping[path]}\n`;
+  });
+  return {
+    id: workflow.id,
+    image: workflow.image,
+    workerId: workflow.workerId,
+    memoryLimit: workflow.memoryLimit,
+    minDeployments: workflow.minDeployments,
+    maxDeployments: workflow.maxDeployments,
+    algorithm: workflow.algorithm,
+    algorithmDisplay: getAlgorithmDisplay(workflow.algorithm),
+    mapping,
+  };
+};
+
 // eslint-disable-next-line default-param-last
 export default (state = INITIAL_STATE, { type, payload }) => {
   switch (type) {
@@ -27,23 +50,33 @@ export default (state = INITIAL_STATE, { type, payload }) => {
       const { workflows } = payload;
       return {
         ...state,
-        workflows: workflows.map((workflow) => {
-          let mapping = '';
-          Object.keys(workflow.pathsMapping).forEach((path) => {
-            mapping += `${path} - ${workflow.pathsMapping[path]}\n`;
-          });
-          const algorithm = workflow.algorithm.replaceAll('_', ' ').toLowerCase();
-          return {
-            id: workflow.id,
-            image: workflow.image,
-            workerId: workflow.workerId,
-            memoryLimit: workflow.memoryLimit,
-            minDeployments: workflow.minDeployments,
-            maxDeployments: workflow.maxDeployments,
-            algorithm: algorithm.charAt(0).toUpperCase() + algorithm.slice(1),
-            mapping,
-          };
-        }),
+        workflows: workflows.map(createWorkflowData),
+      };
+    case types.ADD_WORKFLOW:
+      return {
+        ...state,
+        workflows: [
+          ...state.workflows,
+          createWorkflowData(payload.workflow),
+        ],
+      };
+    case types.UPDATE_WORKFLOW:
+      const updWorkflow = state.workflows.find((w) => w.id === payload.id);
+      updWorkflow.algorithm = payload.algorithm;
+      updWorkflow.algorithmDisplay = getAlgorithmDisplay(payload.algorithm);
+      updWorkflow.minDeployments = payload.minDeployments;
+      updWorkflow.maxDeployments = payload.maxDeployments;
+      return {
+        ...state,
+        workflows: [
+          ...state.workflows,
+        ],
+      };
+    case types.DELETE_WORKFLOW:
+      const newWorkflows = state.workflows.filter((w) => w.id !== payload.id);
+      return {
+        ...state,
+        workflows: newWorkflows,
       };
     case types.GET_WORKERS:
       const { workers } = payload;

@@ -13,4 +13,25 @@ export const ranges = [
   { text: 'Last month', value: 30 * 24 * 60 * 60, unit: 'w' },
 ];
 
+export const Icons = {
+  ADD: 'bi-plus-lg',
+  EDIT: 'bi-pencil',
+  DELETE: 'bi-x-lg',
+  FREEZE: 'bi-snow',
+  REFRESH: 'bi-arrow-clockwise',
+  ARROW_RIGHT: 'bi-arrow-right',
+};
+
+export const algorithms = [
+  { display: 'Random', value: 'RANDOM' },
+  { display: 'Least connection', value: 'LEAST_CONNECTION' },
+  { display: 'Round robin', value: 'ROUND_ROBIN' },
+  { display: 'Weighted response time', value: 'WEIGHTED_RESPONSE_TIME' },
+];
+
+export const ModalFormModes = {
+  ADD: 'ADD',
+  UPDATE: 'UPDATE',
+};
+
 export const defaultRange = ranges[2];

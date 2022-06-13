@@ -176,8 +176,12 @@ class WorkflowStorage {
             DBConnector.getConnection()
                 .prepareStatement("SELECT min_deployments, max_deployments, algorithm FROM workflows WHERE id = ?")
                 .use { st ->
+                    st.setString(1, id)
                     st.executeQuery()
                         .use { rs ->
+                            if (!rs.next()) {
+                                throw NotFoundException()
+                            }
                             newMinDeployments = minDeployments ?: rs.getInt("min_deployments")
                             if (newMinDeployments == 0) {
                                 newMinDeployments = null

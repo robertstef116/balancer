@@ -23,7 +23,14 @@ function RangeSelector({ onRangeChange }) {
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
-        {ranges.map((rangeConfig) => <Dropdown.Item key={rangeConfig.value} onClick={() => selectRange(rangeConfig)}>{rangeConfig.text}</Dropdown.Item>)}
+        {ranges.map((rangeConfig) => (
+          <Dropdown.Item
+            key={rangeConfig.value}
+            onClick={() => selectRange(rangeConfig)}
+          >
+            {rangeConfig.text}
+          </Dropdown.Item>
+        ))}
       </Dropdown.Menu>
     </Dropdown>
   );

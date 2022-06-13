@@ -49,6 +49,30 @@ export const getWorkflows = async () => {
   throw new Error('Get workflows failed!');
 };
 
+export const addWorkflow = async (token, { image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping }) => {
+  const res = await axios.post(`${API_URL}/workflow`, { image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping });
+  if (res.status === 200) {
+    return res.data;
+  }
+  throw new Error('Add workflow failed!');
+};
+
+export const updateWorkflow = async (token, { id, algorithm, minDeployments, maxDeployments }) => {
+  const res = await axios.put(`${API_URL}/workflow/${id}`, { algorithm, minDeployments, maxDeployments });
+  if (res.status === 200) {
+    return res.data;
+  }
+  throw new Error('Update workflow failed!');
+};
+
+export const deleteWorkflow = async (token, { id }) => {
+  const res = await axios.delete(`${API_URL}/workflow/${id}`);
+  if (res.status === 200) {
+    return;
+  }
+  throw new Error('Delete workflow failed!');
+};
+
 export const getDeployments = async () => {
   const res = await axios.get(`${API_URL}/deployment`);
   if (res.status === 200) {

@@ -8,6 +8,9 @@ export const ADD_WORKER = 'ADD_WORKER';
 export const UPDATE_WORKER = 'UPDATE_WORKER';
 export const DELETE_WORKER = 'DELETE_WORKER';
 export const GET_WORKFLOWS = 'GET_WORKFLOWS';
+export const ADD_WORKFLOW = 'ADD_WORKFLOW';
+export const UPDATE_WORKFLOW = 'UPDATE_WORKFLOW';
+export const DELETE_WORKFLOW = 'DELETE_WORKFLOW';
 export const GET_DEPLOYMENTS = 'GET_DEPLOYMENTS';
 export const GET_CONFIGS = 'GET_CONFIGS';
 

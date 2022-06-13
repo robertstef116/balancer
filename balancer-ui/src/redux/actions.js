@@ -157,6 +157,54 @@ export const getWorkflows = ({ reload }, cb) => async (dispatch, getState) => {
   }
 };
 
+export const addWorkflow = ({ image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping }, cb) => async (dispatch, getState) => {
+  const { token } = getState();
+  try {
+    const workflow = await api.addWorkflow(token, { image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping });
+    dispatch({
+      type: types.ADD_WORKFLOW,
+      payload: {
+        workflow,
+      },
+    });
+    cb();
+  } catch (e) {
+    cb(errors.ADD_WORKFLOWS_ERROR);
+  }
+};
+
+export const updateWorkflow = ({ id, algorithm, minDeployments, maxDeployments }, cb) => async (dispatch, getState) => {
+  const { token } = getState();
+  try {
+    await api.updateWorkflow(token, { id, algorithm, minDeployments, maxDeployments });
+    dispatch({
+      type: types.UPDATE_WORKFLOW,
+      payload: {
+        id, algorithm, minDeployments, maxDeployments,
+      },
+    });
+    cb();
+  } catch (e) {
+    cb(errors.UPDATE_WORKFLOWS_ERROR);
+  }
+};
+
+export const deleteWorkflow = ({ id }, cb) => async (dispatch, getState) => {
+  const { token } = getState();
+  try {
+    await api.deleteWorkflow(token, { id });
+    dispatch({
+      type: types.DELETE_WORKFLOW,
+      payload: {
+        id,
+      },
+    });
+    cb();
+  } catch (e) {
+    cb(errors.DELETE_WORKFLOWS_ERROR);
+  }
+};
+
 const _getDeployments = async (token, dispatch) => {
   const deployments = await api.getDeployments(token);
   dispatch({

@@ -34,6 +34,12 @@ $form-label-font-weight: bold;
   background-color: rgba($light, 0.8);
 }
 
+.form-dropdown {
+  background-color: $input-bg !important;
+  min-height: $input-height;
+  border: $input-border-width solid $input-border-color !important;
+}
+
 .navbar {
   padding: 0;
 }

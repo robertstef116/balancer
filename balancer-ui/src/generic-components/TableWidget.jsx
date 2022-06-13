@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import WidgetWrapper from './WidgetWrapper';
 
 function TableWidget({
-  className, cols, rows, isLoading, onRefresh, actions, error, dismissError, activeRowKey, onRowClick,
+  title, className, cols, rows, isLoading, onRefresh, actions, error, dismissError, activeRowKey, onRowClick,
 }) {
   const renderCell = (data, col) => {
     switch (col.type) {
@@ -26,7 +26,7 @@ function TableWidget({
   };
   return (
     <WidgetWrapper
-      title="Workers List"
+      title={title}
       isLoading={isLoading}
       className={className}
       onRefresh={onRefresh}

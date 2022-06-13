@@ -14,6 +14,10 @@ function FormBuilder({
       ...{ [key]: value },
     };
 
+    if (value === '') {
+      delete newData[key];
+    }
+
     setData(newData);
     let valid = true;
     for (const config of configs) {
@@ -30,8 +34,10 @@ function FormBuilder({
           label={config.label}
           value={data[config.key]}
           info={config.info}
+          options={config.options}
+          mapValueType={config.mapValueType}
           {...(config.type && { type: config.type })}
-          onChange={({ target }) => onValuesChanged(config.key, target.value)}
+          onChange={(value) => onValuesChanged(config.key, value)}
         />
       ))}
     </div>

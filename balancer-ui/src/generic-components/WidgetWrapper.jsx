@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import Spinner from '../components/Spinner';
+import { Icons } from '../constants';
 
 function WidgetWrapper({
   className, children, title, isLoading, customAction, error = null, dismissError = null, onRefresh = null, actions = [],
@@ -12,7 +13,7 @@ function WidgetWrapper({
         <span className="ms-auto d-flex align-items-center">
           {onRefresh && (
           <i
-            className={classNames('bi ps-1 widget-action bi-arrow-clockwise', {
+            className={classNames('bi ps-1 widget-action', Icons.REFRESH, {
               invisible: isLoading,
             })}
             title="Refresh"
