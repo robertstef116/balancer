@@ -14,9 +14,9 @@ class Storage {
         private val log = LoggerFactory.getLogger(Storage::class.java)
     }
 
-    fun getWorkers(inUse: Boolean = true): List<WorkerNode> {
+    fun getWorkers(status: WorkerNodeStatus = WorkerNodeStatus.STARTED): List<WorkerNode> {
         log.debug("get workers")
-        val query = "SELECT id, alias, host, port FROM workers where in_use = $inUse"
+        val query = "SELECT id, alias, host, port FROM workers where status='$status'"
         val workerNodes = ArrayList<WorkerNode>()
 
         DBConnector.getConnection().createStatement().use { st ->
@@ -29,7 +29,7 @@ class Storage {
                                 rs.getString("alias"),
                                 rs.getString("host"),
                                 rs.getInt("port"),
-                                true
+                                status
                             )
                         )
                     }
@@ -39,12 +39,13 @@ class Storage {
         return workerNodes
     }
 
-    fun disableWorker(id: String) {
-        log.debug("disable worker")
+    fun disableWorker(id: String, status: WorkerNodeStatus = WorkerNodeStatus.STOPPED) {
+        log.debug("disable worker with id {}, new status will be {}", id, status)
         DBConnector.getTransactionConnection().use { conn ->
             try {
-                conn.prepareStatement("UPDATE workers set in_use = false WHERE id = ?").use { st ->
-                    st.setString(1, id)
+                conn.prepareStatement("UPDATE workers set status = ? WHERE id = ?").use { st ->
+                    st.setString(1, status.toString())
+                    st.setString(2, id)
                     StorageUtils.executeUpdate(st)
                 }
                 conn.prepareStatement("DELETE FROM deployments WHERE worker_id = ?").use { st ->
@@ -56,6 +57,15 @@ class Storage {
                 conn.rollback()
                 throw ServerException()
             }
+        }
+    }
+
+    fun enableWorker(id: String) {
+        log.debug("enable worker with id {}", id)
+        DBConnector.getConnection().prepareStatement("UPDATE workers set status = ? WHERE id = ?").use { st ->
+            st.setString(1, WorkerNodeStatus.STARTED.toString())
+            st.setString(2, id)
+            StorageUtils.executeUpdate(st)
         }
     }
 
@@ -235,7 +245,7 @@ class Storage {
     }
 
     fun addDeployment(id: String?, workerId: String, workflowId: String, containerId: String, portsMapping: Map<Int, Int>): Deployment {
-        log.debug("add deployment")
+        log.debug("adding deployment on worker {}", workerId)
         val deploymentId = id ?: UUID.randomUUID().toString()
         val timestamp = Instant.now().epochSecond
 
@@ -270,7 +280,7 @@ class Storage {
                     }
                 conn.commit()
             } catch (e: Exception) {
-                e.printStackTrace()
+                log.error("error adding deployment, err = {}", e.message)
                 conn.rollback()
                 throw ServerException()
             }
@@ -294,7 +304,7 @@ class Storage {
                 }
                 conn.commit()
             } catch (e: Exception) {
-                e.printStackTrace()
+                log.error("error updating deployment mapping, {}", e.message)
                 conn.rollback()
                 throw ServerException()
             }
@@ -341,7 +351,7 @@ class Storage {
             } catch (e: NotFoundException) {
                 throw e
             } catch (e: Exception) {
-                e.printStackTrace()
+                log.error("error removing deployment, err = {}", e.message)
                 conn.rollback()
                 throw ServerException()
             }

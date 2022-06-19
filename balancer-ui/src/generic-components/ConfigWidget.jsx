@@ -90,7 +90,7 @@ function ConfigWidget({
             error={errors[config.key]}
             value={configValues[config.key]}
             info={config.info}
-            onChange={({ target }) => onValueChanged(config.key, target.value)}
+            onChange={(value) => onValueChanged(config.key, value)}
           />
         ))}
       </div>

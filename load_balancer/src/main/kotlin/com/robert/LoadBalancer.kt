@@ -155,6 +155,7 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
                     streamFromClient = clientSocket.openReadChannel()
 
                     headerProcessingResult = processHeader(streamFromClient, buffer)
+                    log.trace(resourcesManager.pathsMapping.toString())
                     workerSocketInfo = getWorkerSocket(headerProcessingResult.route, resourcesManager.pathsMapping.keys)
                     workerSocket = workerSocketInfo.socket
                     val routePrefixLength = workerSocketInfo.routePrefix.length
@@ -178,7 +179,8 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
                     streamToClient = streamToClient ?: clientSocket.openWriteChannel(true)
                     LoadBalancerUtils.sendNotFound(streamToClient, headerProcessingResult?.protocol ?: "HTTP/1.1")
                 } catch (e: Exception) {
-                    // TO DO: send Internal Server Error
+                    streamToClient = streamToClient ?: clientSocket.openWriteChannel(true)
+                    LoadBalancerUtils.sendInternalServerError(streamToClient, headerProcessingResult?.protocol ?: "HTTP/1.1")
                     e.printStackTrace()
                 } finally {
                     streamToWorker?.close()
@@ -203,12 +205,10 @@ private object LoadBalancerUtils {
     private val log = LoggerFactory.getLogger(LoadBalancerUtils::class.java)
 
     suspend fun sendNotFound(stream: ByteWriteChannel, protocol: String) {
-        stream.writeFully(
-            """
+        val content = """
                 $protocol 404 Not Found
                 Server: load-balancer/1.0.0
                 Content-Type: text/html
-                Content-Length: 166
                 
                 <html>
                 <head><title>Not found</title></head>
@@ -217,8 +217,28 @@ private object LoadBalancerUtils {
                 <hr><center>load-balancer/1.0.0</center>
                 </body>
                 </html>
-            """.trimIndent().toByteArray()
-        )
+            """.trimIndent()
+
+        stream.writeFully(content.toByteArray())
+        log.debug("not found sent")
+    }
+
+    suspend fun sendInternalServerError(stream: ByteWriteChannel, protocol: String) {
+        val content = """
+                $protocol 500 Internal Server Error
+                Server: load-balancer/1.0.0
+                Content-Type: text/html
+                
+                <html>
+                <head><title>Internal Server error</title></head>
+                <body>
+                <center><h1>Oops, something went wrong</h1></center>
+                <hr><center>load-balancer/1.0.0</center>
+                </body>
+                </html>
+            """.trimIndent()
+
+        stream.writeFully(content.toByteArray())
         log.debug("not found sent")
     }
 }

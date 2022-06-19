@@ -9,7 +9,7 @@ function TableWidget({
   const renderCell = (data, col) => {
     switch (col.type) {
       case 'Icon':
-        return <td key={col.key} style={{ width: col.width }}><i className={data[col.key]} /></td>;
+        return <td key={col.key} style={{ width: col.width }} title={col.titleKey ? data[col.titleKey] : ''}><i className={data[col.key]} /></td>;
       case 'InfoIcon':
         return (
           <td key={col.key} style={{ width: col.width }}>

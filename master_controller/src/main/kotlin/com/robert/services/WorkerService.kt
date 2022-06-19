@@ -39,6 +39,11 @@ class WorkerService : UpdateAwareService(Constants.WORKER_SERVICE_KEY) {
         markChange()
     }
 
+    fun flipStatus(id: String) {
+        workerNodeStorage.flipStatus(id)
+        markChange()
+    }
+
     fun delete(id: String) {
         workerNodeStorage.delete(id)
         markChange()

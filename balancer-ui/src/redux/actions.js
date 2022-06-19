@@ -119,6 +119,22 @@ export const updateWorker = ({ id, alias, port }, cb) => async (dispatch, getSta
   }
 };
 
+export const disableWorker = ({ id }, cb) => async (dispatch, getState) => {
+  const { token } = getState();
+  try {
+    await api.disableWorker(token, { id });
+    dispatch({
+      type: types.DISABLE_WORKER,
+      payload: {
+        id,
+      },
+    });
+    cb();
+  } catch (e) {
+    cb(errors.DISABLE_WORKER_ERROR);
+  }
+};
+
 export const deleteWorker = ({ id }, cb) => async (dispatch, getState) => {
   const { token } = getState();
   try {

@@ -1,3 +1,3 @@
 package com.robert.exceptions
 
-class ServerException : RuntimeException()
+class ServerException : RuntimeException("Internal Server Error")

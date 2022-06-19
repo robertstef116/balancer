@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS workers
     alias  varchar(50) NOT NULL,
     host   varchar(50) NOT NULL,
     port   integer     NOT NULL,
-    in_use boolean     NOT NULL
+    status varchar(8)  NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS workflows
@@ -94,8 +94,8 @@ CREATE TABLE IF NOT EXISTS workflow_analytics
 
 CREATE TABLE IF NOT EXISTS metadata
 (
-    key     varchar(36) PRIMARY KEY,
-    value   varchar(36) NOT NULL
+    key   varchar(36) PRIMARY KEY,
+    value varchar(36) NOT NULL
 );
 
 INSERT INTO config(key, value)
@@ -113,7 +113,7 @@ ON CONFLICT DO NOTHING;
 
 -- ADD TEST DATA
 
-INSERT INTO workers(id, alias, host, port, in_use)
+INSERT INTO workers(id, alias, host, port, status)
 VALUES ('7a0acdc5-9dd0-467a-9c92-9569d47eac1b', 'worker 1', '192.168.100.92', 8081, true),
        ('d0cb107a-78a5-4e1b-bde2-0318701ac329', 'worker 2', '192.168.100.93', 8081, true)
 ON CONFLICT DO NOTHING;

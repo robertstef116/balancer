@@ -33,6 +33,14 @@ export const updateWorker = async (token, { id, alias, port }) => {
   throw new Error('Update worker failed!');
 };
 
+export const disableWorker = async (token, { id }) => {
+  const res = await axios.put(`${API_URL}/worker/${id}/stop`);
+  if (res.status === 200) {
+    return;
+  }
+  throw new Error('Delete worker failed!');
+};
+
 export const deleteWorker = async (token, { id }) => {
   const res = await axios.delete(`${API_URL}/worker/${id}`);
   if (res.status === 200) {

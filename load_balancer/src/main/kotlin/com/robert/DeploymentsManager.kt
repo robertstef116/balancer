@@ -60,7 +60,7 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
                 try {
                     val healthChecks = resourcesManager.healthChecks
 
-                    for(healthCheck in healthChecks) {
+                    for (healthCheck in healthChecks) {
                         if (healthCheck.lastCheckTimestamp < lastDeploymentsChange) {
                             throw WaitResourceInfoUpdate()
                         }
@@ -114,9 +114,11 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
                             }
 
                             if (deploymentPerformance == null) {
-                                val worker = resourcesManager.workers.find { it.id == deployment.workerId }!!
+                                val worker = resourcesManager.workers.find { it.id == deployment.workerId }
                                 log.debug("remove unhealthy deployment {}", deployment.id)
-                                service.removeDeployment(worker, deployment.id, deployment.containerId)
+                                if (worker != null) {
+                                    service.removeDeployment(worker, deployment.id, deployment.containerId)
+                                }
                                 removedDeployments.add(deployment)
 //                                val newDeployment = deployWorkflow(workflow)
 //                                if (newDeployment != null) { // if successfully deployed
@@ -140,7 +142,7 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
 
                     deployments = deployments - removedDeployments + addedDeployments
 
-                    // TO DO: apply changes instead of reload
+                    // TODO: apply changes instead of reload
                     if (removedDeployments.size > 0 || addedDeployments.size > 0) {
                         log.debug("deployments changed, reload resources")
                         resourcesManager.pathsMappingChanged()
@@ -149,7 +151,7 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
                 } catch (e: WaitResourceInfoUpdate) {
                     log.debug("skip check, no resource info date received since the last update")
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    log.error("error processing deployments, err = {}", e.message)
                 }
 
                 log.debug("processing deployments done, next check in {} ms", deploymentsCheckInterval)

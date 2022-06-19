@@ -24,6 +24,11 @@ fun Route.worker(path: String, workerService: WorkerService) {
             call.respond(workerService.add(request.alias.trim(), request.host.trim(), request.port))
         }
 
+        put("/{id}/stop") {
+            val id = call.parameters["id"].toString()
+            call.respond(workerService.flipStatus(id))
+        }
+
         put("/{id}") {
             val id = call.parameters["id"].toString()
             val request = call.receive<WorkerUpdateRequest>()

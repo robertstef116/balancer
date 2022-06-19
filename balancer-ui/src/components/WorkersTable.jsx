@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import TableWidget from '../generic-components/TableWidget';
-import { addWorker, deleteWorker, getWorkers, updateWorker } from '../redux/actions';
+import { addWorker, deleteWorker, disableWorker, getWorkers, updateWorker } from '../redux/actions';
 import useWidgetUtils from '../custom-hooks/useWidgetUtils';
 import ModalWrapper from '../generic-components/ModalWrapper';
 import FormBuilder from '../generic-components/FormBuilder';
 import { SimpleModal, SimpleModalTypes } from './SimpleModal';
-import { Icons, ModalFormModes } from '../constants';
+import { Icons, ModalFormModes, WorkerNodeStatus } from '../constants';
 
 const aliasValidator = (data) => data.alias && data.alias.length >= 1 && data.alias.length <= 50;
 const hostValidator = (data) => data.host && data.host.length >= 1 && data.host.length <= 50;
@@ -90,8 +90,21 @@ function WorkersTable({ className }) {
   }, [modalData]);
 
   const onDisable = () => {
+    const worker = getSelectedWorker();
+    const actionName = worker.status === WorkerNodeStatus.STARTED || worker.status === WorkerNodeStatus.STARTING ? 'Disable' : 'Enable';
+    const title = `${actionName} worker`;
     if (ensureWorkerSelected('Disable worker')) {
-      //
+      setModalNotificationConfigs({
+        title,
+        description: `Are you sure you want to ${actionName.toLowerCase()} the worker "${worker.alias || ''}", this action might be destructive?`,
+        type: SimpleModalTypes.CONFIRMATION,
+        dismiss: (res) => {
+          if (res) {
+            actionWrapper({ action: disableWorker, params: { id: selectedWorkerId } });
+          }
+          dismissModalNotification();
+        },
+      });
     }
   };
 
@@ -152,7 +165,7 @@ function WorkersTable({ className }) {
         {...widgetProps}
         onRefresh={onRefresh}
         cols={[
-          { key: 'inUseIcon', type: 'Icon', width: '20px' },
+          { key: 'statusIcon', type: 'Icon', width: '20px', titleKey: 'statusTitle' },
           { header: 'Alias', key: 'alias' },
           { header: 'Host', key: 'host' },
           { header: 'Port', key: 'port', width: '70px' }]}

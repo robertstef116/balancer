@@ -3,12 +3,13 @@ package com.robert.algorithms
 import com.robert.LBAlgorithms
 import com.robert.PathTargetResource
 import com.robert.SelectedDeploymentInfo
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 
 class LeastConnectionAlgorithm(private var availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
     override val algorithm = LBAlgorithms.LEAST_CONNECTION
-    private val targets = HashMap<PathTargetResource, AtomicLong>()
+    private val targets = ConcurrentHashMap<PathTargetResource, AtomicLong>()
 
     init {
         updateTargets(availableTargets)

@@ -5,9 +5,14 @@ import com.robert.DBConnector
 import com.robert.ImageScalingData
 import com.robert.WorkflowAnalyticsData
 import com.robert.exceptions.WorkflowAnalyticsEvent
+import org.slf4j.LoggerFactory
 import java.time.Instant
 
 class AnalyticsStorage {
+    companion object {
+        private val log = LoggerFactory.getLogger(AnalyticsStorage::class.java)
+    }
+
     private val ANALYTICS_RESULTS_COUNT = 100
 
     fun getAnalytics(from: Long, workerId: String?, workflowId: String?, deploymentId: String?): List<AnalyticsEntry> {
@@ -151,7 +156,7 @@ class AnalyticsStorage {
 
                 return Pair(workflowMapping, analytics)
             } catch (e: Exception) {
-                e.printStackTrace()
+                log.error("error getting workflow analytics data, err = {}", e.message)
                 conn.rollback()
                 return Pair(mutableMapOf(), emptyList())
             }

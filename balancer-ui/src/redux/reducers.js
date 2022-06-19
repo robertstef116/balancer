@@ -1,4 +1,5 @@
 import * as types from './types';
+import { Icons, WorkerNodeStatus } from '../constants';
 
 const INITIAL_STATE = {
   isAuthenticated: false,
@@ -11,10 +12,26 @@ const INITIAL_STATE = {
   configs: null,
 };
 
+const getWorkerNodeStatusIcon = (status) => {
+  switch (status) {
+    case WorkerNodeStatus.STARTED:
+      return Icons.NODE_STARTED;
+    case WorkerNodeStatus.STARTING:
+      return Icons.NODE_STARTING;
+    case WorkerNodeStatus.STOPPED:
+      return Icons.NODE_STOPPED;
+    case WorkerNodeStatus.STOPPING:
+      return Icons.NODE_STOPPING;
+    default:
+      return '';
+  }
+};
+
 const createWorkerData = (worker) => ({
   id: worker.id,
-  inUse: worker.inUse,
-  inUseIcon: worker.inUse ? 'bi-play-circle text-success' : 'bi-stop-circle text-danger',
+  status: worker.status,
+  statusIcon: getWorkerNodeStatusIcon(worker.status),
+  statusTitle: worker.status.charAt(0).toUpperCase() + worker.status.slice(1).toLowerCase(),
   alias: worker.alias,
   host: worker.host,
   port: worker.port,
@@ -96,6 +113,18 @@ export default (state = INITIAL_STATE, { type, payload }) => {
       const updWorker = state.workers.find((w) => w.id === payload.id);
       updWorker.alias = payload.alias;
       updWorker.port = payload.port;
+      return {
+        ...state,
+        workers: [
+          ...state.workers,
+        ],
+      };
+    case types.DISABLE_WORKER:
+      const disWorker = state.workers.find((w) => w.id === payload.id);
+      disWorker.status = disWorker.status === WorkerNodeStatus.STARTED || disWorker.status === WorkerNodeStatus.STARTING
+        ? WorkerNodeStatus.STOPPING
+        : WorkerNodeStatus.STARTING;
+      disWorker.statusIcon = getWorkerNodeStatusIcon(disWorker.status);
       return {
         ...state,
         workers: [

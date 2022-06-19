@@ -20,6 +20,17 @@ export const Icons = {
   FREEZE: 'bi-snow',
   REFRESH: 'bi-arrow-clockwise',
   ARROW_RIGHT: 'bi-arrow-right',
+  NODE_STARTED: 'bi-play-circle text-success',
+  NODE_STARTING: 'bi-cloud-arrow-up text-info',
+  NODE_STOPPED: 'bi-stop-circle text-danger',
+  NODE_STOPPING: 'bi-cloud-arrow-down text-info',
+};
+
+export const WorkerNodeStatus = {
+  STARTED: 'STARTED',
+  STARTING: 'STARTING',
+  STOPPING: 'STOPPING',
+  STOPPED: 'STOPPED',
 };
 
 export const algorithms = [

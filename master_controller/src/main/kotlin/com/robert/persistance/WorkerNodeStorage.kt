@@ -3,6 +3,7 @@ package com.robert.persistance
 import com.robert.DBConnector
 import com.robert.StorageUtils
 import com.robert.WorkerNode
+import com.robert.WorkerNodeStatus
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ServerException
 import java.util.*
@@ -10,7 +11,7 @@ import kotlin.collections.ArrayList
 
 class WorkerNodeStorage {
     fun get(id: String): WorkerNode {
-        DBConnector.getConnection().prepareStatement("SELECT id, alias, host, port, in_use FROM workers WHERE id = ?")
+        DBConnector.getConnection().prepareStatement("SELECT id, alias, host, port, status FROM workers WHERE id = ?")
             .use { st ->
                 st.setString(1, id)
                 st.executeQuery()
@@ -21,7 +22,7 @@ class WorkerNodeStorage {
                                 rs.getString("alias"),
                                 rs.getString("host"),
                                 rs.getInt("port"),
-                                rs.getBoolean("in_use")
+                                WorkerNodeStatus.valueOf(rs.getString("status"))
                             )
                         }
                     }
@@ -31,7 +32,7 @@ class WorkerNodeStorage {
     }
 
     fun getAll(): List<WorkerNode> {
-        val query = "SELECT id, alias, host, port, in_use FROM workers order by alias"
+        val query = "SELECT id, alias, host, port, status FROM workers order by alias"
         val workerNodes = ArrayList<WorkerNode>()
 
         DBConnector.getConnection().createStatement()
@@ -45,7 +46,7 @@ class WorkerNodeStorage {
                                     rs.getString("alias"),
                                     rs.getString("host"),
                                     rs.getInt("port"),
-                                    rs.getBoolean("in_use")
+                                    WorkerNodeStatus.valueOf(rs.getString("status"))
                                 )
                             )
                         }
@@ -59,38 +60,63 @@ class WorkerNodeStorage {
         val id = UUID.randomUUID().toString()
 
         DBConnector.getConnection()
-            .prepareStatement("INSERT INTO workers(id, alias, host, port, in_use) VALUES (?, ?, ?, ?, ?)")
+            .prepareStatement("INSERT INTO workers(id, alias, host, port, status) VALUES (?, ?, ?, ?, ?)")
             .use { st ->
-
+                val status = WorkerNodeStatus.STARTING
                 st.setString(1, id)
                 st.setString(2, alias)
                 st.setString(3, host)
                 st.setInt(4, port)
-                st.setBoolean(5, false)
+                st.setString(5, status.toString())
                 val res = st.executeUpdate()
 
                 if (res > 0) {
-                    return WorkerNode(id, alias, host, port, false)
+                    return WorkerNode(id, alias, host, port, status)
                 }
             }
 
         throw ServerException()
     }
 
-    fun update(id: String, alias: String?, port: Int?, inUse: Boolean?) {
+    fun update(id: String, alias: String?, port: Int?, status: WorkerNodeStatus?) {
         var workerNode: WorkerNode? = null
-        if (alias == null || inUse == null || port == null) {
+        if (alias == null || status == null || port == null) {
             workerNode = get(id)
         }
         DBConnector.getConnection()
-            .prepareStatement("UPDATE workers SET alias = ?, in_use = ?, port = ? WHERE id = ?")
+            .prepareStatement("UPDATE workers SET alias = ?, status = ?, port = ? WHERE id = ?")
             .use { st ->
                 st.setString(4, id)
                 st.setString(1, alias ?: workerNode!!.alias)
-                st.setBoolean(2, inUse ?: workerNode!!.inUse)
+                st.setString(2, (status ?: workerNode!!.status).toString())
                 st.setInt(3, port ?: workerNode!!.port)
                 StorageUtils.executeUpdate(st)
             }
+    }
+
+    fun flipStatus(id: String) {
+        DBConnector.getTransactionConnection().use { conn ->
+            val status: WorkerNodeStatus
+            conn.prepareStatement("SELECT status FROM workers WHERE id = ?").use { st ->
+                st.setString(1, id)
+                st.executeQuery().use { rs ->
+                    if (!rs.next()) {
+                        throw NotFoundException()
+                    }
+                    status = WorkerNodeStatus.valueOf(rs.getString("status"))
+                }
+            }
+            conn.prepareStatement("UPDATE workers SET status = ? WHERE id = ?").use { st ->
+                if (status == WorkerNodeStatus.STARTED || status == WorkerNodeStatus.STARTING) {
+                    st.setString(1, WorkerNodeStatus.STOPPING.toString())
+                } else {
+                    st.setString(1, WorkerNodeStatus.STARTING.toString())
+                }
+                st.setString(2, id)
+                StorageUtils.executeUpdate(st)
+            }
+            conn.commit()
+        }
     }
 
     fun delete(id: String) {

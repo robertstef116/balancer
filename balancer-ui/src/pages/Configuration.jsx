@@ -48,6 +48,12 @@ const balancingConfigs = [
     info: 'Interval between configuration verifications',
     validator: positiveNumberValidator,
   },
+  {
+    label: 'Workers sync interval',
+    key: 'WORKERS_CHECK_INTERVAL',
+    info: 'Interval between workers verifications',
+    validator: positiveNumberValidator,
+  },
 ];
 
 const algorithmConfigs = [

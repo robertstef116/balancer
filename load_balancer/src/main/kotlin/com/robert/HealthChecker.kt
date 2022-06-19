@@ -7,19 +7,21 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
+import kotlin.properties.Delegates
 
 class HealthChecker(
     val worker: WorkerNode,
-    private var checkInterval: Long,
-    private var checkTimeout: Long,
-    private var maxNumberOfFailures: Int,
-    private var numberOfRelevantPerformanceMetrics: Int,
     private val onInitialize: () -> Unit,
-    val onFailure: (HealthChecker) -> Unit
+    val onFailure: () -> Unit
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(HealthChecker::class.java)
         private val context = Dispatchers.IO.limitedParallelism(1)
+
+        private var checkInterval by Delegates.notNull<Long>()
+        private var checkTimeout by Delegates.notNull<Long>()
+        private var maxNumberOfFailures by Delegates.notNull<Int>()
+        private var relevantPerformanceMetricsNumber by Delegates.notNull<Int>()
 
         private fun <T> addMetric(latestMetrics: ConcurrentLinkedQueue<T>, newValue: T, limit: Int) {
             while (latestMetrics.size > limit) {
@@ -27,11 +29,24 @@ class HealthChecker(
             }
             latestMetrics.add(newValue)
         }
+
+        suspend fun doHealthCheck(worker: WorkerNode): WorkerResourceResponse {
+            log.debug("Health check {}:{}", worker.host, worker.port)
+            val url = "http://${worker.host}:${worker.port}/resource"
+            return HttpClient.get(url, checkTimeout)
+        }
+
+        fun reloadDynamicConfigs() {
+            log.debug("reload health checker dynamic configs")
+            relevantPerformanceMetricsNumber = DynamicConfigProperties.getIntPropertyOrDefault(Constants.NUMBER_RELEVANT_PERFORMANCE_METRICS, 3)
+            checkTimeout =  DynamicConfigProperties.getLongPropertyOrDefault(Constants.HEALTH_CHECK_TIMEOUT, 10000L)
+            checkInterval = DynamicConfigProperties.getLongPropertyOrDefault(Constants.HEALTH_CHECK_INTERVAL, 10000L)
+            maxNumberOfFailures = DynamicConfigProperties.getIntPropertyOrDefault(Constants.HEALTH_CHECK_MAX_FAILURES, 3)
+        }
     }
 
-    private lateinit var healthCheckerFn: Job
-    private val url = "http://${worker.host}:${worker.port}/resource"
     private var nrOfFailures = 0
+    private var runHealthCheck = true
 
     private val resourcesLock = ReentrantReadWriteLock()
 
@@ -59,15 +74,14 @@ class HealthChecker(
 
     fun start() {
         log.debug("starting health check {} {}", worker.host, worker.port)
-        val currentHealthChecker = this
 
-        healthCheckerFn = CoroutineScope(context).launch {
-            while (true) {
+        CoroutineScope(context).launch {
+            while (runHealthCheck) {
                 try {
-                    log.debug("Health check {}:{}", worker.host, worker.port)
-                    val res = HttpClient.get<WorkerResourceResponse>(url, checkTimeout)
-                    addMetric(latestAvailableCpus, 100 - res.resourcesInfo.cpuLoad, numberOfRelevantPerformanceMetrics)
-                    addMetric(latestAvailableMemories, res.resourcesInfo.availableMemory, numberOfRelevantPerformanceMetrics)
+                    val res = doHealthCheck(worker)
+
+                    addMetric(latestAvailableCpus, 100 - res.resourcesInfo.cpuLoad, relevantPerformanceMetricsNumber)
+                    addMetric(latestAvailableMemories, res.resourcesInfo.availableMemory, relevantPerformanceMetricsNumber)
 
                     // remove performance data of the container which no longer exists
                     val deploymentsPerformanceToRemove = mutableSetOf<DeploymentPerformance>()
@@ -96,12 +110,12 @@ class HealthChecker(
                         addMetric(
                             deploymentPerformance.latestAvailableCpus,
                             100 - containerStats.cpuLoad,
-                            numberOfRelevantPerformanceMetrics
+                            relevantPerformanceMetricsNumber
                         )
                         addMetric(
                             deploymentPerformance.latestAvailableMemories,
                             containerStats.availableMemory,
-                            numberOfRelevantPerformanceMetrics
+                            relevantPerformanceMetricsNumber
                         )
                     }
 
@@ -115,10 +129,8 @@ class HealthChecker(
                     log.error("failed health check on host {}", worker.host)
                     nrOfFailures++
                     if (nrOfFailures >= maxNumberOfFailures) {
-                        if (initialized.compareAndSet(false, true)) {
-                            onInitialize()
-                        }
-                        onFailure(currentHealthChecker)
+                        terminate()
+                        onFailure()
                     }
                 }
                 log.debug("Health check {}:{} done, next check in {} ms", worker.host, worker.port, checkInterval)
@@ -127,15 +139,10 @@ class HealthChecker(
         }
     }
 
-    fun stop() {
-        healthCheckerFn.cancel()
-    }
-
-    fun updateConfigs(checkInterval: Long, checkTimeout: Long, maxNumberOfFailures: Int, numberOfRelevantPerformanceMetrics: Int) {
-        log.debug("update configs")
-        this.checkInterval = checkInterval
-        this.checkTimeout = checkTimeout
-        this.maxNumberOfFailures = maxNumberOfFailures
-        this.numberOfRelevantPerformanceMetrics = numberOfRelevantPerformanceMetrics
+    fun terminate() {
+        runHealthCheck = false
+        if (initialized.compareAndSet(false, true)) {
+            onInitialize()
+        }
     }
 }

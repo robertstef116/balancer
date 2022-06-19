@@ -1,18 +1,15 @@
 package com.robert.algorithms
 
 import com.robert.*
-import kotlinx.coroutines.internal.SynchronizedObject
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.collections.HashMap
-import kotlin.concurrent.read
 import kotlin.concurrent.withLock
-import kotlin.concurrent.write
+import kotlin.properties.Delegates
 
 private data class TargetWeightedResponseInfo(
     val target: PathTargetResource,
@@ -35,11 +32,18 @@ private data class TargetWeightedResponseInfo(
     }
 }
 
-class WeightedResponseTimeAlgorithm(
-    availableTargets: List<PathTargetResource>, private var recomputeWeightInterval: Int
-) : LoadBalancingAlgorithm {
+class WeightedResponseTimeAlgorithm(availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
     companion object {
         private val log = LoggerFactory.getLogger(WeightedResponseTimeAlgorithm::class.java)
+        private var recomputeWeightInterval by Delegates.notNull<Int>()
+
+        fun reloadDynamicConfigs() {
+            log.debug("reload weighted response time algorithm dynamic configs")
+            recomputeWeightInterval = DynamicConfigProperties.getIntPropertyOrDefault(
+                Constants.COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL,
+                Constants.DEFAULT_COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL
+            )
+        }
     }
 
     override val algorithm = LBAlgorithms.WEIGHTED_RESPONSE_TIME
@@ -115,10 +119,5 @@ class WeightedResponseTimeAlgorithm(
                 TargetWeightedResponseInfo(it.target, weight)
             }
         }
-    }
-
-    fun updateConfigs(recomputeWeightInterval: Int) {
-        log.debug("update configs")
-        this.recomputeWeightInterval = recomputeWeightInterval
     }
 }

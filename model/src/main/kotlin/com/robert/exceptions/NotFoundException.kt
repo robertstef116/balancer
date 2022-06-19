@@ -1,3 +1,3 @@
 package com.robert.exceptions
 
-class NotFoundException : RuntimeException()
+class NotFoundException : RuntimeException("Not found")

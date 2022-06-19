@@ -1,3 +1,3 @@
 package com.robert.exceptions
 
-class ValidationException(override val message: String) : RuntimeException()
+class ValidationException(override val message: String) : RuntimeException("Validation Exception")

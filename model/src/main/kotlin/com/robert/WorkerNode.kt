@@ -5,5 +5,5 @@ data class WorkerNode(
     val alias: String,
     val host: String,
     val port: Int,
-    val inUse: Boolean
+    val status: WorkerNodeStatus
 )

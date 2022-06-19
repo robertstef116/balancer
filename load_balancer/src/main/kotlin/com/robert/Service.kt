@@ -36,8 +36,7 @@ class Service(private val storage: Storage) {
                     dockerContainerResponse.ports
                 )
             } catch (e: Exception) {
-                e.printStackTrace()
-                log.error("error deploying workflow {}", e.message)
+                log.error("error deploying workflow, err = {}", e.message)
                 if (dockerContainerResponse != null) {
                     HttpClient.delete<String>("$url?id=${dockerContainerResponse.id}")
                 } else {
@@ -59,14 +58,12 @@ class Service(private val storage: Storage) {
                     response = true
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
-                log.error("error removing deployment {}", e.message)
+                log.error("error removing deployment err = {}", e.message)
             }
             try {
                 storage.deleteDeployment(id)
             } catch (e: Exception) {
-                e.printStackTrace()
-                log.error("error removing deployment from db {}", e.message)
+                log.error("error removing deployment from db, err = {}", e.message)
             }
             return@runBlocking response
         }
@@ -87,8 +84,7 @@ class Service(private val storage: Storage) {
             updateAwareServicesMetadata = newMetadata
             return updatedServicesKeys
         } catch (e: Exception) {
-            e.printStackTrace()
-            log.error("error getting updated services config timestamps")
+            log.error("error getting updated services config timestamps, err = {}", e.message)
         }
         return null
     }
@@ -97,7 +93,7 @@ class Service(private val storage: Storage) {
         try {
             storage.persistAnalytics(targetResource.workerId, targetResource.workflowId, targetResource.deploymentId, Instant.now().epochSecond)
         } catch (e: Exception) {
-            log.warn("unable to persist analytics data {}", e.message)
+            log.warn("unable to persist analytics data, err = {}", e.message)
         }
     }
 
