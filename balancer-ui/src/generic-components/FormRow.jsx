@@ -106,7 +106,7 @@ function FormRow({
       <div className={classNames('col', { 'has-error': !!error })}>
         <div className="d-flex align-items-center">
           {getControl()}
-          {info && <i className="bi bi-info-circle text-primary ms-2" title={info} />}
+          {info && <i className={classNames('text-primary ms-2', Icons.INFO)} title={info} />}
         </div>
         <div className="input-error">
           {error}

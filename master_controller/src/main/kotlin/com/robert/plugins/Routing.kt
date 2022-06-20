@@ -8,6 +8,7 @@ import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.response.*
 
@@ -21,13 +22,13 @@ fun Application.configureRouting() {
     routing {
         login()
 
-//        authenticate("auth-jwt") {
-        config("/config", configService)
-        worker("/worker", workerService)
-        workflow("/workflow", workflowService)
-        deployment("/deployment", deploymentService)
-        analytics("/analytics", analyticsService)
-//        }
+        authenticate("auth-jwt") {
+            config("/config", configService)
+            worker("/worker", workerService)
+            workflow("/workflow", workflowService)
+            deployment("/deployment", deploymentService)
+            analytics("/analytics", analyticsService)
+        }
 
         // Static plugin. Try to access `/static/index.html`
         static("/static") {

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Button, Container, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { APP_NAME } from '../constants';
+import classNames from 'classnames';
+import { APP_NAME, Icons } from '../constants';
 import * as actions from '../redux/actions';
 import Spinner from '../components/Spinner';
 
@@ -46,7 +47,7 @@ function LoginPage() {
         </Form.Group>
         {!!error && (
         <div className="text-danger mb-4">
-          <i className="bi bi-x-circle-fill pe-1" />
+          <i className={classNames('pe-1', Icons.ERROR)} />
           {error}
         </div>
         )}

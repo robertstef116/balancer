@@ -2,6 +2,7 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 import classNames from 'classnames';
 import WidgetWrapper from './WidgetWrapper';
+import { Icons } from '../constants';
 
 function TableWidget({
   title, className, cols, rows, isLoading, onRefresh, actions, error, dismissError, activeRowKey, onRowClick,
@@ -13,7 +14,7 @@ function TableWidget({
       case 'InfoIcon':
         return (
           <td key={col.key} style={{ width: col.width }}>
-            <i className="bi bi-info-circle text-secondary" title={data[col.key]} />
+            <i className={classNames('text-secondary', Icons.INFO)} title={data[col.key]} />
           </td>
         );
       default:

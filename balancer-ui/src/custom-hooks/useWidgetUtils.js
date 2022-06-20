@@ -5,6 +5,7 @@ import { CancelToken, isCancel } from 'axios';
 const useWidgetUtils = ({ withCancellation } = { withCancellation: false }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const isActive = useRef(true);
   const dispatch = useDispatch();
   const cancellationToken = useRef();
   const loadingCount = useRef(0);
@@ -47,16 +48,19 @@ const useWidgetUtils = ({ withCancellation } = { withCancellation: false }) => {
     startLoading();
     const actionParams = handleCancellation(params);
     action(actionParams, (err, data) => {
-      stopLoading();
-      if (err) {
-        if (isCancel(err)) {
-          return;
+      if (isActive.current) {
+        stopLoading();
+        if (err) {
+          if (!isCancel(err)) {
+            setError(err);
+          }
+        } else {
+          setError(null);
+          if (cb) {
+            cb(data);
+          }
         }
-        setError(err);
-      } else if (cb) {
-        cb(data);
       }
-      setError(null);
     });
   };
 
@@ -64,26 +68,28 @@ const useWidgetUtils = ({ withCancellation } = { withCancellation: false }) => {
     startLoading();
     const actionParams = handleCancellation({ ...params, reload });
     dispatch(action(actionParams, (err) => {
-      stopLoading();
-      if (err) {
-        if (isCancel(err)) {
-          return;
+      if (isActive.current) {
+        stopLoading();
+        if (err) {
+          if (!isCancel(err)) {
+            setError(err);
+          }
+        } else {
+          setError(null);
+          if (cb) {
+            cb();
+          }
         }
-        setError(err);
-      } else if (cb) {
-        cb();
       }
-      setError(null);
     }));
   };
 
-  if (withCancellation) {
-    useEffect(() => () => {
-      if (cancellationToken.current) {
-        cancellationToken.current.cancel();
-      }
-    }, []);
-  }
+  useEffect(() => () => {
+    isActive.current = false;
+    if (cancellationToken.current) {
+      cancellationToken.current.cancel();
+    }
+  }, []);
 
   return {
     emitError,

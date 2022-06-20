@@ -1,5 +1,31 @@
 import axios from 'axios';
 import { API_URL } from './constants';
+import store from './redux/store';
+import * as types from './redux/types';
+
+axios.interceptors.request.use((req) => {
+  if (!req.url.includes('/login')) {
+    const { token } = store.getState();
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+  return req;
+}, (error) => error);
+
+axios.interceptors.response.use((res) => res, (error) => {
+  if (error.response.status === 401) {
+    sessionStorage.removeItem('JWT_TOKEN');
+    sessionStorage.removeItem('USERNAME');
+    store.dispatch({
+      type: types.SESSION_EXPIRED,
+      payload: {
+        username: null,
+        token: null,
+        isAuthenticated: false,
+      },
+    });
+  }
+  return error;
+});
 
 export const login = async ({ username, password }) => {
   const res = await axios.post(`${API_URL}/login`, { username, password });
@@ -17,7 +43,7 @@ export const getWorkers = async () => {
   throw new Error('Get workers failed!');
 };
 
-export const addWorker = async (token, { alias, host, port }) => {
+export const addWorker = async ({ alias, host, port }) => {
   const res = await axios.post(`${API_URL}/worker`, { alias, host, port });
   if (res.status === 200) {
     return res.data;
@@ -25,7 +51,7 @@ export const addWorker = async (token, { alias, host, port }) => {
   throw new Error('Add worker failed!');
 };
 
-export const updateWorker = async (token, { id, alias, port }) => {
+export const updateWorker = async ({ id, alias, port }) => {
   const res = await axios.put(`${API_URL}/worker/${id}`, { alias, port });
   if (res.status === 200) {
     return res.data;
@@ -33,7 +59,7 @@ export const updateWorker = async (token, { id, alias, port }) => {
   throw new Error('Update worker failed!');
 };
 
-export const disableWorker = async (token, { id }) => {
+export const disableWorker = async ({ id }) => {
   const res = await axios.put(`${API_URL}/worker/${id}/stop`);
   if (res.status === 200) {
     return;
@@ -41,7 +67,7 @@ export const disableWorker = async (token, { id }) => {
   throw new Error('Delete worker failed!');
 };
 
-export const deleteWorker = async (token, { id }) => {
+export const deleteWorker = async ({ id }) => {
   const res = await axios.delete(`${API_URL}/worker/${id}`);
   if (res.status === 200) {
     return;
@@ -57,7 +83,7 @@ export const getWorkflows = async () => {
   throw new Error('Get workflows failed!');
 };
 
-export const addWorkflow = async (token, { image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping }) => {
+export const addWorkflow = async ({ image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping }) => {
   const res = await axios.post(`${API_URL}/workflow`, { image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping });
   if (res.status === 200) {
     return res.data;
@@ -65,7 +91,7 @@ export const addWorkflow = async (token, { image, memoryLimit, algorithm, minDep
   throw new Error('Add workflow failed!');
 };
 
-export const updateWorkflow = async (token, { id, algorithm, minDeployments, maxDeployments }) => {
+export const updateWorkflow = async ({ id, algorithm, minDeployments, maxDeployments }) => {
   const res = await axios.put(`${API_URL}/workflow/${id}`, { algorithm, minDeployments, maxDeployments });
   if (res.status === 200) {
     return res.data;
@@ -73,7 +99,7 @@ export const updateWorkflow = async (token, { id, algorithm, minDeployments, max
   throw new Error('Update workflow failed!');
 };
 
-export const deleteWorkflow = async (token, { id }) => {
+export const deleteWorkflow = async ({ id }) => {
   const res = await axios.delete(`${API_URL}/workflow/${id}`);
   if (res.status === 200) {
     return;

@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import Spinner from '../components/Spinner';
+import { Icons } from '../constants';
 
 function PageWrapper({
   children, isLoading, error = null, dismissError = null, onRefresh = null,
@@ -13,13 +14,13 @@ function PageWrapper({
             <span className="text-truncate" title={error}>
               {error}
             </span>
-            <i className="icon-button bi bi-x-lg ms-2 me-1" onClick={dismissError} />
+            <i className={classNames('icon-button ms-2 me-1', Icons.DELETE)} onClick={dismissError} />
           </div>
         )}
         {onRefresh && (
           <div className="bg-dark ms-auto ps-5 pe-3 page-action-wrapper position-relative">
             <i
-              className={classNames('bi ps-1 page-action bi-arrow-clockwise', {
+              className={classNames('ps-1 page-action', Icons.REFRESH, {
                 invisible: isLoading,
               })}
               title="Refresh"

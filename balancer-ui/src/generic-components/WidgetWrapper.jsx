@@ -13,7 +13,7 @@ function WidgetWrapper({
         <span className="ms-auto d-flex align-items-center">
           {onRefresh && (
           <i
-            className={classNames('bi ps-1 widget-action', Icons.REFRESH, {
+            className={classNames('ps-1 widget-action', Icons.REFRESH, {
               invisible: isLoading,
             })}
             title="Refresh"
@@ -23,7 +23,7 @@ function WidgetWrapper({
           {actions.map((action) => (
             <i
               key={action.icon}
-              className={classNames(`bi ps-1 widget-action ${action.icon}`, {
+              className={classNames(`ps-1 widget-action ${action.icon}`, {
                 invisible: isLoading || action.hide,
               })}
               title={action.title}
@@ -43,7 +43,7 @@ function WidgetWrapper({
           <span className="text-truncate" title={error}>
             {error}
           </span>
-          <i className="icon-button bi bi-x-lg" onClick={dismissError} />
+          <i className={classNames('icon-button bi', Icons.DELETE)} onClick={dismissError} />
         </div>
         )}
         <div className="flex-grow-1 overflow-auto">

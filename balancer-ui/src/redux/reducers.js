@@ -163,6 +163,7 @@ export default (state = INITIAL_STATE, { type, payload }) => {
     case types.REMOVE_CREDENTIALS:
     case types.LOGOUT:
     case types.LOGIN:
+    case types.SESSION_EXPIRED:
       return {
         ...state,
         ...payload,

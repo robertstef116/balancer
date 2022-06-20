@@ -1,5 +1,6 @@
 import React from 'react';
 import WidgetWrapper from './WidgetWrapper';
+import { Icons } from '../constants';
 
 function EditableWidget({
   title, isLoading, onSave, changed, children, error, dismissError, className,
@@ -13,7 +14,7 @@ function EditableWidget({
       dismissError={dismissError}
       actions={[
         {
-          title: 'Save', icon: 'bi-check-lg', onClick: onSave, hide: !changed,
+          title: 'Save', icon: Icons.SAVE, onClick: onSave, hide: !changed,
         },
       ]}
     >

@@ -2,6 +2,7 @@ export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 export const SET_CREDENTIALS = 'SET_CREDENTIALS';
 export const REMOVE_CREDENTIALS = 'REMOVE_CREDENTIALS';
+export const SESSION_EXPIRED = 'SESSION_EXPIRED';
 
 export const GET_WORKERS = 'GET_WORKERS';
 export const ADD_WORKER = 'ADD_WORKER';

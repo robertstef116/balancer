@@ -14,16 +14,19 @@ export const ranges = [
 ];
 
 export const Icons = {
-  ADD: 'bi-plus-lg',
-  EDIT: 'bi-pencil',
-  DELETE: 'bi-x-lg',
-  FREEZE: 'bi-snow',
-  REFRESH: 'bi-arrow-clockwise',
-  ARROW_RIGHT: 'bi-arrow-right',
-  NODE_STARTED: 'bi-play-circle text-success',
-  NODE_STARTING: 'bi-cloud-arrow-up text-info',
-  NODE_STOPPED: 'bi-stop-circle text-danger',
-  NODE_STOPPING: 'bi-cloud-arrow-down text-info',
+  ADD: 'bi bi-plus-lg',
+  EDIT: 'bi bi-pencil',
+  DELETE: 'bi bi-x-lg',
+  FREEZE: 'bi bi-snow',
+  REFRESH: 'bi bi-arrow-clockwise',
+  ARROW_RIGHT: 'bi bi-arrow-right',
+  NODE_STARTED: 'bi bi-play-circle text-success',
+  NODE_STARTING: 'bi bi-cloud-arrow-up text-info',
+  NODE_STOPPED: 'bi bi-stop-circle text-danger',
+  NODE_STOPPING: 'bi bi-cloud-arrow-down text-info',
+  SAVE: 'bi bi-check-lg',
+  ERROR: 'bi bi-x-circle-fill',
+  INFO: 'bi bi-info-circle',
 };
 
 export const WorkerNodeStatus = {
