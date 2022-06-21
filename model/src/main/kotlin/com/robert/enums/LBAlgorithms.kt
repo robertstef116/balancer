@@ -1,4 +1,4 @@
-package com.robert
+package com.robert.enums
 
 enum class LBAlgorithms(val value: String) {
     RANDOM("RANDOM"),

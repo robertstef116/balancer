@@ -1,8 +1,8 @@
 package com.robert.services
 
 import com.robert.Constants
-import com.robert.LBAlgorithms
-import com.robert.Workflow
+import com.robert.enums.LBAlgorithms
+import com.robert.resources.Workflow
 import com.robert.UpdateAwareService
 import com.robert.exceptions.ValidationException
 import com.robert.persistance.WorkflowStorage

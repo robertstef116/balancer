@@ -1,21 +1,21 @@
 package com.robert.algorithms
 
-import com.robert.LBAlgorithms
-import com.robert.PathTargetResource
-import com.robert.SelectedDeploymentInfo
+import com.robert.enums.LBAlgorithms
+import com.robert.balancing.RequestTargetData
+import com.robert.balancing.RequestData
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 
-class LeastConnectionAlgorithm(private var availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
+class LeastConnectionAlgorithm(private var availableTargets: List<RequestTargetData>) : LoadBalancingAlgorithm {
     override val algorithm = LBAlgorithms.LEAST_CONNECTION
-    private val targets = ConcurrentHashMap<PathTargetResource, AtomicLong>()
+    private val targets = ConcurrentHashMap<RequestTargetData, AtomicLong>()
 
     init {
         updateTargets(availableTargets)
     }
 
-    override fun updateTargets(newTargets: List<PathTargetResource>) {
+    override fun updateTargets(newTargets: List<RequestTargetData>) {
         for (target in targets.keys) {
             if (!newTargets.contains(target)) {
                 targets.remove(target)
@@ -31,18 +31,16 @@ class LeastConnectionAlgorithm(private var availableTargets: List<PathTargetReso
         availableTargets = newTargets
     }
 
-    override fun selectTargetDeployment(): SelectedDeploymentInfo {
+    override fun selectTargetDeployment(): RequestData {
         val minTarget = targets.entries.minByOrNull { it.value.get() }
         minTarget!!.value.incrementAndGet()
-        return SelectedDeploymentInfo(
-            minTarget.key.host,
-            minTarget.key.port,
+        return RequestData(
             "",
             minTarget.key
         )
     }
 
-    override fun registerProcessingFinished(deploymentInfo: SelectedDeploymentInfo) {
+    override fun registerProcessingFinished(deploymentInfo: RequestData) {
         targets[deploymentInfo.targetResource]?.decrementAndGet()
     }
 }

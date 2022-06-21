@@ -1,8 +1,8 @@
 package com.robert.persistance
 
 import com.robert.DBConnector
-import com.robert.LBAlgorithms
-import com.robert.Workflow
+import com.robert.enums.LBAlgorithms
+import com.robert.resources.Workflow
 import com.robert.StorageUtils
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ServerException

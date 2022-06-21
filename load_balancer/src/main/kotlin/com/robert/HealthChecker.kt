@@ -1,5 +1,8 @@
 package com.robert
 
+import com.robert.api.response.WorkerResourceResponse
+import com.robert.resources.performance.DeploymentPerformanceData
+import com.robert.resources.Worker
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -10,7 +13,7 @@ import kotlin.concurrent.read
 import kotlin.properties.Delegates
 
 class HealthChecker(
-    val worker: WorkerNode,
+    val worker: Worker,
     private val onInitialize: () -> Unit,
     val onFailure: () -> Unit
 ) {
@@ -30,7 +33,7 @@ class HealthChecker(
             latestMetrics.add(newValue)
         }
 
-        suspend fun doHealthCheck(worker: WorkerNode): WorkerResourceResponse {
+        suspend fun doHealthCheck(worker: Worker): WorkerResourceResponse {
             log.debug("Health check {}:{}", worker.host, worker.port)
             val url = "http://${worker.host}:${worker.port}/resource"
             return HttpClient.get(url, checkTimeout)
@@ -57,7 +60,7 @@ class HealthChecker(
     var lastCheckTimestamp = 0L
         private set
 
-    var deploymentsPerformance: List<DeploymentPerformance> = listOf()
+    var deploymentsPerformance: List<DeploymentPerformanceData> = listOf()
         get() = resourcesLock.read { field }
 
     fun getAverageAvailableCpu(): Double {
@@ -80,11 +83,11 @@ class HealthChecker(
                 try {
                     val res = doHealthCheck(worker)
 
-                    addMetric(latestAvailableCpus, 100 - res.resourcesInfo.cpuLoad, relevantPerformanceMetricsNumber)
-                    addMetric(latestAvailableMemories, res.resourcesInfo.availableMemory, relevantPerformanceMetricsNumber)
+                    addMetric(latestAvailableCpus, 100 - res.performanceData.cpuLoad, relevantPerformanceMetricsNumber)
+                    addMetric(latestAvailableMemories, res.performanceData.availableMemory, relevantPerformanceMetricsNumber)
 
                     // remove performance data of the container which no longer exists
-                    val deploymentsPerformanceToRemove = mutableSetOf<DeploymentPerformance>()
+                    val deploymentsPerformanceToRemove = mutableSetOf<DeploymentPerformanceData>()
                     deploymentsPerformance.forEach { containerStats ->
                         if (res.containersStats.find { it.containerId == containerStats.containerId } == null) {
                             deploymentsPerformanceToRemove.add(containerStats)
@@ -93,7 +96,7 @@ class HealthChecker(
                     deploymentsPerformance = deploymentsPerformance - deploymentsPerformanceToRemove
 
                     // add new deployed containers
-                    val deploymentsPerformanceToAdd = mutableListOf<DeploymentPerformance>()
+                    val deploymentsPerformanceToAdd = mutableListOf<DeploymentPerformanceData>()
 
                     for (containerStats in res.containersStats) {
                         var deploymentPerformance = deploymentsPerformance.find {
@@ -102,7 +105,7 @@ class HealthChecker(
 
                         // create deploymentPerformance data for new containers
                         if (deploymentPerformance == null) {
-                            deploymentPerformance = DeploymentPerformance(containerStats.deploymentId, containerStats.containerId)
+                            deploymentPerformance = DeploymentPerformanceData(containerStats.deploymentId, containerStats.containerId)
                             deploymentsPerformanceToAdd.add(deploymentPerformance)
                         }
 

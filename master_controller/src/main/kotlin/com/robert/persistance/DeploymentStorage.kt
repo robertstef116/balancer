@@ -1,7 +1,7 @@
 package com.robert.persistance
 
 import com.robert.DBConnector
-import com.robert.Deployment
+import com.robert.resources.Deployment
 
 class DeploymentStorage {
     fun getDeployments(): List<Deployment> {

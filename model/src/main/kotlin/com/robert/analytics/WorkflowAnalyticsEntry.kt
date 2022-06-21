@@ -1,4 +1,4 @@
-package com.robert
+package com.robert.analytics
 
 data class WorkflowAnalyticsEntry(
     val workflowId: String,

@@ -1,4 +1,6 @@
-package com.robert
+package com.robert.api.request
+
+import com.robert.enums.LBAlgorithms
 
 data class WorkflowCreateRequest (
     val image: String,

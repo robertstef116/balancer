@@ -1,6 +1,6 @@
 package com.robert.services
 
-import com.robert.Deployment
+import com.robert.resources.Deployment
 import com.robert.persistance.DeploymentStorage
 
 class DeploymentService {

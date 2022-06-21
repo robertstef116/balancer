@@ -1,6 +1,6 @@
 package com.robert.routes
 
-import com.robert.LoginRequest
+import com.robert.api.request.LoginRequest
 import com.robert.services.LoginService
 import io.ktor.application.*
 import io.ktor.request.*

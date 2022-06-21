@@ -1,6 +1,10 @@
 package com.robert
 
 import com.robert.algorithms.*
+import com.robert.balancing.RequestTargetData
+import com.robert.enums.LBAlgorithms
+import com.robert.enums.WorkerStatus
+import com.robert.resources.Worker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -29,8 +33,8 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     private val algorithmConfigLock = ReentrantLock()
     private val initializationWaiters = ConcurrentLinkedQueue<() -> Unit>()
 
-    var pathsMapping: Map<WorkflowPath, List<PathTargetResource>> = emptyMap()
-    var workers: List<WorkerNode> = emptyList()
+    var pathsMapping: Map<WorkflowPath, List<RequestTargetData>> = emptyMap()
+    var workers: List<Worker> = emptyList()
     var healthChecks: List<HealthChecker> = emptyList()
 
     fun getWorkflows() = storage.getWorkflows()
@@ -41,7 +45,7 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
         workersCheckInterval = DynamicConfigProperties.getLongPropertyOrDefault(Constants.WORKERS_CHECK_INTERVAL, 60000L)
     }
 
-    private fun getWorkflowPathAlgorithms(algorithm: LBAlgorithms, targetResources: List<PathTargetResource>): LoadBalancingAlgorithm {
+    private fun getWorkflowPathAlgorithms(algorithm: LBAlgorithms, targetResources: List<RequestTargetData>): LoadBalancingAlgorithm {
         return when (algorithm) {
             LBAlgorithms.RANDOM -> RandomAlgorithm(targetResources)
             LBAlgorithms.ROUND_ROBIN -> RoundRobinAlgorithm(targetResources)
@@ -74,11 +78,11 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
         }
     }
 
-    private fun initWorkerHealthChecks(worker: WorkerNode): HealthChecker {
+    private fun initWorkerHealthChecks(worker: Worker): HealthChecker {
         log.debug("init workers health checks")
         val healthCheck = HealthChecker(worker, this::onInitialized) {
             log.debug("worker check failed {}", worker)
-            storage.disableWorker(worker.id, WorkerNodeStatus.STARTING)
+            storage.disableWorker(worker.id, WorkerStatus.STARTING)
             workersChanged()
             pathsMappingChanged()
         }
@@ -163,12 +167,12 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     }
 
     private fun handleStoppingWorkers(): Int {
-        val stoppingWorkers = storage.getWorkers(WorkerNodeStatus.STOPPING)
+        val stoppingWorkers = storage.getWorkers(WorkerStatus.STOPPING)
         log.trace("{} workers in stopping state", stoppingWorkers.size)
         var workersStopped = 0
 
         for (worker in stoppingWorkers) {
-            storage.disableWorker(worker.id, WorkerNodeStatus.STOPPED)
+            storage.disableWorker(worker.id, WorkerStatus.STOPPED)
             workersStopped++
         }
 
@@ -176,7 +180,7 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     }
 
     private suspend fun handleStaringWorkers(): Int {
-        val startingWorkers = storage.getWorkers(WorkerNodeStatus.STARTING)
+        val startingWorkers = storage.getWorkers(WorkerStatus.STARTING)
         log.trace("{} workers in starting state", startingWorkers.size)
         var workersStarted = 0
 

@@ -1,8 +1,8 @@
-package com.robert
+package com.robert.resources.performance
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-data class DeploymentPerformance(
+data class DeploymentPerformanceData(
     val deploymentId: String,
     val containerId: String,
 ) {

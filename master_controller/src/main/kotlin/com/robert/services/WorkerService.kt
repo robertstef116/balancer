@@ -2,10 +2,9 @@ package com.robert.services
 
 import com.robert.Constants
 import com.robert.UpdateAwareService
-import com.robert.WorkerNode
+import com.robert.resources.Worker
 import com.robert.exceptions.ValidationException
 import com.robert.persistance.WorkerNodeStorage
-import org.apache.commons.validator.routines.InetAddressValidator
 
 class WorkerService : UpdateAwareService(Constants.WORKER_SERVICE_KEY) {
     companion object {
@@ -14,15 +13,15 @@ class WorkerService : UpdateAwareService(Constants.WORKER_SERVICE_KEY) {
 
     private val workerNodeStorage = WorkerNodeStorage()
 
-    fun get(id: String): WorkerNode {
+    fun get(id: String): Worker {
         return workerNodeStorage.get(id)
     }
 
-    fun getAll(): List<WorkerNode> {
+    fun getAll(): List<Worker> {
         return workerNodeStorage.getAll()
     }
 
-    fun add(alias: String, host: String, port: Int): WorkerNode {
+    fun add(alias: String, host: String, port: Int): Worker {
         if (!validateWorkerAlias(alias)) {
             throw ValidationException("Invalid alias")
         }

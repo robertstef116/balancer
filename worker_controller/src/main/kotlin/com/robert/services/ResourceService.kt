@@ -1,6 +1,6 @@
 package com.robert.services
 
-import com.robert.ResourcesInfo
+import com.robert.resources.performance.WorkerPerformanceData
 import org.slf4j.LoggerFactory
 import oshi.SystemInfo
 import oshi.hardware.CentralProcessor
@@ -16,12 +16,12 @@ class ResourceService {
 
     private var prevTicks = LongArray(CentralProcessor.TickType.values().size)
 
-    fun getResources(): ResourcesInfo {
+    fun getResources(): WorkerPerformanceData {
         log.debug("get container resources")
         val cpuLoad = processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100
         prevTicks = processor.systemCpuLoadTicks
 
-        return ResourcesInfo(
+        return WorkerPerformanceData(
             processor.logicalProcessorCount,
             cpuLoad,
             memory.available,

@@ -1,6 +1,12 @@
 package com.robert
 
-import DockerContainerPorts
+import com.robert.api.request.DockerCreateContainerRequest
+import com.robert.api.response.DockerCreateContainerResponse
+import com.robert.balancing.RequestTargetData
+import com.robert.docker.DockerContainerPorts
+import com.robert.resources.Deployment
+import com.robert.resources.Worker
+import com.robert.resources.Workflow
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -13,7 +19,7 @@ class Service(private val storage: Storage) {
 
     private lateinit var updateAwareServicesMetadata: Map<String, Long>
 
-    fun deployWorkflow(worker: WorkerNode, workflow: Workflow): Deployment? {
+    fun deployWorkflow(worker: Worker, workflow: Workflow): Deployment? {
         return runBlocking {
             val url = "http://${worker.host}:${worker.port}/docker"
             var dockerContainerResponse: DockerCreateContainerResponse? = null
@@ -47,7 +53,7 @@ class Service(private val storage: Storage) {
         }
     }
 
-    fun removeDeployment(worker: WorkerNode, id: String, containerId: String): Boolean {
+    fun removeDeployment(worker: Worker, id: String, containerId: String): Boolean {
         return runBlocking {
             var response = false
             val url = "http://${worker.host}:${worker.port}/docker/$containerId"
@@ -89,7 +95,7 @@ class Service(private val storage: Storage) {
         return null
     }
 
-    fun persistAnalytics(targetResource: PathTargetResource) {
+    fun persistAnalytics(targetResource: RequestTargetData) {
         try {
             storage.persistAnalytics(targetResource.workerId, targetResource.workflowId, targetResource.deploymentId, Instant.now().epochSecond)
         } catch (e: Exception) {
@@ -120,7 +126,7 @@ class Service(private val storage: Storage) {
         log.debug("workers synced")
     }
 
-    private suspend fun syncWorker(worker: WorkerNode) {
+    private suspend fun syncWorker(worker: Worker) {
         log.debug("syncing worker {}", worker)
         val url = "http://${worker.host}:${worker.port}/docker/ports"
         val res = HttpClient.get<List<DockerContainerPorts>>(url, 60000)

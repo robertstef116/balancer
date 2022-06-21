@@ -1,7 +1,7 @@
 package com.robert.routes
 
-import com.robert.WorkerCreateRequest
-import com.robert.WorkerUpdateRequest
+import com.robert.api.request.WorkerUpdateRequest
+import com.robert.api.response.WorkerCreateRequest
 import com.robert.services.WorkerService
 import io.ktor.application.*
 import io.ktor.request.*

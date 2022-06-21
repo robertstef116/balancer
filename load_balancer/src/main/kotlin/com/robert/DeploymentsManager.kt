@@ -1,5 +1,8 @@
 package com.robert
 
+import com.robert.resources.Deployment
+import com.robert.resources.Worker
+import com.robert.resources.Workflow
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -7,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.properties.Delegates
 
-private data class WorkerResource(val worker: WorkerNode, val availableCpu: Double, val availableMemory: Double)
+private data class WorkerResource(val worker: Worker, val availableCpu: Double, val availableMemory: Double)
 
 private data class WorkersResources(
     val totalAvailableCpu: Double, val totalAvailableMemory: Double, val workersResources: List<WorkerResource>

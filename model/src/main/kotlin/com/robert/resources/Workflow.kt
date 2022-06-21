@@ -1,4 +1,6 @@
-package com.robert
+package com.robert.resources
+
+import com.robert.enums.LBAlgorithms
 
 data class Workflow(
     val id: String,

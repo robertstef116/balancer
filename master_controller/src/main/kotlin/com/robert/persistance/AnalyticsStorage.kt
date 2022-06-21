@@ -1,10 +1,10 @@
 package com.robert.persistance
 
-import com.robert.AnalyticsEntry
+import com.robert.analytics.UsageAnalyticsEntry
 import com.robert.DBConnector
-import com.robert.ImageScalingData
-import com.robert.WorkflowAnalyticsData
-import com.robert.exceptions.WorkflowAnalyticsEvent
+import com.robert.analytics.ImageScalingAnalyticsData
+import com.robert.analytics.WorkflowAnalyticsData
+import com.robert.enums.WorkflowAnalyticsEventType
 import org.slf4j.LoggerFactory
 import java.time.Instant
 
@@ -15,8 +15,8 @@ class AnalyticsStorage {
 
     private val ANALYTICS_RESULTS_COUNT = 100
 
-    fun getAnalytics(from: Long, workerId: String?, workflowId: String?, deploymentId: String?): List<AnalyticsEntry> {
-        val analytics = ArrayList<AnalyticsEntry>()
+    fun getAnalytics(from: Long, workerId: String?, workflowId: String?, deploymentId: String?): List<UsageAnalyticsEntry> {
+        val analytics = ArrayList<UsageAnalyticsEntry>()
         val to = Instant.now().epochSecond
         val step: Long = (to - from) / ANALYTICS_RESULTS_COUNT + 1
 
@@ -66,7 +66,7 @@ class AnalyticsStorage {
                 .use { rs ->
                     while (rs.next()) {
                         analytics.add(
-                            AnalyticsEntry(
+                            UsageAnalyticsEntry(
                                 rs.getLong("value"),
                                 rs.getLong("time")
                             )
@@ -82,9 +82,9 @@ class AnalyticsStorage {
         from: Long,
         workerId: String?,
         workflowId: String?
-    ): Pair<MutableMap<String, ImageScalingData>, List<WorkflowAnalyticsData>> {
+    ): Pair<MutableMap<String, ImageScalingAnalyticsData>, List<WorkflowAnalyticsData>> {
         val analytics = ArrayList<WorkflowAnalyticsData>()
-        val workflowMapping = mutableMapOf<String, ImageScalingData>()
+        val workflowMapping = mutableMapOf<String, ImageScalingAnalyticsData>()
 
         val qs = StringBuilder()
 
@@ -111,7 +111,7 @@ class AnalyticsStorage {
 
                     st.executeQuery().use { rs ->
                         while (rs.next()) {
-                            workflowMapping[rs.getString("workflow_id")] = ImageScalingData(
+                            workflowMapping[rs.getString("workflow_id")] = ImageScalingAnalyticsData(
                                 rs.getString("image"), rs.getInt("no_of_deployments")
                             )
                         }
@@ -144,7 +144,7 @@ class AnalyticsStorage {
                                 WorkflowAnalyticsData(
                                     rs.getString("workflow_id"),
                                     rs.getString("image"),
-                                    WorkflowAnalyticsEvent.valueOf(rs.getString("event")),
+                                    WorkflowAnalyticsEventType.valueOf(rs.getString("event")),
                                     rs.getLong("timestamp")
                                 )
                             )

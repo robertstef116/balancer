@@ -1,6 +1,6 @@
-package com.robert
+package com.robert.balancing
 
-data class PathTargetResource (
+data class RequestTargetData (
     val workerId: String,
     val workflowId: String,
     val deploymentId: String,

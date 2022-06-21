@@ -1,6 +1,9 @@
 package com.robert.algorithms
 
 import com.robert.*
+import com.robert.balancing.RequestData
+import com.robert.balancing.RequestTargetData
+import com.robert.enums.LBAlgorithms
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
@@ -12,7 +15,7 @@ import kotlin.concurrent.withLock
 import kotlin.properties.Delegates
 
 private data class TargetWeightedResponseInfo(
-    val target: PathTargetResource,
+    val target: RequestTargetData,
     var weight: Float
 ) {
     private var numberOfElements: Int = 0
@@ -32,7 +35,7 @@ private data class TargetWeightedResponseInfo(
     }
 }
 
-class WeightedResponseTimeAlgorithm(availableTargets: List<PathTargetResource>) : LoadBalancingAlgorithm {
+class WeightedResponseTimeAlgorithm(availableTargets: List<RequestTargetData>) : LoadBalancingAlgorithm {
     companion object {
         private val log = LoggerFactory.getLogger(WeightedResponseTimeAlgorithm::class.java)
         private var recomputeWeightInterval by Delegates.notNull<Int>()
@@ -57,27 +60,22 @@ class WeightedResponseTimeAlgorithm(availableTargets: List<PathTargetResource>) 
         updateTargets(availableTargets)
     }
 
-    override fun updateTargets(newTargets: List<PathTargetResource>) {
+    override fun updateTargets(newTargets: List<RequestTargetData>) {
         // reinitialize all the weights, on targets change
         targetsLock.withLock {
             targets = newTargets.map { TargetWeightedResponseInfo(it, 1f / newTargets.size) }
         }
     }
 
-    override fun selectTargetDeployment(): SelectedDeploymentInfo {
+    override fun selectTargetDeployment(): RequestData {
         val referenceId = UUID.randomUUID().toString()
         val targetInfo = selectTarget()
         requests[referenceId] = Pair(Instant.now().epochSecond, targetInfo)
 
-        return SelectedDeploymentInfo(
-            targetInfo.target.host,
-            targetInfo.target.port,
-            referenceId,
-            targetInfo.target
-        )
+        return RequestData(referenceId, targetInfo.target)
     }
 
-    override fun registerProcessingFinished(deploymentInfo: SelectedDeploymentInfo) {
+    override fun registerProcessingFinished(deploymentInfo: RequestData) {
         requests.remove(deploymentInfo.referenceId)?.let {
             val (requestTime, targetInfo) = it
             if (requestTime > 0) {

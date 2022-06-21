@@ -1,6 +1,7 @@
 package com.robert
 
 import com.robert.algorithms.LoadBalancingAlgorithm
+import com.robert.balancing.RequestData
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ValidationException
 import io.ktor.network.selector.*
@@ -24,7 +25,7 @@ private data class HeaderProcessingResult(
 private data class WorkerSocketInfo(
     val routePrefix: String,
     val socket: Socket,
-    val deploymentInfo: SelectedDeploymentInfo,
+    val deploymentInfo: RequestData,
     val algorithm: LoadBalancingAlgorithm
 )
 
@@ -106,8 +107,8 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
         private suspend fun getWorkerSocket(route: String, pathsMapping: Set<WorkflowPath>): WorkerSocketInfo {
             val pathData = pathsMapping.find { route.startsWith(it.path) } ?: throw NotFoundException()
             val deployment = pathData.deploymentSelectionAlgorithm.selectTargetDeployment()
-            log.debug("selected deployment running at host {} on port {}", deployment.host, deployment.port)
-            val socket = aSocket(selectorManager).tcp().connect(deployment.host, deployment.port)
+            log.debug("selected deployment running at host {} on port {}", deployment.targetResource.host, deployment.targetResource.port)
+            val socket = aSocket(selectorManager).tcp().connect(deployment.targetResource.host, deployment.targetResource.port)
 
             return WorkerSocketInfo(
                 pathData.path,

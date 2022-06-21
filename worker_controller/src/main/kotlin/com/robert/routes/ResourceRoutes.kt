@@ -1,8 +1,6 @@
 package com.robert.routes
 
-import com.robert.DockerContainerStats
-import com.robert.ResourcesInfo
-import com.robert.WorkerResourceResponse
+import com.robert.api.response.WorkerResourceResponse
 import com.robert.services.DockerService
 import com.robert.services.ResourceService
 import io.ktor.application.*

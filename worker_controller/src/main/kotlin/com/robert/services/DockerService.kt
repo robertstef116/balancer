@@ -1,7 +1,10 @@
 package com.robert.services
 
-import DockerContainerPorts
+import com.robert.docker.DockerContainerPorts
 import com.robert.*
+import com.robert.api.response.DockerCreateContainerResponse
+import com.robert.docker.DockerContainer
+import com.robert.docker.DockerContainerStats
 import com.robert.exceptions.NotFoundException
 import com.spotify.docker.client.DefaultDockerClient
 import com.spotify.docker.client.DockerClient
@@ -38,12 +41,7 @@ class DockerService {
         }
     }
 
-    fun startContainer(
-        deploymentId: String,
-        image: String,
-        memoryLimit: Long?,
-        ports: List<Int>
-    ): DockerCreateContainerResponse {
+    fun startContainer(deploymentId: String, image: String, memoryLimit: Long?, ports: List<Int>): DockerCreateContainerResponse {
         // TODO: test image has tag, e.g. latest
 
         val portBindings = HashMap<String, List<PortBinding>>()
@@ -52,7 +50,7 @@ class DockerService {
             portBindings[it.toString()] = listOf(portBinding)
         }
 
-        log.debug("pulling image", image)
+        log.debug("pulling image {}", image)
         docker.pull(image, registry)
 
         // TODO: set docker registry
@@ -71,14 +69,14 @@ class DockerService {
             .exposedPorts(*ports.map { it.toString() }.toTypedArray())
             .build()
 
-        log.debug("creating container", containerConfig)
+        log.debug("creating container with config {}", containerConfig)
         val creation = docker.createContainer(containerConfig)
         val id = creation.id()!!
 
-        log.debug("starting container", id)
+        log.debug("starting container with {}", id)
         docker.startContainer(id)
 
-        log.debug("getting container info", id)
+        log.debug("getting container info {}", id)
         val info = docker.inspectContainer(id)
         val containerPorts = info.networkSettings().ports()?.entries?.associate {
             it.value.first().hostPort().toInt() to it.key.split("/")[0].toInt()
@@ -88,13 +86,13 @@ class DockerService {
     }
 
     fun removeContainer(id: String) {
-        log.debug("removing container", id)
+        log.debug("removing container with id {}", id)
 
         try {
             docker.removeContainer(id, DockerClient.RemoveContainerParam.forceKill())
             log.debug("container removed")
         } catch (e: ContainerNotFoundException) {
-            log.debug("container not found", id)
+            log.debug("container with id {} not found", id)
             throw NotFoundException()
         }
     }

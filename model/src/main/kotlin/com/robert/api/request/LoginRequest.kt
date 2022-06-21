@@ -1,4 +1,4 @@
-package com.robert
+package com.robert.api.request
 
 data class LoginRequest(
     val username: String,

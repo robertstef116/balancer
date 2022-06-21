@@ -1,8 +1,14 @@
 package com.robert
 
+import com.robert.balancing.RequestTargetData
+import com.robert.enums.LBAlgorithms
+import com.robert.enums.WorkerStatus
+import com.robert.enums.WorkflowAnalyticsEventType
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ServerException
-import com.robert.exceptions.WorkflowAnalyticsEvent
+import com.robert.resources.Deployment
+import com.robert.resources.Worker
+import com.robert.resources.Workflow
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
@@ -14,17 +20,17 @@ class Storage {
         private val log = LoggerFactory.getLogger(Storage::class.java)
     }
 
-    fun getWorkers(status: WorkerNodeStatus = WorkerNodeStatus.STARTED): List<WorkerNode> {
+    fun getWorkers(status: WorkerStatus = WorkerStatus.STARTED): List<Worker> {
         log.debug("get workers")
         val query = "SELECT id, alias, host, port FROM workers where status='$status'"
-        val workerNodes = ArrayList<WorkerNode>()
+        val workers = ArrayList<Worker>()
 
         DBConnector.getConnection().createStatement().use { st ->
             st.executeQuery(query)
                 .use { rs ->
                     while (rs.next()) {
-                        workerNodes.add(
-                            WorkerNode(
+                        workers.add(
+                            Worker(
                                 rs.getString("id"),
                                 rs.getString("alias"),
                                 rs.getString("host"),
@@ -36,10 +42,10 @@ class Storage {
                 }
         }
 
-        return workerNodes
+        return workers
     }
 
-    fun disableWorker(id: String, status: WorkerNodeStatus = WorkerNodeStatus.STOPPED) {
+    fun disableWorker(id: String, status: WorkerStatus = WorkerStatus.STOPPED) {
         log.debug("disable worker with id {}, new status will be {}", id, status)
         DBConnector.getTransactionConnection().use { conn ->
             try {
@@ -63,13 +69,13 @@ class Storage {
     fun enableWorker(id: String) {
         log.debug("enable worker with id {}", id)
         DBConnector.getConnection().prepareStatement("UPDATE workers set status = ? WHERE id = ?").use { st ->
-            st.setString(1, WorkerNodeStatus.STARTED.toString())
+            st.setString(1, WorkerStatus.STARTED.toString())
             st.setString(2, id)
             StorageUtils.executeUpdate(st)
         }
     }
 
-    fun getPathsMapping(): Map<WorkflowPath, List<PathTargetResource>> {
+    fun getPathsMapping(): Map<WorkflowPath, List<RequestTargetData>> {
         log.debug("get paths mapping")
         val query = """
             SELECT d.id, d.worker_id, d.workflow_id, wm.path, w.host, worker_port, w2.algorithm FROM deployment_mappings
@@ -80,14 +86,14 @@ class Storage {
                     ORDER BY wm.path
         """.trimIndent()
 
-        val pathsMapping = HashMap<WorkflowPath, List<PathTargetResource>>()
+        val pathsMapping = HashMap<WorkflowPath, List<RequestTargetData>>()
         DBConnector.getConnection().createStatement().use { st ->
             st.executeQuery(query)
                 .use { rs ->
                     var path: String? = null
                     var currentPath: String?
                     var algorithm: LBAlgorithms? = null
-                    var mappingList: MutableList<PathTargetResource>? = null
+                    var mappingList: MutableList<RequestTargetData>? = null
 
                     while (rs.next()) {
                         currentPath = rs.getString("path")
@@ -100,7 +106,7 @@ class Storage {
                             mappingList = ArrayList()
                         }
                         mappingList!!.add(
-                            PathTargetResource(
+                            RequestTargetData(
                                 rs.getString("worker_id"),
                                 rs.getString("workflow_id"),
                                 rs.getString("id"),
@@ -274,7 +280,7 @@ class Storage {
                         st.setString(1, workerId)
                         st.setString(2, workflowId)
                         st.setString(3, deploymentId)
-                        st.setString(4, WorkflowAnalyticsEvent.ADD.value)
+                        st.setString(4, WorkflowAnalyticsEventType.ADD.value)
                         st.setLong(5, timestamp)
                         StorageUtils.executeInsert(st)
                     }
@@ -343,7 +349,7 @@ class Storage {
                         st.setString(1, workerId)
                         st.setString(2, workflowId)
                         st.setString(3, id)
-                        st.setString(4, WorkflowAnalyticsEvent.REMOVE.value)
+                        st.setString(4, WorkflowAnalyticsEventType.REMOVE.value)
                         st.setLong(5, timestamp)
                         StorageUtils.executeInsert(st)
                     }

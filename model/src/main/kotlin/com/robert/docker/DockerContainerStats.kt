@@ -1,4 +1,4 @@
-package com.robert
+package com.robert.docker
 
 data class DockerContainerStats(
     val deploymentId: String,

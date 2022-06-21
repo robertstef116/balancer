@@ -1,6 +1,6 @@
-package com.robert
+package com.robert.enums
 
-enum class WorkerNodeStatus(status: String) {
+enum class WorkerStatus(status: String) {
     STARTED("STARTED"),
     STARTING("STARTING"),
     STOPPING("STOPPING"),

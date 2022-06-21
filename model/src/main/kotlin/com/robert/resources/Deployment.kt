@@ -1,4 +1,4 @@
-package com.robert
+package com.robert.resources
 
 data class Deployment(
     val id: String,

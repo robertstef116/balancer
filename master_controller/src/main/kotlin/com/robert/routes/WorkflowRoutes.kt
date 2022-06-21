@@ -1,7 +1,7 @@
 package com.robert.routes
 
-import com.robert.WorkflowCreateRequest
-import com.robert.WorkflowUpdateRequest
+import com.robert.api.request.WorkflowCreateRequest
+import com.robert.api.request.WorkflowUpdateRequest
 import com.robert.services.WorkflowService
 import io.ktor.application.*
 import io.ktor.request.*

@@ -1,6 +1,6 @@
-package com.robert
+package com.robert.resources.performance
 
-data class ResourcesInfo(
+data class WorkerPerformanceData(
     val logicalProcessorCount: Int,
     val cpuLoad: Double,
     val availableMemory: Long,
