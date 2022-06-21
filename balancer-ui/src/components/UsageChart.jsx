@@ -38,7 +38,7 @@ function UsageChart({
       onRangeChanged={setRange}
       data={data}
       now={now}
-      {...widgetProps}
+      widgetProps={widgetProps}
     >
       <Line name="Requests" type="monotone" dataKey="value" stroke="#FC7F03" dot={false} />
     </LineChartWrapper>

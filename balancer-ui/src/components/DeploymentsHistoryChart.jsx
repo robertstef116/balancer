@@ -77,7 +77,7 @@ function DeploymentsHistoryChart({ classNames, workerId, workflowId }) {
       onRangeChanged={setRange}
       data={data}
       now={now}
-      {...widgetProps}
+      widgetProps={widgetProps}
     >
       {Object.keys(workflowMapping).map((wid) => <Line key={wid} name={workflowMapping[wid]} type="monotone" dataKey={wid} dot={false} />)}
     </LineChartWrapper>

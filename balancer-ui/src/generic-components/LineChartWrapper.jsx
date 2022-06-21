@@ -37,7 +37,7 @@ function RangeSelector({ onRangeChange }) {
 }
 
 function LineChartWrapper({
-  children, title, className, now, onRefresh, onRangeChanged, data, error, isLoading, dismissError,
+  children, title, className, now, onRefresh, onRangeChanged, data, widgetProps = { error: '' },
 }) {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [xAxisLimits, setXAxisLimits] = useState({ min: 0, max: 0 });
@@ -82,7 +82,7 @@ function LineChartWrapper({
 
   useEffect(() => {
     updateSize();
-  }, [chartWrapperRef.current, error]);
+  }, [chartWrapperRef.current, widgetProps.error]);
 
   useEffect(() => {
     setXAxisLimits({ min: now - range.value, max: now });
@@ -94,9 +94,7 @@ function LineChartWrapper({
       title={title}
       onRefresh={onRefresh}
       customAction={onRangeChanged && <RangeSelector onRangeChange={(rangeConfig) => internalOnRangeChange(rangeConfig)} />}
-      error={error}
-      isLoading={isLoading}
-      dismissError={dismissError}
+      widgetProps={widgetProps}
     >
       <div className="pt-3 pe-3 w-100 h-100">
         <div className="w-100 h-100" ref={chartWrapperRef}>

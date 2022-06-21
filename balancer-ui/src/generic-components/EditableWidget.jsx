@@ -3,15 +3,13 @@ import WidgetWrapper from './WidgetWrapper';
 import { Icons } from '../constants';
 
 function EditableWidget({
-  title, isLoading, onSave, changed, children, error, dismissError, className,
+  title, onSave, changed, children, className, widgetProps,
 }) {
   return (
     <WidgetWrapper
       title={title}
-      isLoading={isLoading}
       className={className}
-      error={error}
-      dismissError={dismissError}
+      widgetProps={widgetProps}
       actions={[
         {
           title: 'Save', icon: Icons.SAVE, onClick: onSave, hide: !changed,

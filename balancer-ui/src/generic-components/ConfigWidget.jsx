@@ -80,7 +80,7 @@ function ConfigWidget({
       changed={valuesChanged}
       onSave={onSave}
       className={className}
-      {...widgetProps}
+      widgetProps={widgetProps}
     >
       <div className="container">
         {configs.map((config) => (

@@ -4,8 +4,10 @@ import Spinner from '../components/Spinner';
 import { Icons } from '../constants';
 
 function PageWrapper({
-  children, isLoading, error = null, dismissError = null, onRefresh = null,
+  children, widgetProps = {}, onRefresh = null,
 }) {
+  const { isLoading, error, dismissError } = widgetProps;
+
   return (
     <>
       <div className="d-flex page-header">

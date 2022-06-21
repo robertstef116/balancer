@@ -5,7 +5,7 @@ import WidgetWrapper from './WidgetWrapper';
 import { Icons } from '../constants';
 
 function TableWidget({
-  title, className, cols, rows, isLoading, onRefresh, actions, error, dismissError, activeRowKey, onRowClick,
+  title, className, cols, rows, onRefresh, actions, widgetProps, activeRowKey, onRowClick,
 }) {
   const renderCell = (data, col) => {
     switch (col.type) {
@@ -28,12 +28,10 @@ function TableWidget({
   return (
     <WidgetWrapper
       title={title}
-      isLoading={isLoading}
       className={className}
       onRefresh={onRefresh}
       actions={actions}
-      error={error}
-      dismissError={dismissError}
+      widgetProps={widgetProps}
     >
       <div className="scrollable-table overflow-auto w-100 h-100">
         <Table striped borderless hover>

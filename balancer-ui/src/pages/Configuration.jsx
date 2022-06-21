@@ -102,7 +102,7 @@ function ConfigurationPage() {
   }, []);
 
   return (
-    <PageWrapper onRefresh={onRefresh} {...widgetProps}>
+    <PageWrapper onRefresh={onRefresh} widgetProps={widgetProps}>
       <div className="row">
         <ConfigWidget className="col-6 wh-1" title="Balancing configs" configs={balancingConfigs} isLoading={widgetProps.isLoading} />
         <ConfigWidget

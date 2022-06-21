@@ -4,8 +4,10 @@ import Spinner from '../components/Spinner';
 import { Icons } from '../constants';
 
 function WidgetWrapper({
-  className, children, title, isLoading, customAction, error = null, dismissError = null, onRefresh = null, actions = [],
+  className, children, title, customAction, widgetProps = { error: null, dismissError: null }, onRefresh = null, actions = [],
 }) {
+  const { isLoading, error, dismissError } = widgetProps;
+
   return (
     <div className={`p-4 animate__animated animate__zoomIn animate__faster ${className}`}>
       <span className="d-flex align-items-center widget-header">

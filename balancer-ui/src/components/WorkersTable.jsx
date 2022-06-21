@@ -162,7 +162,7 @@ function WorkersTable({ className }) {
       <TableWidget
         className={className}
         title="Workers List"
-        {...widgetProps}
+        widgetProps={widgetProps}
         onRefresh={onRefresh}
         cols={[
           { key: 'statusIcon', type: 'Icon', width: '20px', titleKey: 'statusTitle' },

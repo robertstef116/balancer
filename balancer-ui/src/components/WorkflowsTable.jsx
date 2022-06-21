@@ -181,7 +181,7 @@ function WorkflowsTable({ className }) {
         className={className}
         title="Workflows List"
         onRefresh={onRefresh}
-        {...widgetProps}
+        widgetProps={widgetProps}
         cols={[
           { header: 'Image', key: 'image', maxWidth: '200px' },
           { header: 'Memory Limit(b)', key: 'memoryLimit' },
