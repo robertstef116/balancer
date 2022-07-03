@@ -1,6 +1,7 @@
 package com.robert
 
 import com.robert.algorithms.LoadBalancingAlgorithm
+import com.robert.balancing.ProcessedHeader
 import com.robert.balancing.RequestData
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ValidationException
@@ -12,15 +13,6 @@ import org.slf4j.LoggerFactory
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.properties.Delegates
-
-private data class HeaderProcessingResult(
-    val route: String,
-    val routeBegin: Int,
-    val bytesRead: Int,
-    val protocol: String,
-    @Suppress("ArrayInDataClass")
-    val bufferRead: ByteArray
-)
 
 private data class WorkerSocketInfo(
     val routePrefix: String,
@@ -37,14 +29,15 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
         private const val CR_CHAR = '\r'.code.toByte()
         private val selectorManager = ActorSelectorManager(Dispatchers.IO)
 
-        private suspend fun redirectProcessedHeader(output: ByteWriteChannel, prefixLength: Int, headerProcessingResult: HeaderProcessingResult) {
+        private suspend fun redirectProcessedHeader(output: ByteWriteChannel, prefixLength: Int, headerProcessingResult: ProcessedHeader) {
             val prefixEnd = headerProcessingResult.routeBegin + prefixLength
             output.writeAvailable(headerProcessingResult.bufferRead, 0, headerProcessingResult.routeBegin);
             output.writeAvailable(headerProcessingResult.bufferRead, prefixEnd, headerProcessingResult.bytesRead - prefixEnd)
         }
 
-        private suspend fun processHeader(input: ByteReadChannel, buffer: ByteArray): HeaderProcessingResult {
+        private suspend fun processHeader(input: ByteReadChannel, buffer: ByteArray): ProcessedHeader {
             val route = StringBuilder()
+            val method = StringBuilder()
             val protocol = StringBuilder()
             var totalBytesRead = 0
             var spacesRead = 0
@@ -79,34 +72,37 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
                         continue
                     }
 
-                    if (spacesRead == 1) {
-                        route.append(byte.toInt().toChar())
-                    } else if (spacesRead == 2) {
-                        protocol.append(byte.toInt().toChar())
+                    when (spacesRead) {
+                        0 -> method.append(byte.toInt().toChar())
+                        1 -> route.append(byte.toInt().toChar())
+                        2 -> protocol.append(byte.toInt().toChar())
                     }
 
                     i++
                 }
+
                 globalIdx += i
             } while (input.availableForRead > 0)
 
-            return HeaderProcessingResult(route.toString(), begin!!, totalBytesRead, protocol.toString(), tmpBuffer!!)
+            return ProcessedHeader(route.toString(), begin!!, totalBytesRead, protocol.toString(), "", tmpBuffer!!)
         }
 
         private suspend fun redirect(input: ByteReadChannel, output: ByteWriteChannel, buffer: ByteArray) {
             var bytesRead: Int
+
             do {
                 bytesRead = input.readAvailable(buffer)
                 if (bytesRead >= 0) {
                     output.writeAvailable(buffer, 0, bytesRead);
                 }
             } while (input.availableForRead > 0)
+
             output.flush()
         }
 
-        private suspend fun getWorkerSocket(route: String, pathsMapping: Set<WorkflowPath>): WorkerSocketInfo {
-            val pathData = pathsMapping.find { route.startsWith(it.path) } ?: throw NotFoundException()
-            val deployment = pathData.deploymentSelectionAlgorithm.selectTargetDeployment()
+        private suspend fun getWorkerSocket(header: ProcessedHeader, pathsMapping: Set<WorkflowPath>): WorkerSocketInfo {
+            val pathData = pathsMapping.find { header.route.startsWith(it.path) } ?: throw NotFoundException()
+            val deployment = pathData.deploymentSelectionAlgorithm.selectTargetDeployment(header)
             log.debug("selected deployment running at host {} on port {}", deployment.targetResource.host, deployment.targetResource.port)
             val socket = aSocket(selectorManager).tcp().connect(deployment.targetResource.host, deployment.targetResource.port)
 
@@ -142,7 +138,7 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
             log.debug("received a new request")
 
             CoroutineScope(Dispatchers.IO).launch {
-                var headerProcessingResult: HeaderProcessingResult? = null
+                var header: ProcessedHeader? = null
                 var workerSocket: Socket? = null
                 val streamFromClient: ByteReadChannel?
                 val streamFromWorker: ByteReadChannel?
@@ -155,14 +151,14 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
                 try {
                     streamFromClient = clientSocket.openReadChannel()
 
-                    headerProcessingResult = processHeader(streamFromClient, buffer)
+                    header = processHeader(streamFromClient, buffer)
                     log.trace(resourcesManager.pathsMapping.toString())
-                    workerSocketInfo = getWorkerSocket(headerProcessingResult.route, resourcesManager.pathsMapping.keys)
+                    workerSocketInfo = getWorkerSocket(header, resourcesManager.pathsMapping.keys)
                     workerSocket = workerSocketInfo.socket
                     val routePrefixLength = workerSocketInfo.routePrefix.length
 
                     streamToWorker = workerSocket.openWriteChannel(true)
-                    redirectProcessedHeader(streamToWorker, routePrefixLength, headerProcessingResult)
+                    redirectProcessedHeader(streamToWorker, routePrefixLength, header)
 
                     streamFromWorker = workerSocket.openReadChannel()
                     streamToClient = clientSocket.openWriteChannel(true)
@@ -176,13 +172,12 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
                 } catch (e: ValidationException) {
                     log.debug("Received an invalid request")
                 } catch (e: NotFoundException) {
-                    log.debug("No registered worker found for {}", headerProcessingResult?.route)
+                    log.debug("No registered worker found for {}", header?.route)
                     streamToClient = streamToClient ?: clientSocket.openWriteChannel(true)
-                    LoadBalancerUtils.sendNotFound(streamToClient, headerProcessingResult?.protocol ?: "HTTP/1.1")
+                    LoadBalancerUtils.sendNotFound(streamToClient, header?.protocol ?: "HTTP/1.1")
                 } catch (e: Exception) {
                     streamToClient = streamToClient ?: clientSocket.openWriteChannel(true)
-                    LoadBalancerUtils.sendInternalServerError(streamToClient, headerProcessingResult?.protocol ?: "HTTP/1.1")
-                    e.printStackTrace()
+                    LoadBalancerUtils.sendInternalServerError(streamToClient, header?.protocol ?: "HTTP/1.1")
                 } finally {
                     streamToWorker?.close()
                     streamToClient?.close()

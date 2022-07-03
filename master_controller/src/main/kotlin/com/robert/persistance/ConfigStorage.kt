@@ -29,10 +29,11 @@ class ConfigStorage {
     fun setConfig(configs: Map<String, String>) {
         DBConnector.getTransactionConnection().use { conn ->
             for ((key, value) in configs.entries) {
-                conn.prepareStatement("UPDATE config SET value = ? WHERE key = ?")
+                conn.prepareStatement("INSERT INTO config(key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?")
                     .use { st ->
-                        st.setString(2, key)
-                        st.setString(1, value)
+                        st.setString(1, key)
+                        st.setString(2, value)
+                        st.setString(3, value)
                         try {
                             StorageUtils.executeUpdate(st)
                         } catch (e: Exception) {

@@ -1,17 +1,18 @@
 package com.robert.algorithms
 
+import com.robert.balancing.ProcessedHeader
 import com.robert.enums.LBAlgorithms
-import com.robert.balancing.RequestTargetData
+import com.robert.balancing.TargetData
 import com.robert.balancing.RequestData
 
-class RandomAlgorithm(private var availableTargets: List<RequestTargetData>): LoadBalancingAlgorithm {
+class RandomAlgorithm(private var availableTargets: List<TargetData>): LoadBalancingAlgorithm {
     override val algorithm = LBAlgorithms.RANDOM
 
-    override fun updateTargets(newTargets: List<RequestTargetData>) {
+    override fun updateTargets(newTargets: List<TargetData>) {
         availableTargets = newTargets
     }
 
-    override fun selectTargetDeployment(): RequestData {
+    override fun selectTargetDeployment(header: ProcessedHeader): RequestData {
         val targetIdx = (availableTargets.indices).random()
         val target = availableTargets[targetIdx]
 

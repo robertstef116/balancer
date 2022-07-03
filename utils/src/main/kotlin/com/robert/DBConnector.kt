@@ -27,6 +27,7 @@ object DBConnector {
             log.debug("connected to database successfully")
             connection
         } catch (e: Exception) {
+            log.error("unable to connect to DB")
             null;
         }
     }

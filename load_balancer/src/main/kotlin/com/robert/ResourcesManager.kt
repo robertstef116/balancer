@@ -1,7 +1,7 @@
 package com.robert
 
 import com.robert.algorithms.*
-import com.robert.balancing.RequestTargetData
+import com.robert.balancing.TargetData
 import com.robert.enums.LBAlgorithms
 import com.robert.enums.WorkerStatus
 import com.robert.resources.Worker
@@ -33,7 +33,7 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     private val algorithmConfigLock = ReentrantLock()
     private val initializationWaiters = ConcurrentLinkedQueue<() -> Unit>()
 
-    var pathsMapping: Map<WorkflowPath, List<RequestTargetData>> = emptyMap()
+    var pathsMapping: Map<WorkflowPath, List<TargetData>> = emptyMap()
     var workers: List<Worker> = emptyList()
     var healthChecks: List<HealthChecker> = emptyList()
 
@@ -45,12 +45,13 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
         workersCheckInterval = DynamicConfigProperties.getLongPropertyOrDefault(Constants.WORKERS_CHECK_INTERVAL, 60000L)
     }
 
-    private fun getWorkflowPathAlgorithms(algorithm: LBAlgorithms, targetResources: List<RequestTargetData>): LoadBalancingAlgorithm {
+    private fun getWorkflowPathAlgorithms(algorithm: LBAlgorithms, targetResources: List<TargetData>): LoadBalancingAlgorithm {
         return when (algorithm) {
             LBAlgorithms.RANDOM -> RandomAlgorithm(targetResources)
             LBAlgorithms.ROUND_ROBIN -> RoundRobinAlgorithm(targetResources)
             LBAlgorithms.LEAST_CONNECTION -> LeastConnectionAlgorithm(targetResources)
             LBAlgorithms.WEIGHTED_RESPONSE_TIME -> WeightedResponseTimeAlgorithm(targetResources)
+            LBAlgorithms.ADAPTIVE -> AdaptiveAlgorithmController(targetResources)
         }
     }
 

@@ -43,8 +43,8 @@ object DynamicConfigProperties {
     }
 
     @JvmStatic
-    fun getFloatPropertyOrDefault(key: String, default: Float): Float {
-        val value = properties[key]?.toFloat() ?: default
+    fun getDoublePropertyOrDefault(key: String, default: Double): Double {
+        val value = properties[key]?.toDouble()?: default
         log.trace("get property {} = {}", key, value)
         return value
     }

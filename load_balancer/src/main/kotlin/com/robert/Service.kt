@@ -2,7 +2,7 @@ package com.robert
 
 import com.robert.api.request.DockerCreateContainerRequest
 import com.robert.api.response.DockerCreateContainerResponse
-import com.robert.balancing.RequestTargetData
+import com.robert.balancing.TargetData
 import com.robert.docker.DockerContainerPorts
 import com.robert.resources.Deployment
 import com.robert.resources.Worker
@@ -95,7 +95,7 @@ class Service(private val storage: Storage) {
         return null
     }
 
-    fun persistAnalytics(targetResource: RequestTargetData) {
+    fun persistAnalytics(targetResource: TargetData) {
         try {
             storage.persistAnalytics(targetResource.workerId, targetResource.workflowId, targetResource.deploymentId, Instant.now().epochSecond)
         } catch (e: Exception) {

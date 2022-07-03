@@ -29,8 +29,8 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
     private val weightsLock = ReentrantLock()
     private var lastDeploymentsChange = Instant.now().epochSecond
 
-    private var cpuWeight by Delegates.notNull<Float>()
-    private var memoryWeight by Delegates.notNull<Float>()
+    private var cpuWeight by Delegates.notNull<Double>()
+    private var memoryWeight by Delegates.notNull<Double>()
     private var deploymentsCheckInterval by Delegates.notNull<Long>()
 
     private var workflows = emptyList<Workflow>()
@@ -49,8 +49,8 @@ class DeploymentsManager(private val resourcesManager: ResourcesManager, private
     fun reloadDynamicConfigs() {
         log.debug("load configs")
         weightsLock.withLock {
-            cpuWeight = (DynamicConfigProperties.getFloatPropertyOrDefault(Constants.CPU_WEIGHT, 0.5f))
-            memoryWeight = DynamicConfigProperties.getFloatPropertyOrDefault(Constants.MEMORY_WEIGHT, 0.5f)
+            cpuWeight = (DynamicConfigProperties.getDoublePropertyOrDefault(Constants.CPU_WEIGHT, 0.5))
+            memoryWeight = DynamicConfigProperties.getDoublePropertyOrDefault(Constants.MEMORY_WEIGHT, 0.5)
         }
         deploymentsCheckInterval = DynamicConfigProperties.getLongPropertyOrDefault(Constants.DEPLOYMENTS_CHECK_INTERVAL, 60000)
     }

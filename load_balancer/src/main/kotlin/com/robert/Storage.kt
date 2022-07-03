@@ -1,6 +1,6 @@
 package com.robert
 
-import com.robert.balancing.RequestTargetData
+import com.robert.balancing.TargetData
 import com.robert.enums.LBAlgorithms
 import com.robert.enums.WorkerStatus
 import com.robert.enums.WorkflowAnalyticsEventType
@@ -75,7 +75,7 @@ class Storage {
         }
     }
 
-    fun getPathsMapping(): Map<WorkflowPath, List<RequestTargetData>> {
+    fun getPathsMapping(): Map<WorkflowPath, List<TargetData>> {
         log.debug("get paths mapping")
         val query = """
             SELECT d.id, d.worker_id, d.workflow_id, wm.path, w.host, worker_port, w2.algorithm FROM deployment_mappings
@@ -86,14 +86,14 @@ class Storage {
                     ORDER BY wm.path
         """.trimIndent()
 
-        val pathsMapping = HashMap<WorkflowPath, List<RequestTargetData>>()
+        val pathsMapping = HashMap<WorkflowPath, List<TargetData>>()
         DBConnector.getConnection().createStatement().use { st ->
             st.executeQuery(query)
                 .use { rs ->
                     var path: String? = null
                     var currentPath: String?
                     var algorithm: LBAlgorithms? = null
-                    var mappingList: MutableList<RequestTargetData>? = null
+                    var mappingList: MutableList<TargetData>? = null
 
                     while (rs.next()) {
                         currentPath = rs.getString("path")
@@ -106,7 +106,7 @@ class Storage {
                             mappingList = ArrayList()
                         }
                         mappingList!!.add(
-                            RequestTargetData(
+                            TargetData(
                                 rs.getString("worker_id"),
                                 rs.getString("workflow_id"),
                                 rs.getString("id"),

@@ -1,5 +1,6 @@
 package com.robert
 
+import com.robert.algorithms.AdaptiveAlgorithmController
 import com.robert.algorithms.WeightedResponseTimeAlgorithm
 
 class DynamicConfigsManager(
@@ -12,6 +13,7 @@ class DynamicConfigsManager(
 
     init {
         DynamicConfigProperties.setPropertiesData(configs)
+        AdaptiveAlgorithmController.reloadDynamicConfigs()
         deploymentsManager.reloadDynamicConfigs()
         HealthChecker.reloadDynamicConfigs()
         WeightedResponseTimeAlgorithm.reloadDynamicConfigs()
@@ -43,6 +45,10 @@ class DynamicConfigsManager(
             configs[Constants.HEALTH_CHECK_INTERVAL] != newConfigs[Constants.HEALTH_CHECK_INTERVAL] ||
             configs[Constants.HEALTH_CHECK_MAX_FAILURES] != newConfigs[Constants.HEALTH_CHECK_MAX_FAILURES]) {
             HealthChecker.reloadDynamicConfigs()
+        }
+
+        if (configs[Constants.COMPUTE_ADAPTIVE_WEIGHTED_RESPONSE_TIME_INTERVAL] != newConfigs[Constants.COMPUTE_ADAPTIVE_WEIGHTED_RESPONSE_TIME_INTERVAL]) {
+            AdaptiveAlgorithmController.reloadDynamicConfigs()
         }
 
         if (configs[Constants.COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL] != newConfigs[Constants.COMPUTE_WEIGHTED_RESPONSE_TIME_INTERVAL]) {

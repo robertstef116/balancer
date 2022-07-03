@@ -64,6 +64,12 @@ const algorithmConfigs = [
     validator: positiveNumberValidator,
   },
   {
+    label: 'Recompute Adaptive weights',
+    key: 'COMPUTE_ADAPTIVE_WEIGHTED_RESPONSE_TIME_INTERVAL',
+    info: 'Recompute adaptive algorithm weights after x requests',
+    validator: positiveNumberValidator,
+  },
+  {
     label: 'CPU weight',
     key: 'CPU_WEIGHT',
     info: 'Weight of the CPU, between 0 and 1',

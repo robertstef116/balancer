@@ -1,6 +1,6 @@
 package com.robert.balancing
 
-data class RequestTargetData (
+data class TargetData (
     val workerId: String,
     val workflowId: String,
     val deploymentId: String,
