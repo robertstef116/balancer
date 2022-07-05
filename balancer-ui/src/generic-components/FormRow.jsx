@@ -46,7 +46,7 @@ function FormRow({
       case 'map':
         return (
           <div className="w-100">
-            <div className="container p-0">
+            <div className="container-fluid p-0">
               {value && value.map((entry) => (
                 <div key={entry.internalKey} className="row m-0 align-items-center pb-1">
                   <Form.Control
@@ -100,10 +100,10 @@ function FormRow({
 
   return (
     <div className="row pt-3">
-      <div className="col-5">
+      <div className="form-row-label">
         <Form.Label>{label}</Form.Label>
       </div>
-      <div className={classNames('col', { 'has-error': !!error })}>
+      <div className={classNames('form-row-control', { 'has-error': !!error })}>
         <div className="d-flex align-items-center">
           {getControl()}
           {info && <i className={classNames('text-primary ms-2', Icons.INFO)} title={info} />}

@@ -27,7 +27,7 @@ function FormBuilder({
   };
 
   return (
-    <div className="container">
+    <div className="container-fluid">
       {configs.map((config) => (
         <FormRow
           key={config.key}

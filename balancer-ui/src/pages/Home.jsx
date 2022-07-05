@@ -31,9 +31,9 @@ function HomePage() {
 
   return (
     <PageWrapper>
-      <div className="row">
-        <ResourcesList classname="col-4 wh-2" onSelectionChanged={selectedResourcePathChanged} />
-        <div className="col-8">
+      <div className="row justify-content-center">
+        <ResourcesList classname="widget-4 wh-2" onSelectionChanged={selectedResourcePathChanged} />
+        <div className="widget-8">
           <div className="row">
             <UsageChart classname="col-12 wh-1" workerId={workerId} workflowId={workflowId} deploymentId={deploymentId} />
             <DeploymentsHistoryChart classNames="col-12 wh-1" workerId={workerId} workflowId={workflowId} />

@@ -6,9 +6,9 @@ import PageWrapper from '../generic-components/PageWrapper';
 function NodesPage() {
   return (
     <PageWrapper>
-      <div className="row">
-        <WorkersTable className="col-4 wh-1" />
-        <WorkflowsTable className="col-8 wh-1" />
+      <div className="row justify-content-center">
+        <WorkersTable className="widget-4 wh-1" />
+        <WorkflowsTable className="widget-8 wh-1" />
       </div>
     </PageWrapper>
   );

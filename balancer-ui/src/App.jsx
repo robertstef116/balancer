@@ -1,7 +1,5 @@
 import React from 'react';
-import './App.css';
 import { BrowserRouter } from 'react-router-dom';
-import { TransitionGroup } from 'react-transition-group';
 import { Provider } from 'react-redux';
 import { AppRoutes } from './navigation/appRoutes';
 import { AuthenticationProvider } from './providers/Authentication';
@@ -12,9 +10,7 @@ function App() {
     <Provider store={store}>
       <AuthenticationProvider>
         <BrowserRouter>
-          <TransitionGroup>
-            <AppRoutes />
-          </TransitionGroup>
+          <AppRoutes />
         </BrowserRouter>
       </AuthenticationProvider>
     </Provider>

@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Route, Routes, useLocation,
 } from 'react-router-dom';
-import { CSSTransition } from 'react-transition-group';
 import PrivateRoute from './PrivateRoute';
 import HomePage from '../pages/Home';
 import Login from '../pages/Login';
@@ -10,6 +9,7 @@ import NotFound from '../pages/NotFound';
 import Header from '../generic-components/Header';
 import NodesPage from '../pages/Nodes';
 import ConfigurationPage from '../pages/Configuration';
+import Footer from '../generic-components/Footer';
 
 export const routesPath = {
   homePage: '/',
@@ -37,47 +37,42 @@ export function AppRoutes() {
   const location = useLocation();
 
   return (
-    <CSSTransition
-      key={location.pathname}
-      classNames="fade"
-      timeout={200}
-    >
-      <>
-        {routesWithHeader.includes(location.pathname) && (
+    <>
+      {routesWithHeader.includes(location.pathname) && (
         <Header
           menus={headerMenus}
           activeMenuPath={location.pathname}
         />
-        )}
-        <Routes location={location}>
-          <Route
-            path={routesPath.homePage}
-            element={(
-              <PrivateRoute>
-                <HomePage />
-              </PrivateRoute>
+      )}
+      <Routes location={location}>
+        <Route
+          path={routesPath.homePage}
+          element={(
+            <PrivateRoute>
+              <HomePage />
+            </PrivateRoute>
           )}
-          />
-          <Route
-            path={routesPath.nodesPage}
-            element={(
-              <PrivateRoute>
-                <NodesPage />
-              </PrivateRoute>
+        />
+        <Route
+          path={routesPath.nodesPage}
+          element={(
+            <PrivateRoute>
+              <NodesPage />
+            </PrivateRoute>
           )}
-          />
-          <Route
-            path={routesPath.configurationPage}
-            element={(
-              <PrivateRoute>
-                <ConfigurationPage />
-              </PrivateRoute>
+        />
+        <Route
+          path={routesPath.configurationPage}
+          element={(
+            <PrivateRoute>
+              <ConfigurationPage />
+            </PrivateRoute>
           )}
-          />
-          <Route path={routesPath.loginPage} element={<Login />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </>
-    </CSSTransition>
+        />
+        <Route path={routesPath.loginPage} element={<Login />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Footer />
+    </>
   );
 }
