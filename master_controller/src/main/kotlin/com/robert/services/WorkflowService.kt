@@ -36,6 +36,8 @@ class WorkflowService : UpdateAwareService(Constants.WORKFLOW_SERVICE_KEY) {
         memoryLimit: Long?,
         minDeployments: Int?,
         maxDeployments: Int?,
+        upScaling: Int?,
+        downScaling: Int?,
         algorithm: LBAlgorithms,
         pathMapping: Map<String, Int>
     ): Workflow {
@@ -64,16 +66,16 @@ class WorkflowService : UpdateAwareService(Constants.WORKFLOW_SERVICE_KEY) {
             }
         }
 
-        val res = workflowStorage.add(image, memoryLimit, minDeployments, maxDeployments, algorithm, pathMapping)
+        val res = workflowStorage.add(image, memoryLimit, minDeployments, maxDeployments, upScaling, downScaling, algorithm, pathMapping)
         markChange()
         return res
     }
 
-    fun update(id: String, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms?) {
+    fun update(id: String, minDeployments: Int?, maxDeployments: Int?, upScaling: Int?, downScaling: Int?, algorithm: LBAlgorithms?) {
         if (!validateDeploymentLimits(minDeployments, maxDeployments)) {
             throw ValidationException("Invalid deployment limits")
         }
-        workflowStorage.update(id, minDeployments, maxDeployments, algorithm)
+        workflowStorage.update(id, minDeployments, maxDeployments, upScaling, downScaling, algorithm)
         markChange()
     }
 

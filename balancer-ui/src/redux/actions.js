@@ -184,13 +184,13 @@ export const addWorkflow = ({ image, memoryLimit, algorithm, minDeployments, max
   }
 };
 
-export const updateWorkflow = ({ id, algorithm, minDeployments, maxDeployments }, cb) => async (dispatch) => {
+export const updateWorkflow = ({ id, algorithm, minDeployments, maxDeployments, upScaling, downScaling }, cb) => async (dispatch) => {
   try {
-    await api.updateWorkflow({ id, algorithm, minDeployments, maxDeployments });
+    await api.updateWorkflow({ id, algorithm, minDeployments, maxDeployments, upScaling, downScaling });
     dispatch({
       type: types.UPDATE_WORKFLOW,
       payload: {
-        id, algorithm, minDeployments, maxDeployments,
+        id, algorithm, minDeployments, maxDeployments, upScaling, downScaling,
       },
     });
     cb();

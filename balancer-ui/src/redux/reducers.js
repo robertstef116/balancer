@@ -54,6 +54,8 @@ const createWorkflowData = (workflow) => {
     memoryLimit: workflow.memoryLimit,
     minDeployments: workflow.minDeployments,
     maxDeployments: workflow.maxDeployments,
+    upScaling: workflow.upScaling,
+    downScaling: workflow.downScaling,
     algorithm: workflow.algorithm,
     algorithmDisplay: getAlgorithmDisplay(workflow.algorithm),
     mapping,
@@ -83,6 +85,8 @@ export default (state = INITIAL_STATE, { type, payload }) => {
       updWorkflow.algorithmDisplay = getAlgorithmDisplay(payload.algorithm);
       updWorkflow.minDeployments = payload.minDeployments;
       updWorkflow.maxDeployments = payload.maxDeployments;
+      updWorkflow.upScaling = payload.upScaling;
+      updWorkflow.downScaling = payload.downScaling;
       return {
         ...state,
         workflows: [

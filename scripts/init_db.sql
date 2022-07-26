@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS workers
 (
     id     varchar(36) PRIMARY KEY,
     alias  varchar(50) NOT NULL,
-    host   varchar(50) NOT NULL,
+    host   varchar(50) NOT NULL UNIQUE,
     port   integer     NOT NULL,
     status varchar(8)  NOT NULL
 );
@@ -27,7 +27,9 @@ CREATE TABLE IF NOT EXISTS workflows
     memory_limit    numeric,
     algorithm       varchar(25)  NOT NULL,
     min_deployments numeric,
-    max_deployments numeric
+    max_deployments numeric,
+    up_scaling      int,
+    down_scaling    int
 );
 
 CREATE TABLE IF NOT EXISTS workflow_mappings

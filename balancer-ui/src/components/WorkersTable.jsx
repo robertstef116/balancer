@@ -162,7 +162,7 @@ function WorkersTable({ className }) {
       <TableWidget
         className={className}
         title="Workers List"
-        widgetProps={widgetProps}
+        widgetProps={!modalFormMode && widgetProps}
         onRefresh={onRefresh}
         cols={[
           { key: 'statusIcon', type: 'Icon', width: '20px', titleKey: 'statusTitle' },
@@ -181,6 +181,7 @@ function WorkersTable({ className }) {
       />
       <ModalWrapper
         title={modalFormConfig.title}
+        widgetProps={widgetProps}
         show={!!modalFormMode}
         onHide={() => setModalFormMode(null)}
         valid={valid}

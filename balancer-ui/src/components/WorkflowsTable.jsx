@@ -35,6 +35,21 @@ const maxDeploymentsValidator = (data) => {
   }
   return true;
 };
+const downScalingValidator = (data) => {
+  if (data.downScaling) {
+    const downScaling = parseInt(data.downScaling, 10);
+    return (typeof data.downScaling !== 'string' || `${downScaling}` === data.downScaling) && downScaling >= 10;
+  }
+  return true;
+};
+const upScalingValidator = (data) => {
+  if (data.upScaling) {
+    const downScaling = parseInt(data.downScaling, 10) || 10;
+    const upScaling = parseInt(data.upScaling, 10);
+    return (typeof data.upScaling !== 'string' || `${upScaling}` === data.upScaling) && upScaling >= downScaling && upScaling < 95;
+  }
+  return true;
+};
 const pathMappingValidator = (data) => {
   if (!data.pathMapping || !data.pathMapping.length) {
     return false;
@@ -56,6 +71,8 @@ const memoryConfig = { key: 'memoryLimit', label: 'Memory limit', type: 'number'
 const algorithmConfig = { key: 'algorithm', label: 'Algorithm', type: 'dropdown', options: algorithms, info: 'Algorithm used for load balancing', validator: algorithmValidator };
 const minDeploymentsConfig = { key: 'minDeployments', label: 'Minimum scaling', type: 'number', info: 'Minimum number of deployments', validator: minDeploymentsValidator };
 const maxDeploymentsConfig = { key: 'maxDeployments', label: 'Maximum scaling', type: 'number', info: 'Maximum number of deployments', validator: maxDeploymentsValidator };
+const upScalingConfig = { key: 'upScaling', label: 'Up scale threshold', type: 'number', info: 'Average utilization percentage threshold for up scaling < 95%', validator: upScalingValidator };
+const downScalingConfig = { key: 'downScaling', label: 'Down scale threshold', type: 'number', info: 'Average utilization percentage threshold for down scaling > 10%', validator: downScalingValidator };
 const pathMappingConfig = { key: 'pathMapping', label: 'Mapping', type: 'map', mapValueType: 'number', info: 'Resource mapping (path -> port)', validator: pathMappingValidator };
 
 function WorkflowsTable({ className }) {
@@ -87,6 +104,7 @@ function WorkflowsTable({ className }) {
   };
 
   const onAddClick = () => {
+    setModalData({});
     setValid(false);
     setModalFormMode(ModalFormModes.ADD);
   };
@@ -156,6 +174,8 @@ function WorkflowsTable({ className }) {
             algorithmConfig,
             minDeploymentsConfig,
             maxDeploymentsConfig,
+            upScalingConfig,
+            downScalingConfig,
             pathMappingConfig,
           ],
           submit: onSave,
@@ -167,6 +187,8 @@ function WorkflowsTable({ className }) {
             algorithmConfig,
             minDeploymentsConfig,
             maxDeploymentsConfig,
+            upScalingConfig,
+            downScalingConfig,
           ],
           submit: onUpdate,
         });
@@ -181,12 +203,14 @@ function WorkflowsTable({ className }) {
         className={className}
         title="Workflows List"
         onRefresh={onRefresh}
-        widgetProps={widgetProps}
+        widgetProps={!modalFormMode && widgetProps}
         cols={[
           { header: 'Image', key: 'image', maxWidth: '200px' },
           { header: 'Memory Limit(b)', key: 'memoryLimit' },
           { header: 'Min', key: 'minDeployments' },
           { header: 'Max', key: 'maxDeployments' },
+          { header: 'Up scale', key: 'upScaling' },
+          { header: 'Down scale', key: 'downScaling' },
           { header: 'Algorithm', key: 'algorithmDisplay' },
           { header: 'Mapping', key: 'mapping', type: 'InfoIcon' }]}
         rows={workflows}
@@ -200,6 +224,7 @@ function WorkflowsTable({ className }) {
       />
       <ModalWrapper
         title={modalFormConfig.title}
+        widgetProps={widgetProps}
         show={!!modalFormMode}
         onHide={() => setModalFormMode(null)}
         valid={valid}

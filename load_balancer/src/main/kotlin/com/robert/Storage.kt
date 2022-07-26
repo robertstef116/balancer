@@ -128,7 +128,7 @@ class Storage {
     fun getWorkflows(): List<Workflow> {
         log.debug("get workflows")
         val query = """
-            SELECT id, image, memory_limit, min_deployments, max_deployments, algorithm, wm.path, wm.port FROM workflows 
+            SELECT id, image, memory_limit, min_deployments, max_deployments, up_scaling, down_scaling, algorithm, wm.path, wm.port FROM workflows 
             INNER JOIN workflow_mappings wm on workflows.id = wm.workflow_id order by id
         """.trimIndent()
         val workflows = ArrayList<Workflow>()
@@ -141,6 +141,8 @@ class Storage {
                     var memoryLimit: Long? = null
                     var minDeployments: Int? = null
                     var maxDeployments: Int? = null
+                    var upScaling: Int? = null
+                    var downScaling: Int? = null
                     var algorithm: LBAlgorithms? = null
                     var pathMapping: MutableMap<String, Int>? = null
                     var currentId: String?
@@ -151,8 +153,8 @@ class Storage {
                             if (id != null) {
                                 workflows.add(
                                     Workflow(
-                                        id, image!!, memoryLimit, minDeployments,
-                                        maxDeployments, algorithm!!, pathMapping!!
+                                        id, image!!, memoryLimit, minDeployments, maxDeployments,
+                                        upScaling, downScaling, algorithm!!, pathMapping!!
                                     )
                                 )
                             }
@@ -170,6 +172,14 @@ class Storage {
                             if (maxDeployments == 0) {
                                 maxDeployments = null
                             }
+                            upScaling = rs.getInt("up_scaling")
+                            if (upScaling == 0) {
+                                upScaling = null
+                            }
+                            downScaling = rs.getInt("down_scaling")
+                            if (downScaling == 0) {
+                                downScaling = null
+                            }
                             algorithm = LBAlgorithms.valueOf(rs.getString("algorithm"))
                             pathMapping = HashMap()
                         }
@@ -178,8 +188,8 @@ class Storage {
                     if (id != null) {
                         workflows.add(
                             Workflow(
-                                id, image!!, memoryLimit, minDeployments,
-                                maxDeployments, algorithm!!, pathMapping!!
+                                id, image!!, memoryLimit, minDeployments, maxDeployments,
+                                upScaling, downScaling, algorithm!!, pathMapping!!
                             )
                         )
                     }

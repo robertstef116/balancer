@@ -91,8 +91,8 @@ export const addWorkflow = async ({ image, memoryLimit, algorithm, minDeployment
   throw new Error('Add workflow failed!');
 };
 
-export const updateWorkflow = async ({ id, algorithm, minDeployments, maxDeployments }) => {
-  const res = await axios.put(`${API_URL}/workflow/${id}`, { algorithm, minDeployments, maxDeployments });
+export const updateWorkflow = async ({ id, algorithm, minDeployments, maxDeployments, upScaling, downScaling }) => {
+  const res = await axios.put(`${API_URL}/workflow/${id}`, { algorithm, minDeployments, maxDeployments, upScaling, downScaling });
   if (res.status === 200) {
     return res.data;
   }
