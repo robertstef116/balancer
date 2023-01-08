@@ -1,6 +1,5 @@
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
+val ktorVersion: String by project
+val kotlinVersion: String by project
 
 plugins {
     application
@@ -24,13 +23,11 @@ tasks.dockerPrepare {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("io.ktor:ktor-server-host-common:$ktor_version")
-    implementation("io.ktor:ktor-gson:$ktor_version")
-    implementation("io.ktor:ktor-server-netty:$ktor_version")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    testImplementation("io.ktor:ktor-server-tests:$ktor_version")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    implementation(project(":model"))
+    implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel") {}

@@ -1,0 +1,171 @@
+version: "3.9"
+name: "balancer-master"
+services:
+  database:
+    container_name: ${DB_HOST}
+    image: "postgres:${POSTGRES_VERSION}"
+    restart: always
+    ports:
+      - "${DB_EXTERNAL_PORT}:${DB_PORT}"
+    environment:
+      - "POSTGRES_USER=${DB_ADMIN}"
+      - "POSTGRES_PASSWORD=${DB_ADMIN_PW}"
+      - "POSTGRES_DB=${DB_NAME}"
+    volumes:
+      - ./data/database:/var/lib/postgresql/data
+    networks:
+      - database-svc
+  init-database: # https://stackoverflow.com/questions/70322031/does-docker-compose-support-init-container
+    image: "postgres:${POSTGRES_VERSION}"
+    command: /init-database.sh
+    restart: on-failure
+    environment:
+      - "POSTGRES_USER=${DB_ADMIN}"
+      - "POSTGRES_PASSWORD=${DB_ADMIN_PW}"
+      - "POSTGRES_DB=${DB_NAME}"
+      - "POSTGRES_HOST=${DB_HOST}"
+      - "POSTGRES_PORT=${DB_PORT}"
+      - "ADMIN_PW=${ADMIN_PW}"
+    volumes:
+      - ../scripts/init-database.sh:/init-database.sh
+      - ../scripts/init-database.sql:/init-database.sql
+    depends_on:
+      database:
+        condition: service_started
+    networks:
+      - database-svc
+  balancer-master:
+    build: . # FOR LOCAL TESTING
+    image: "r0bb3rt17/balancer-master:${BALANCER_VERSION}"
+    restart: on-failure
+    ports:
+      - "${MASTER_EXTERNAL_PORT}:${MASTER_PORT}"
+    environment:
+      - "POSTGRES_USER=${DB_ADMIN}"
+      - "POSTGRES_PASSWORD=${DB_ADMIN_PW}"
+      - "POSTGRES_DB=${DB_NAME}"
+      - "POSTGRES_HOST=${DB_HOST}"
+      - "POSTGRES_PORT=${DB_PORT}"
+    depends_on:
+      init-database:
+        condition: service_completed_successfully
+    networks:
+      - database-svc
+  load_balancer:
+    build: . # FOR LOCAL TESTING
+    image: "r0bb3rt17/load_balancer:${BALANCER_VERSION}"
+    restart: on-failure
+    ports:
+      - "${BALANCER_EXTERNAL_PORT}:${BALANCER_PORT}"
+    environment:
+      - "PORT=${BALANCER_PORT}"
+      - "POSTGRES_USER=${DB_ADMIN}"
+      - "POSTGRES_PASSWORD=${DB_ADMIN_PW}"
+      - "POSTGRES_DB=${DB_NAME}"
+      - "POSTGRES_HOST=${DB_HOST}"
+      - "POSTGRES_PORT=${DB_PORT}"
+    depends_on:
+      init-database:
+        condition: service_completed_successfully
+#      broker:
+#        condition: service_started
+    networks:
+      - database-svc
+########################################################################
+#                          PULSAR CLUSTER                              #
+########################################################################
+  zookeeper:
+    image: apachepulsar/pulsar:latest
+    container_name: zookeeper
+    restart: on-failure
+    networks:
+      - pulsar-svc
+    volumes:
+      - ./data/zookeeper:/pulsar/data/zookeeper
+    environment:
+      - metadataStoreUrl=zk:zookeeper:2181
+    command: >
+      bash -c "bin/apply-config-from-env.py conf/zookeeper.conf && \
+             bin/generate-zookeeper-config.sh conf/zookeeper.conf && \
+             exec bin/pulsar zookeeper"
+    healthcheck:
+      test: [ "CMD", "bin/pulsar-zookeeper-ruok.sh" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+  pulsar-init:
+    container_name: pulsar-init
+    hostname: pulsar-init
+    image: apachepulsar/pulsar:latest
+    networks:
+      - pulsar-svc
+    command: >
+      bin/pulsar initialize-cluster-metadata \
+               --cluster cluster-a \
+               --zookeeper zookeeper:2181 \
+               --configuration-store zookeeper:2181 \
+               --web-service-url http://broker:8080 \
+               --broker-service-url pulsar://broker:6650
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+  bookie:
+    image: apachepulsar/pulsar:latest
+    container_name: bookie
+    restart: on-failure
+    networks:
+      - pulsar-svc
+    environment:
+      - clusterName=cluster-a
+      - zkServers=zookeeper:2181
+      - metadataServiceUri=metadata-store:zk:zookeeper:2181
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+      pulsar-init:
+        condition: service_completed_successfully
+    # Map the local directory to the container to avoid bookie startup failure due to insufficient container disks.
+    volumes:
+      - ./data/bookkeeper:/pulsar/data/bookkeeper
+    command: bash -c "bin/apply-config-from-env.py conf/bookkeeper.conf
+      && exec bin/pulsar bookie"
+  broker:
+    image: apachepulsar/pulsar:latest
+    container_name: broker
+    hostname: broker
+    restart: on-failure
+    networks:
+      - pulsar-svc
+    environment:
+      - metadataStoreUrl=zk:zookeeper:2181
+      - zookeeperServers=zookeeper:2181
+      - clusterName=cluster-a
+      - managedLedgerDefaultEnsembleSize=1
+      - managedLedgerDefaultWriteQuorum=1
+      - managedLedgerDefaultAckQuorum=1
+      - advertisedAddress=broker
+      - advertisedListeners=external:pulsar://127.0.0.1:6650
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+      bookie:
+        condition: service_started
+    ports:
+      - "${PULSAR_PORT}:${PULSAR_EXTERNAL_PORT}"
+    command: bash -c "bin/apply-config-from-env.py conf/broker.conf
+      && exec bin/pulsar broker"
+  pulsar-setup:
+    image: apachepulsar/pulsar:latest
+    command: /init-pulsar.sh
+    networks:
+      - pulsar-svc
+    environment:
+      webServiceUrl: http://broker:8080/
+    depends_on:
+      broker:
+        condition: service_started
+    volumes:
+      - ../scripts/init-pulsar.sh:/init-pulsar.sh
+networks:
+  database-svc:
+  pulsar-svc:

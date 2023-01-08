@@ -7,8 +7,7 @@ import java.util.Properties
 
 object DBConnector {
     private val log = LoggerFactory.getLogger(DBConnector::class.java)
-
-    private val dbUrl = ConfigProperties.getString("postgres.url")
+    private val dbUrl = "jdbc:postgresql://${ConfigProperties.getString("postgres.host")}:${ConfigProperties.getString("postgres.port")}/${ConfigProperties.getString("postgres.db")}"
     private val dbUsername = ConfigProperties.getString("postgres.username")
     private val dbPassword = ConfigProperties.getString("postgres.password")
 
@@ -27,7 +26,7 @@ object DBConnector {
             log.debug("connected to database successfully")
             connection
         } catch (e: Exception) {
-            log.error("unable to connect to DB")
+            log.error("unable to connect to DB: {}", e.message)
             null;
         }
     }

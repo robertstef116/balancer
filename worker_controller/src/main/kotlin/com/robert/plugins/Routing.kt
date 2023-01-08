@@ -5,11 +5,11 @@ import com.robert.exceptions.AuthorizationException
 import com.robert.exceptions.NotFoundException
 import com.robert.routes.docker
 import com.robert.routes.resource
-import io.ktor.routing.*
 import io.ktor.http.*
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     routing {
@@ -21,18 +21,18 @@ fun Application.configureRouting() {
         get("/health") {
             call.respondText("healthy")
         }
+    }
 
-        install(StatusPages) {
-            exception<NotFoundException> {
-                call.respond(HttpStatusCode.NotFound)
-            }
-            exception<AuthenticationException> {
-                call.respond(HttpStatusCode.Unauthorized)
-            }
-            exception<AuthorizationException> {
-                call.respond(HttpStatusCode.Forbidden)
-            }
-
+    install(StatusPages) {
+        exception<NotFoundException> { call, _ ->
+            call.respond(HttpStatusCode.NotFound)
         }
+        exception<AuthenticationException> { call, _ ->
+            call.respond(HttpStatusCode.Unauthorized)
+        }
+        exception<AuthorizationException> { call, _ ->
+            call.respond(HttpStatusCode.Forbidden)
+        }
+
     }
 }

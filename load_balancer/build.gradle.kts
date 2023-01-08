@@ -1,20 +1,55 @@
-val logback_version: String by project
-val ktor_version: String by project
+val ktorVersion: String by project
+val buildVersion: String by project
+val dockerImagePrefix: String by project
+val dockerJdkBaseVersion: String by project
 
 plugins {
     application
     kotlin("jvm")
+    id("com.palantir.docker")
+    id("com.github.johnrengelman.shadow")
+}
+
+application {
+    mainClass.set("com.robert.MainKt")
 }
 
 dependencies {
     implementation(project(":model"))
     implementation(project(":utils"))
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
-//    implementation("org.apache.httpcomponents:httpcore:4.4.15")
-    implementation("org.postgresql:postgresql:42.3.3")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("io.ktor:ktor-network:$ktor_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.postgresql:postgresql:42.5.1")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel"){}
+
+tasks.register<Copy>("setUpDockerContext") {
+    val contextPath = "${project.projectDir}/build/docker"
+    destinationDir=file(contextPath)
+
+    dependsOn("shadowJar")
+    from("${project.projectDir}/build/libs") {
+        into("app")
+        include("*-all.jar")
+    }
+
+    doLast {
+        val versionFile = file("${contextPath}/version.txt")
+        if (!versionFile.exists()) versionFile.createNewFile()
+        versionFile.writeText(buildVersion)
+    }
+}
+
+tasks.dockerPrepare {
+    dependsOn("setUpDockerContext")
+}
+
+docker {
+    name = "$dockerImagePrefix/load_balancer:$buildVersion"
+    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
+    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
+    noCache(true)
+}

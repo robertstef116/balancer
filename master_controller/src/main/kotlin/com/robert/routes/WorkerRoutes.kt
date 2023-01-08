@@ -3,10 +3,10 @@ package com.robert.routes
 import com.robert.api.request.WorkerUpdateRequest
 import com.robert.api.response.WorkerCreateRequest
 import com.robert.services.WorkerService
-import io.ktor.application.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 fun Route.worker(path: String, workerService: WorkerService) {
     route(path) {

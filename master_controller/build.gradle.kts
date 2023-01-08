@@ -1,35 +1,72 @@
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
+val ktorVersion: String by project
+val kotlinVersion: String by project
+val buildVersion: String by project
+val dockerImagePrefix: String by project
+val dockerJdkBaseVersion: String by project
 
 plugins {
     application
     kotlin("jvm")
+    id("com.palantir.docker")
+    id("com.github.johnrengelman.shadow")
 }
 
-//group = "com.robert"
-//version = "0.0.1"
-//application {
-//    mainClass.set("com.robert.ApplicationKt")
-//
-//    val isDevelopment: Boolean = project.ext.has("development")
-//    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-//}
+application {
+    mainClass.set("com.robert.ApplicationKt")
+}
 
 dependencies {
     implementation(project(":model"))
     implementation(project(":utils"))
     implementation("commons-validator:commons-validator:1.7")
-    implementation("org.postgresql:postgresql:42.3.3")
-    implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("io.ktor:ktor-auth:$ktor_version")
-    implementation("io.ktor:ktor-auth-jwt:$ktor_version")
-    implementation("io.ktor:ktor-server-sessions:$ktor_version")
-    implementation("io.ktor:ktor-server-host-common:$ktor_version")
-    implementation("io.ktor:ktor-gson:$ktor_version")
-    implementation("io.ktor:ktor-server-netty:$ktor_version")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+    implementation("org.postgresql:postgresql:42.5.1")
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
+    implementation("io.ktor:ktor-server-cors:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
+    implementation("io.ktor:ktor-server-sessions:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel"){}
+
+tasks.register<Copy>("prepareStaticFiles") {
+    destinationDir=file("${project.projectDir}/build/resources/main/ui")
+
+    dependsOn(":balancer-ui:bundle")
+    from("${project.rootDir}/balancer-ui/build")
+}
+
+tasks.getByName("shadowJar").dependsOn("prepareStaticFiles")
+
+tasks.register<Copy>("setUpDockerContext") {
+    val contextPath = "${project.projectDir}/build/docker"
+    destinationDir=file(contextPath)
+
+    dependsOn("shadowJar")
+    from("${project.projectDir}/build/libs") {
+        into("app")
+        include("*-all.jar")
+    }
+
+    doLast {
+        val versionFile = file("${contextPath}/version.txt")
+        if (!versionFile.exists()) versionFile.createNewFile()
+        versionFile.writeText(buildVersion)
+    }
+}
+
+tasks.dockerPrepare {
+    dependsOn("setUpDockerContext")
+}
+
+docker {
+    name = "$dockerImagePrefix/balancer-master:$buildVersion"
+    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
+    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
+    noCache(true)
+}

@@ -129,8 +129,9 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
 
     private suspend fun run() {
         log.debug("starting load balancer")
+        val port = ConfigProperties.getInteger("ktor.deployment.port")!!
 
-        val server = aSocket(selectorManager).tcp().bind("127.0.0.1", 9999)
+        val server = aSocket(selectorManager).tcp().bind("127.0.0.1", port)
 
         while (true) {
             val clientSocket = server.accept()

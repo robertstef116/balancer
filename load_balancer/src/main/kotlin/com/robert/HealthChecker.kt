@@ -3,6 +3,7 @@ package com.robert
 import com.robert.api.response.WorkerResourceResponse
 import com.robert.resources.performance.DeploymentPerformanceData
 import com.robert.resources.Worker
+import io.ktor.client.call.*
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -36,7 +37,7 @@ class HealthChecker(
         suspend fun doHealthCheck(worker: Worker): WorkerResourceResponse {
             log.debug("Health check {}:{}", worker.host, worker.port)
             val url = "http://${worker.host}:${worker.port}/resource"
-            return HttpClient.get(url, checkTimeout)
+            return HttpClient.get<WorkerResourceResponse>(url, checkTimeout).body()
         }
 
         fun reloadDynamicConfigs() {

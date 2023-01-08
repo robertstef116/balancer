@@ -1,15 +1,14 @@
 package com.robert.plugins
 
-import io.ktor.features.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.request.*
 import org.slf4j.event.*
-import io.ktor.request.*
-import io.ktor.application.*
-import io.ktor.response.*
 
 fun Application.configureMonitoring() {
     install(CallLogging) {
         level = Level.INFO
-        filter { call -> call.request.path().startsWith("/") }
+        filter { call -> call.request.path().startsWith("/api") }
     }
 
 }

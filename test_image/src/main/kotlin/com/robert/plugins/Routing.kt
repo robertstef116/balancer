@@ -1,12 +1,14 @@
 package com.robert.plugins
 
+import com.robert.exceptions.AuthenticationException
+import com.robert.exceptions.AuthorizationException
 import com.robert.mainRoute
-import io.ktor.routing.*
 import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.features.*
-import io.ktor.application.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.http.content.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
 
@@ -17,17 +19,15 @@ fun Application.configureRouting() {
         static("/static") {
             resources("static")
         }
-        install(StatusPages) {
-            exception<AuthenticationException> { cause ->
-                call.respond(HttpStatusCode.Unauthorized)
-            }
-            exception<AuthorizationException> { cause ->
-                call.respond(HttpStatusCode.Forbidden)
-            }
+    }
 
+    install(StatusPages) {
+        exception<AuthenticationException> { call, _ ->
+            call.respond(HttpStatusCode.Unauthorized)
         }
+        exception<AuthorizationException> { call, _ ->
+            call.respond(HttpStatusCode.Forbidden)
+        }
+
     }
 }
-
-class AuthenticationException : RuntimeException()
-class AuthorizationException : RuntimeException()

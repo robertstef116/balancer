@@ -37,3 +37,4 @@ out/
 .vscode/
 
 test.csv
+/docker/data

@@ -1,7 +1,7 @@
 package com.robert
 
 import com.robert.plugins.*
-import io.ktor.application.*
+import io.ktor.server.application.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
