@@ -3,7 +3,7 @@ package com.robert
 import org.slf4j.LoggerFactory
 
 object DynamicConfigProperties {
-    private val log = LoggerFactory.getLogger(DynamicConfigProperties::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     @JvmStatic
     private lateinit var properties: Map<String, String>

@@ -97,6 +97,7 @@ services:
     container_name: pulsar-init
     hostname: pulsar-init
     image: apachepulsar/pulsar:latest
+    restart: on-failure
     networks:
       - pulsar-svc
     command: >
@@ -105,7 +106,7 @@ services:
                --zookeeper zookeeper:2181 \
                --configuration-store zookeeper:2181 \
                --web-service-url http://broker:8080 \
-               --broker-service-url pulsar://broker:6650
+               --broker-service-url ${PULSAR_PROTOCOL}://${PULSAR_HOST}:${PULSAR_EXTERNAL_PORT}
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -144,7 +145,7 @@ services:
       - managedLedgerDefaultWriteQuorum=1
       - managedLedgerDefaultAckQuorum=1
       - advertisedAddress=broker
-      - advertisedListeners=external:pulsar://127.0.0.1:6650
+      - advertisedListeners=external:${PULSAR_PROTOCOL}://${PULSAR_HOST}:${PULSAR_PORT}
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -157,6 +158,7 @@ services:
   pulsar-setup:
     image: apachepulsar/pulsar:latest
     command: /init-pulsar.sh
+    restart: on-failure
     networks:
       - pulsar-svc
     environment:

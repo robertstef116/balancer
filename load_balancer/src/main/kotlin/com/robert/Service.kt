@@ -34,7 +34,7 @@ class Service(private val storage: Storage) {
                         workflow.memoryLimit,
                         workflow.pathsMapping.values.toList().distinct()
                     )
-                )
+                ).body()
                 return@runBlocking storage.addDeployment(
                     deploymentId,
                     worker.id,

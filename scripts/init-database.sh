@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: wait for database to be up
+
 echo "Initializing database"
 
 PGPASSWORD="$POSTGRES_PASSWORD" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -a -w --no-password -f /init-database.sql

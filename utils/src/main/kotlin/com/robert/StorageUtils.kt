@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import java.sql.PreparedStatement
 
 object StorageUtils {
-    private val log = LoggerFactory.getLogger(StorageUtils::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
     fun executeUpdate(st: PreparedStatement) {
         val res = st.executeUpdate()
 

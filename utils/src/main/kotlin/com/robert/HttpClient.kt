@@ -22,17 +22,18 @@ object HttpClient {
     }
 
     @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-    suspend inline fun <reified T : Any> get(url: String, timeout: Long = Long.MAX_VALUE): HttpResponse = this.client.get(url) {
-        timeout {
-            requestTimeoutMillis = timeout
+    suspend inline fun <reified T : Any> get(url: String, timeout: Long = Long.MAX_VALUE): HttpResponse =
+        this.client.get(url) {
+            timeout {
+                requestTimeoutMillis = timeout
+            }
+            headers {
+                append(HttpHeaders.ContentType, "application/json")
+            }
         }
-        headers {
-            append(HttpHeaders.ContentType, "application/json")
-        }
-    }
 
     @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-    suspend inline fun <reified T : Any> post(url: String, reqBody: Any, timeout: Long = Long.MAX_VALUE): DockerCreateContainerResponse? =
+    suspend inline fun <reified T : Any> post(url: String, reqBody: Any, timeout: Long = Long.MAX_VALUE): HttpResponse =
         this.client.post(url) {
             setBody(reqBody)
             timeout {
@@ -41,7 +42,7 @@ object HttpClient {
             headers {
                 append(HttpHeaders.ContentType, "application/json")
             }
-        }.body()
+        }
 
     @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
     suspend inline fun <reified T : Any> delete(url: String, timeout: Long = Long.MAX_VALUE): HttpResponse =
