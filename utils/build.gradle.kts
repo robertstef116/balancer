@@ -1,6 +1,7 @@
 val ktorVersion: String by project
 val kotlinVersion: String by project
 val pulsarVersion: String by project
+val koinVersion: String by project
 
 plugins {
     kotlin("jvm")
@@ -15,5 +16,6 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("org.apache.pulsar:pulsar-client:$pulsarVersion")
+    implementation("io.insert-koin:koin-core:$koinVersion")
     implementation("org.slf4j:slf4j-simple:2.0.6")
 }
