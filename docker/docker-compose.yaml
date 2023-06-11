@@ -71,103 +71,19 @@ services:
 #        condition: service_started
     networks:
       - database-svc
-########################################################################
-#                          PULSAR CLUSTER                              #
-########################################################################
-  zookeeper:
-    image: apachepulsar/pulsar:latest
-    container_name: zookeeper
+  rabitmq:
+    container_name: ${RABBITMQ_HOST}
+    image: "rabbitmq:${RABBITMQ_VERSION}"
     restart: on-failure
-    networks:
-      - pulsar-svc
-    volumes:
-      - ./data/zookeeper:/pulsar/data/zookeeper
-    environment:
-      - metadataStoreUrl=zk:zookeeper:2181
-    command: >
-      bash -c "bin/apply-config-from-env.py conf/zookeeper.conf && \
-             bin/generate-zookeeper-config.sh conf/zookeeper.conf && \
-             exec bin/pulsar zookeeper"
-    healthcheck:
-      test: [ "CMD", "bin/pulsar-zookeeper-ruok.sh" ]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-  pulsar-init:
-    container_name: pulsar-init
-    hostname: pulsar-init
-    image: apachepulsar/pulsar:latest
-    restart: on-failure
-    networks:
-      - pulsar-svc
-    command: >
-      bin/pulsar initialize-cluster-metadata \
-               --cluster cluster-a \
-               --zookeeper zookeeper:2181 \
-               --configuration-store zookeeper:2181 \
-               --web-service-url http://broker:8080 \
-               --broker-service-url ${PULSAR_PROTOCOL}://${PULSAR_HOST}:${PULSAR_EXTERNAL_PORT}
-    depends_on:
-      zookeeper:
-        condition: service_healthy
-  bookie:
-    image: apachepulsar/pulsar:latest
-    container_name: bookie
-    restart: on-failure
-    networks:
-      - pulsar-svc
-    environment:
-      - clusterName=cluster-a
-      - zkServers=zookeeper:2181
-      - metadataServiceUri=metadata-store:zk:zookeeper:2181
-    depends_on:
-      zookeeper:
-        condition: service_healthy
-      pulsar-init:
-        condition: service_completed_successfully
-    # Map the local directory to the container to avoid bookie startup failure due to insufficient container disks.
-    volumes:
-      - ./data/bookkeeper:/pulsar/data/bookkeeper
-    command: bash -c "bin/apply-config-from-env.py conf/bookkeeper.conf
-      && exec bin/pulsar bookie"
-  broker:
-    image: apachepulsar/pulsar:latest
-    container_name: broker
-    hostname: broker
-    restart: on-failure
-    networks:
-      - pulsar-svc
-    environment:
-      - metadataStoreUrl=zk:zookeeper:2181
-      - zookeeperServers=zookeeper:2181
-      - clusterName=cluster-a
-      - managedLedgerDefaultEnsembleSize=1
-      - managedLedgerDefaultWriteQuorum=1
-      - managedLedgerDefaultAckQuorum=1
-      - advertisedAddress=broker
-      - advertisedListeners=external:${PULSAR_PROTOCOL}://${PULSAR_HOST}:${PULSAR_PORT}
-    depends_on:
-      zookeeper:
-        condition: service_healthy
-      bookie:
-        condition: service_started
     ports:
-      - "${PULSAR_PORT}:${PULSAR_EXTERNAL_PORT}"
-    command: bash -c "bin/apply-config-from-env.py conf/broker.conf
-      && exec bin/pulsar broker"
-  pulsar-setup:
-    image: apachepulsar/pulsar:latest
-    command: /init-pulsar.sh
-    restart: on-failure
-    networks:
-      - pulsar-svc
+      - "${RABBITMQ_EXTERNAL_PORT}:${RABBITMQ_PORT}"
     environment:
-      webServiceUrl: http://broker:8080/
-    depends_on:
-      broker:
-        condition: service_started
+      - "RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}"
+      - "RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}"
     volumes:
-      - ../scripts/init-pulsar.sh:/init-pulsar.sh
+      - ./data/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - rabbitmq-svc
 networks:
   database-svc:
-  pulsar-svc:
+  rabbitmq-svc:

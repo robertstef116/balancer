@@ -26,7 +26,7 @@ class Service(private val storage: Storage) {
             var dockerContainerResponse: DockerCreateContainerResponse? = null
             val deploymentId = UUID.randomUUID().toString()
             try {
-                dockerContainerResponse = HttpClient.post<DockerCreateContainerResponse>(
+                dockerContainerResponse = HttpClient.post(
                     url,
                     DockerCreateContainerRequest(
                         deploymentId,
@@ -45,7 +45,7 @@ class Service(private val storage: Storage) {
             } catch (e: Exception) {
                 log.error("error deploying workflow, err = {}", e.message)
                 if (dockerContainerResponse != null) {
-                    HttpClient.delete<String>("$url?id=${dockerContainerResponse.id}")
+                    HttpClient.delete("$url?id=${dockerContainerResponse.id}")
                 } else {
                     // empty
                 }
@@ -59,7 +59,7 @@ class Service(private val storage: Storage) {
             var response = false
             val url = "http://${worker.host}:${worker.port}/docker/$containerId"
             try {
-                val res = HttpClient.delete<String>(url).body<String>()
+                val res = HttpClient.delete(url).body<String>()
                 if (res == "OK") {
                     storage.deleteDeployment(id)
                     response = true
@@ -130,7 +130,7 @@ class Service(private val storage: Storage) {
     private suspend fun syncWorker(worker: Worker) {
         log.debug("syncing worker {}", worker)
         val url = "http://${worker.host}:${worker.port}/docker/ports"
-        val res = HttpClient.get<List<DockerContainerPorts>>(url, 60000).body<List<DockerContainerPorts>>()
+        val res = HttpClient.get(url, 60000).body<List<DockerContainerPorts>>()
         for (deployment in res) {
             storage.updateDeploymentMapping(deployment.deploymentId, deployment.ports)
         }

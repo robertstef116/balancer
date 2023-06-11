@@ -19,9 +19,9 @@ dependencies {
     implementation(project(":utils"))
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.postgresql:postgresql:42.5.1")
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("org.postgresql:postgresql:42.5.4")
+    implementation("io.ktor:ktor-client-core-jvm:2.2.4")
+    implementation("io.ktor:ktor-client-cio-jvm:2.2.4")
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel"){}

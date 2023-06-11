@@ -1,11 +1,12 @@
 package com.robert
 
-import java.util.UUID
-
 object Constants {
     // Static config properties keys
     const val MANAGED_CONTAINER_LABEL = "MANAGED_BY_BALANCER"
     const val DEPLOYMENT_ID_KEY_LABEL = "DEPLOYMENT_ID"
+
+    const val CONFIGURATION_CHANGES_EXCHANGE_KEY = "CONFIGURATION_CHANGES_EXCHANGE"
+    const val WORKFLOW_LOAD_EXCHANGE_KEY = "rabbitmq.exchanges.workflowLoad"
 
     // Dynamic config properties keys
     const val PROCESSING_SOCKET_BUFFER_LENGTH = "PROCESSING_SOCKET_BUFFER_LENGTH"
@@ -14,7 +15,7 @@ object Constants {
     const val HEALTH_CHECK_TIMEOUT = "HEALTH_CHECK_TIMEOUT"
     const val HEALTH_CHECK_INTERVAL = "HEALTH_CHECK_INTERVAL"
     const val HEALTH_CHECK_MAX_FAILURES = "HEALTH_CHECK_MAX_FAILURES"
-    const val METRICS_STORED_PER_WORKER_LIMIT = "METRICS_STORED_PER_WORKER_LIMIT"
+    const val METRICS_STORED_LIMIT = "METRICS_STORED_LIMIT"
     const val CPU_WEIGHT = "CPU_WEIGHT"
     const val MEMORY_WEIGHT = "MEMORY_WEIGHT"
     const val DEPLOYMENTS_CHECK_INTERVAL = "DEPLOYMENTS_CHECK_INTERVAL"

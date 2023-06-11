@@ -4,3 +4,5 @@ services:
   worker:
     image: r0bb3rt17/balancer-worker:${BALANCER_VERSION}
     restart: on-failure
+    ports:
+      - "8081:8081"

@@ -1,6 +1,5 @@
 package com.robert.balancing
 
-import org.slf4j.LoggerFactory
 
 
 data class TargetWeightData(
@@ -8,7 +7,7 @@ data class TargetWeightData(
     var weight: Double
 ) {
     companion object{
-        private val log = LoggerFactory.getLogger(TargetWeightData::class.java)
+//        private val log = LoggerFactory.getLogger(TargetWeightData::class.java)
 
         fun selectRandomTarget(targets: List<TargetWeightData>): TargetWeightData {
             var rand = kotlin.random.Random.nextDouble()
@@ -19,7 +18,7 @@ data class TargetWeightData(
                 }
                 rand -= weight
             }
-            log.error("Unable to randomly select the target")
+//            log.error("Unable to randomly select the target")
             return targets.first()
         }
     }

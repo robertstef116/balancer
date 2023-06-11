@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.BufferedWriter
-import java.io.File
 import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
@@ -29,7 +28,7 @@ fun main() {
                 println("start $time")
                 val start = System.nanoTime()
                 try {
-                    HttpClient.get<Unit>("$LB_URL/$time", Long.MAX_VALUE)
+                    HttpClient.get("$LB_URL/$time", Long.MAX_VALUE)
                     val end = System.nanoTime()
                     data[i] = ReqData(start/1000000, end/1000000, time, null)
                     println("done $time")

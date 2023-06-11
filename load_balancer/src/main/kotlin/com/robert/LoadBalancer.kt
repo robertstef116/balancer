@@ -120,7 +120,7 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
     override fun start() {
 //        CoroutineScope(Dispatchers.IO).launch {
         runBlocking {
-            suspendCoroutine<Unit> {
+            suspendCoroutine {
                 resourcesManager.registerInitializationWaiter { it.resume(Unit) }
             }
             run()

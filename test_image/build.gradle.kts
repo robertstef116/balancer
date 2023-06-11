@@ -27,7 +27,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:2.2.4")
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel") {}

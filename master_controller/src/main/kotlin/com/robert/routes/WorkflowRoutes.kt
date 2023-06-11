@@ -38,7 +38,16 @@ fun Route.workflow(path: String, workflowService: WorkflowService) {
         put("/{id}") {
             val id = call.parameters["id"].toString()
             val request = call.receive<WorkflowUpdateRequest>()
-            call.respond(workflowService.update(id, request.minDeployments, request.maxDeployments, request.upScaling, request.downScaling, request.algorithm))
+            call.respond(
+                workflowService.update(
+                    id,
+                    request.minDeployments,
+                    request.maxDeployments,
+                    request.upScaling,
+                    request.downScaling,
+                    request.algorithm
+                )
+            )
         }
 
         delete("/{id}") {

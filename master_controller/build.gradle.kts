@@ -20,16 +20,16 @@ dependencies {
     implementation(project(":utils"))
     implementation("commons-validator:commons-validator:1.7")
     implementation("org.postgresql:postgresql:42.5.1")
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
-    implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
+    implementation("io.ktor:ktor-server-core-jvm:2.2.4")
+    implementation("io.ktor:ktor-server-sessions-jvm:2.2.4")
+    implementation("io.ktor:ktor-server-netty-jvm:2.2.4")
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel"){}

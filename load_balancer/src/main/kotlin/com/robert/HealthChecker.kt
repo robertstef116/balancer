@@ -27,7 +27,7 @@ class HealthChecker(
         private var maxNumberOfFailures by Delegates.notNull<Int>()
         private var relevantPerformanceMetricsNumber by Delegates.notNull<Int>()
 
-        private fun <T> addMetric(latestMetrics: ConcurrentLinkedQueue<T>, newValue: T, limit: Int) {
+        private fun <T> addMetric(latestMetrics: java.util.Queue<T>, newValue: T, limit: Int) {
             while (latestMetrics.size > limit) {
                 latestMetrics.remove()
             }
@@ -37,13 +37,13 @@ class HealthChecker(
         suspend fun doHealthCheck(worker: Worker): WorkerResourceResponse {
             log.debug("Health check {}:{}", worker.host, worker.port)
             val url = "http://${worker.host}:${worker.port}/resource"
-            return HttpClient.get<WorkerResourceResponse>(url, checkTimeout).body()
+            return HttpClient.get(url, checkTimeout).body()
         }
 
         fun reloadDynamicConfigs() {
             log.debug("reload health checker dynamic configs")
             relevantPerformanceMetricsNumber = DynamicConfigProperties.getIntPropertyOrDefault(Constants.NUMBER_RELEVANT_PERFORMANCE_METRICS, 3)
-            checkTimeout =  DynamicConfigProperties.getLongPropertyOrDefault(Constants.HEALTH_CHECK_TIMEOUT, 10000L)
+            checkTimeout = DynamicConfigProperties.getLongPropertyOrDefault(Constants.HEALTH_CHECK_TIMEOUT, 10000L)
             checkInterval = DynamicConfigProperties.getLongPropertyOrDefault(Constants.HEALTH_CHECK_INTERVAL, 10000L)
             maxNumberOfFailures = DynamicConfigProperties.getIntPropertyOrDefault(Constants.HEALTH_CHECK_MAX_FAILURES, 3)
         }

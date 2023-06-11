@@ -1,11 +1,18 @@
 package com.robert.resources.performance
 
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.UUID
 
 data class DeploymentPerformanceData(
-    val deploymentId: String,
+    val deploymentId: UUID,
     val containerId: String,
-) {
-    val latestAvailableCpus = ConcurrentLinkedQueue<Double>()
-    val latestAvailableMemories = ConcurrentLinkedQueue<Long>()
+): PerformanceData() {
+    private var totalMemory = 0L
+
+    fun setTotalMemory(value: Long) {
+        totalMemory = value
+    }
+
+    fun getUtilization(): Double {
+        return ((averageMemory * 100 / totalMemory) * memoryWeight + averageCpu * cpuWeight) / 2
+    }
 }

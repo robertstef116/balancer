@@ -3,6 +3,7 @@ val buildVersion: String by project
 val kotlinVersion: String by project
 val dockerImagePrefix: String by project
 val dockerJdkBaseVersion: String by project
+val logbackVersion: String by project
 
 plugins {
     application
@@ -18,18 +19,23 @@ application {
 dependencies {
     implementation(project(":model"))
     implementation(project(":utils"))
-    implementation("com.github.oshi:oshi-core:6.4.0")
-    implementation("com.spotify:docker-client:8.16.0")
-    implementation("io.ktor:ktor-server-auth:$ktorVersion")
-    implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
-    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("com.github.oshi:oshi-core:6.4.0") {
+        exclude("org.slf4j", "slf4j-api")
+    }
+    implementation("com.spotify:docker-client:8.16.0"){
+        exclude("org.slf4j", "slf4j-api")
+    }
+    implementation("io.ktor:ktor-server-auth-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-logging-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-jackson-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel"){}
-
 
 tasks.register<Copy>("setUpDockerContext") {
     val contextPath = "${project.projectDir}/build/docker"

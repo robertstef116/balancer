@@ -9,4 +9,11 @@ include("test_image")
 include("performance_tester")
 include("balancer-ui")
 include("scaller")
-include("scaller")
+include("scalling_controller")
+include("rabbitmq")
+include("scalling_controller:src:main:scalling_api")
+findProject(":scalling_controller:src:main:scalling_api")?.name = "scalling_api"
+include("scalling_controller:scalling_api")
+findProject(":scalling_controller:scalling_api")?.name = "scalling_api"
+include("scalling_controller:scalling_api")
+findProject(":scalling_controller:scalling_api")?.name = "scalling_api"
