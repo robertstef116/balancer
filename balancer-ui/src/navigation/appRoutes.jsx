@@ -10,6 +10,7 @@ import Header from '../generic-components/Header';
 import NodesPage from '../pages/Nodes';
 import ConfigurationPage from '../pages/Configuration';
 import Footer from '../generic-components/Footer';
+import About from '../pages/About';
 
 export const routesPath = {
   homePage: '/',
@@ -69,6 +70,7 @@ export function AppRoutes() {
             </PrivateRoute>
           )}
         />
+        <Route path={routesPath.aboutPage} element={<About />} />
         <Route path={routesPath.loginPage} element={<Login />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

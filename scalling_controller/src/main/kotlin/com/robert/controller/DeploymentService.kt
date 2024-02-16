@@ -1,8 +1,8 @@
 package com.robert.controller
 
+import com.robert.HttpClient
 import com.robert.api.request.DockerCreateContainerRequest
 import com.robert.api.response.DockerCreateContainerResponse
-import com.robert.HttpClient
 import com.robert.persistance.DAORepository
 import com.robert.scaller.DeploymentR
 import com.robert.scaller.WorkerR
@@ -55,7 +55,7 @@ class DeploymentService : KoinComponent {
     }
 
     fun removeDeployment(workerId: UUID, deploymentId: UUID, containerId: String): Boolean {
-        val worker = healthChecker.workers.find { it.id == workerId }
+        val worker = healthChecker.getWorker(workerId)
         try {
             if (worker == null) {
                 LOG.warn("Worker with id {} not found, removing the deployment data", workerId)

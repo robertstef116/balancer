@@ -1,5 +1,7 @@
 export const APP_NAME = 'Balancing';
-export const API_URL = 'http://localhost:8010';
+export const API_URL = process.env.REACT_APP_API_URL || `${window.location.origin}/api/v1`;
+
+console.log(process.env);
 
 export const ranges = [
   { text: 'Last 10 min', value: 10 * 60, unit: 'm' },

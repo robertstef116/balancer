@@ -1,13 +1,16 @@
 package com.robert.persistance
 
 import com.robert.DatabaseFactory
+import com.robert.enums.LBAlgorithms
 import com.robert.scaller.DeploymentR
 import com.robert.scaller.WorkerR
+import com.robert.scaller.WorkerStatusR
 import com.robert.scaller.WorkflowR
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.update
 import java.util.*
 
 class DAORepositoryImpl : DAORepository {
@@ -31,6 +34,15 @@ class DAORepositoryImpl : DAORepository {
             it[health] = worker.port
             it[status] = worker.status
         }
+    }
+
+    override fun updateWorker(id: UUID, alias: String?, status: WorkerStatusR?): Boolean {
+        return Workers.update({Workers.id eq id}) {
+            if (alias != null)
+                it[this.alias] = alias
+            if (status != null)
+                it[this.status] = status
+        } != 0
     }
 
     override fun deleteWorker(id: UUID): Boolean = DatabaseFactory.dbQuery {
@@ -80,6 +92,15 @@ class DAORepositoryImpl : DAORepository {
                 it[containerPort] = cp
             }
         }
+    }
+
+    override fun updateWorkflow(id: UUID, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms?): Boolean = DatabaseFactory.dbQuery {
+        Workflows.update({ Workflows.id eq id }) {
+            it[this.minDeployments] = minDeployments
+            it[this.maxDeployments] = maxDeployments
+            if (algorithm != null)
+                it[this.algorithm] = algorithm
+        } != 0
     }
 
     override fun deleteWorkflow(id: UUID): Boolean = DatabaseFactory.dbQuery {

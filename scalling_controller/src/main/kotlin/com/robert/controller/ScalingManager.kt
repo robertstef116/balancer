@@ -4,12 +4,15 @@ import com.robert.Constants
 import com.robert.annotations.Scheduler
 import com.robert.annotations.SchedulerConsumer
 import com.robert.api.response.ResourceLoadData
+import com.robert.enums.LBAlgorithms
+import com.robert.exceptions.NotFoundException
 import com.robert.persistance.DAORepository
+import com.robert.scaller.WorkerR
+import com.robert.scaller.WorkerStatusR
 import com.robert.scaller.WorkflowR
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.time.Instant
-import java.time.LocalDateTime
+import java.util.*
 
 @Scheduler
 class ScalingManager : KoinComponent {
@@ -37,8 +40,63 @@ class ScalingManager : KoinComponent {
         return deploymentsManager.getWorkflows()
     }
 
-    fun createWorkflow(workflowR: WorkflowR) {
+    fun createWorkflow(image: String, memoryLimit: Long?, cpuLimit: Long?, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms, pathsMapping: MutableMap<String, Int>) {
+        val workflow = WorkflowR(
+            UUID.randomUUID(),
+            image,
+            memoryLimit,
+            cpuLimit,
+            minDeployments,
+            maxDeployments,
+            algorithm,
+            pathsMapping,
+        )
+        deploymentsManager.createWorkflow(workflow)
+        repository.createWorkflow(workflow)
+    }
 
+    fun updateWorkflow(id: UUID, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms?) {
+        var updated = deploymentsManager.updateWorkflow(id, minDeployments, maxDeployments, algorithm)
+        updated = updated || repository.updateWorkflow(id, minDeployments, maxDeployments, algorithm)
+        if (!updated) {
+            throw NotFoundException()
+        }
+    }
+
+    fun deleteWorkflow(id: UUID) {
+        var deleted = deploymentsManager.deleteWorkflow(id)
+        deleted = deleted || repository.deleteWorkflow(id)
+        if (!deleted) {
+            throw NotFoundException()
+        }
+    }
+
+    fun createWorker(alias: String, host: String, port: Int, status: WorkerStatusR) {
+        val worker = WorkerR(
+            UUID.randomUUID(),
+            alias,
+            host,
+            port,
+            status
+        )
+        healthChecker.createWorker(worker)
+        repository.createWorker(worker)
+    }
+
+    fun updateWorker(id: UUID, alias: String?, status: WorkerStatusR?) {
+        var updated = healthChecker.updateWorker(id, alias, status)
+        updated = updated || repository.updateWorker(id, alias, status)
+        if (!updated) {
+            throw NotFoundException()
+        }
+    }
+
+    fun deleteWorker(id: UUID) {
+        var deleted = healthChecker.deleteWorker(id)
+        deleted = deleted || repository.deleteWorker(id)
+        if (!deleted) {
+            throw NotFoundException()
+        }
     }
 
 //        val worker = WorkerR(

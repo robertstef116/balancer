@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":model"))
     implementation(project(":utils"))
     implementation(project(":rabbitmq"))
+    implementation(project("scalling_api"))
 
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-host-common-jvm:$ktorVersion")

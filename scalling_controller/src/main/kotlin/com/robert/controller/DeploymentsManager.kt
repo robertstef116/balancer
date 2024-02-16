@@ -5,6 +5,7 @@ import com.robert.ConfigProperties
 import com.robert.Constants
 import com.robert.RabbitmqService
 import com.robert.api.response.ResourceLoadData
+import com.robert.enums.LBAlgorithms
 import com.robert.persistance.DAORepository
 import com.robert.resources.performance.DeploymentPerformanceData
 import com.robert.resources.performance.PerformanceData
@@ -14,7 +15,16 @@ import io.ktor.util.logging.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.time.Instant
-import java.util.UUID
+import java.util.*
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
+
+data class WorkflowData(
+    val workflow: WorkflowR,
+) {
+    val lock = ReentrantLock()
+    var removed = false
+}
 
 class DeploymentsManager : KoinComponent {
     companion object {
@@ -32,12 +42,12 @@ class DeploymentsManager : KoinComponent {
 
     private var workflowDeployments = loadDeployments()
 
-    private var workflows = loadWorkflows()
+    private val workflows = loadWorkflows()
 
     fun checkDeployments() {
         removeDanglingContainersData()
-        for (workflow in workflows.values) {
-            processWorkflow(workflow)
+        for (workflowId in workflows.keys) {
+            processWorkflow(workflowId)
         }
     }
 
@@ -50,10 +60,10 @@ class DeploymentsManager : KoinComponent {
         return workflowDeployments
     }
 
-    private fun loadWorkflows(): MutableMap<UUID, WorkflowR> {
-        val workflows = mutableMapOf<UUID, WorkflowR>()
+    private fun loadWorkflows(): MutableMap<UUID, WorkflowData> {
+        val workflows = mutableMapOf<UUID, WorkflowData>()
         for (workflow in storage.getWorkflows()) {
-            workflows[workflow.id] = workflow
+            workflows[workflow.id] = WorkflowData(workflow)
         }
         return workflows
     }
@@ -71,24 +81,32 @@ class DeploymentsManager : KoinComponent {
         return hasChanges
     }
 
-    private fun processWorkflow(workflow: WorkflowR): Boolean {
-        log.debug("Processing workflow {}", workflow.id)
-        val deployments = workflowDeployments.getOrPut(workflow.id) { mutableListOf() }
-        var hasChanges = false
-        workflow.maxDeployments?.let { maxDeployments ->
-            val removedDeployments = ensureWorkflowMaxDeploymentLimit(deployments, maxDeployments)
-            if (removedDeployments.isNotEmpty()) {
-                hasChanges = deployments.removeAll(removedDeployments)
+    private fun processWorkflow(workflowId: UUID): Boolean {
+        workflows[workflowId]?.let {
+            it.lock.withLock {
+                if (it.removed) {
+                    return false
+                }
+                log.debug("Processing workflow {}", workflowId)
+                val deployments = workflowDeployments.getOrPut(workflowId) { mutableListOf() }
+                var hasChanges = false
+                it.workflow.maxDeployments?.let { maxDeployments ->
+                    val removedDeployments = ensureWorkflowMaxDeploymentLimit(deployments, maxDeployments)
+                    if (removedDeployments.isNotEmpty()) {
+                        hasChanges = deployments.removeAll(removedDeployments)
+                    }
+                }
+                it.workflow.minDeployments?.let { maxDeployments ->
+                    val addedDeployments = ensureWorkflowMinDeploymentLimit(it.workflow, deployments, maxDeployments)
+                    if (addedDeployments.isNotEmpty()) {
+                        hasChanges = deployments.addAll(addedDeployments)
+                    }
+                }
+                log.trace("Finished processing workflow {}, changes found: {}", workflowId, hasChanges)
+                return hasChanges
             }
         }
-        workflow.minDeployments?.let { maxDeployments ->
-            val addedDeployments = ensureWorkflowMinDeploymentLimit(workflow, deployments, maxDeployments)
-            if (addedDeployments.isNotEmpty()) {
-                hasChanges = deployments.addAll(addedDeployments)
-            }
-        }
-        log.trace("Finished processing workflow {}, changes found: {}", workflow.id, hasChanges)
-        return hasChanges
+        return false
     }
 
     private fun ensureWorkflowMaxDeploymentLimit(workflowDeployments: List<DeploymentR>, maxDeploymentsAllowed: Int): List<DeploymentR> {
@@ -120,7 +138,7 @@ class DeploymentsManager : KoinComponent {
     private fun scaleDownWorkflow(workflowDeployments: List<DeploymentR>): DeploymentR? {
         val randIdx = kotlin.random.Random.nextInt(workflowDeployments.size)
         val deployment = workflowDeployments[randIdx]
-        log.debug("Scaling down workflow, removing deployment {}", deployment.id)
+        log.debug("Scaling down workflow {}, removing deployment {}", deployment.workflowId, deployment.id)
         if (deploymentService.removeDeployment(deployment.workerId, deployment.id, deployment.containerId)) {
             return deployment
         }
@@ -133,7 +151,7 @@ class DeploymentsManager : KoinComponent {
             log.warn("Unable to find an worker for scaling up the workflow {}", workflow.id)
             return null
         }
-        val worker = healthChecker.workers.find { it.id == workerHealth.workerId }
+        val worker = healthChecker.getWorker(workerHealth.workerId)
         if (worker == null) {
             log.warn("Unable to find an worker with id {} for scaling up the workflow {}", workerHealth.workerId, workflow.id)
             return null
@@ -145,7 +163,7 @@ class DeploymentsManager : KoinComponent {
         val allPerformanceData = healthChecker.workersHealthData.values
             .map { it.deploymentsPerformance }
             .flatten()
-        return workflows.values.mapNotNull { workflow ->
+        return workflows.values.mapNotNull { (workflow) ->
             getWorkflowResourcesLoad(workflow, allPerformanceData)
         }
     }
@@ -178,7 +196,7 @@ class DeploymentsManager : KoinComponent {
         val allPerformanceData = healthChecker.workersHealthData.values
             .map { it.deploymentsPerformance }
             .flatten()
-        workflows.values.forEach { workflow ->
+        workflows.values.forEach { (workflow) ->
             getWorkflowResourcesLoad(workflow, allPerformanceData)?.let {
                 rabbitMqService.produce(workflowLoadExchangeName, OM.writeValueAsString(it))
             }
@@ -200,12 +218,47 @@ class DeploymentsManager : KoinComponent {
     }
 
     fun getWorkflows(): Collection<WorkflowR> {
-        return workflows.values
+        return workflows.values.map { it.workflow }
     }
 
     fun createWorkflow(workflow: WorkflowR) {
         log.debug("creating workflow: {}", workflow)
         storage.createWorkflow(workflow)
-        workflows[workflow.id] = workflow
+        workflows[workflow.id] = WorkflowData(workflow)
+    }
+
+    fun deleteWorkflow(id: UUID): Boolean {
+        log.debug("removing workflow {}", id)
+        workflows.remove(id)?.let {
+            it.lock.withLock {
+                val deployments = workflowDeployments[id] ?: listOf()
+                deployments.forEach { deployment ->
+                    log.debug("Scaling down workflow {}, removing deployment {}", deployment.workflowId, deployment.id)
+                    deploymentService.removeDeployment(deployment.workerId, deployment.id, deployment.containerId)
+                }
+                workflowDeployments.remove(id)
+                it.removed = true
+            }
+            return true
+        }
+        return false
+    }
+
+    fun updateWorkflow(id: UUID, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms?): Boolean {
+        log.debug("updating workflow {}: minDeployments = {}, maxDeployments = {}, algorithm = {}", id, minDeployments, maxDeployments, algorithm)
+        workflows[id]?.let {
+            it.lock.withLock {
+                if (it.removed) {
+                    return false
+                }
+                it.workflow.minDeployments = minDeployments
+                it.workflow.maxDeployments = maxDeployments
+                if (algorithm != null) {
+                    it.workflow.algorithm = algorithm
+                }
+            }
+            return true
+        }
+        return false
     }
 }
