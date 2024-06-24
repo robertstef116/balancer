@@ -3,10 +3,10 @@ package com.robert.controller
 import com.robert.HttpClient
 import com.robert.api.request.DockerCreateContainerRequest
 import com.robert.api.response.DockerCreateContainerResponse
-import com.robert.persistance.DAORepository
+import com.robert.persistence.DAORepository
 import com.robert.scaller.DeploymentR
-import com.robert.scaller.WorkerR
-import com.robert.scaller.WorkflowR
+import com.robert.scaller.Worker
+import com.robert.scaller.Workflow
 import io.ktor.http.*
 import io.ktor.util.logging.*
 import org.koin.core.component.KoinComponent
@@ -21,7 +21,7 @@ class DeploymentService : KoinComponent {
     private val healthChecker: HealthChecker by inject()
     private val storage: DAORepository by inject()
 
-    fun createDeployment(worker: WorkerR, workflow: WorkflowR): DeploymentR? {
+    fun createDeployment(worker: Worker, workflow: Workflow): DeploymentR? {
         val url = "http://${worker.host}:${worker.port}/docker"
         val deploymentId = UUID.randomUUID()
         var dockerContainerResponse: DockerCreateContainerResponse? = null

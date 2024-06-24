@@ -3,7 +3,7 @@ package com.robert
 import com.robert.algorithms.*
 import com.robert.balancing.TargetData
 import com.robert.enums.LBAlgorithms
-import com.robert.enums.WorkerStatus
+import com.robert.enums.WorkerStatusDepr
 import com.robert.resources.Worker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +83,7 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
         log.debug("init workers health checks")
         val healthCheck = HealthChecker(worker, this::onInitialized) {
             log.debug("worker check failed {}", worker)
-            storage.disableWorker(worker.id, WorkerStatus.STARTING)
+            storage.disableWorker(worker.id, WorkerStatusDepr.STARTING)
             workersChanged()
             pathsMappingChanged()
         }
@@ -168,12 +168,12 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     }
 
     private fun handleStoppingWorkers(): Int {
-        val stoppingWorkers = storage.getWorkers(WorkerStatus.STOPPING)
+        val stoppingWorkers = storage.getWorkers(WorkerStatusDepr.STOPPING)
         log.trace("{} workers in stopping state", stoppingWorkers.size)
         var workersStopped = 0
 
         for (worker in stoppingWorkers) {
-            storage.disableWorker(worker.id, WorkerStatus.STOPPED)
+            storage.disableWorker(worker.id, WorkerStatusDepr.STOPPED)
             workersStopped++
         }
 
@@ -181,7 +181,7 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     }
 
     private suspend fun handleStaringWorkers(): Int {
-        val startingWorkers = storage.getWorkers(WorkerStatus.STARTING)
+        val startingWorkers = storage.getWorkers(WorkerStatusDepr.STARTING)
         log.trace("{} workers in starting state", startingWorkers.size)
         var workersStarted = 0
 

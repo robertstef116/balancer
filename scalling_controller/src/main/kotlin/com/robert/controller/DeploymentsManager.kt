@@ -6,11 +6,11 @@ import com.robert.Constants
 import com.robert.RabbitmqService
 import com.robert.api.response.ResourceLoadData
 import com.robert.enums.LBAlgorithms
-import com.robert.persistance.DAORepository
+import com.robert.persistence.DAORepository
 import com.robert.resources.performance.DeploymentPerformanceData
 import com.robert.resources.performance.PerformanceData
 import com.robert.scaller.DeploymentR
-import com.robert.scaller.WorkflowR
+import com.robert.scaller.Workflow
 import io.ktor.util.logging.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 data class WorkflowData(
-    val workflow: WorkflowR,
+    val workflow: Workflow,
 ) {
     val lock = ReentrantLock()
     var removed = false
@@ -121,7 +121,7 @@ class DeploymentsManager : KoinComponent {
     }
 
     private fun ensureWorkflowMinDeploymentLimit(
-        workflow: WorkflowR,
+        workflow: Workflow,
         workflowDeployments: List<DeploymentR>,
         minDeploymentsAllowed: Int
     ): List<DeploymentR> {
@@ -145,7 +145,7 @@ class DeploymentsManager : KoinComponent {
         return null
     }
 
-    private fun scaleUpWorkflow(workflow: WorkflowR): DeploymentR? {
+    private fun scaleUpWorkflow(workflow: Workflow): DeploymentR? {
         val workerHealth = PerformanceData.pickRandomResource(healthChecker.workersHealthData.values)
         if (workerHealth == null) {
             log.warn("Unable to find an worker for scaling up the workflow {}", workflow.id)
@@ -168,7 +168,7 @@ class DeploymentsManager : KoinComponent {
         }
     }
 
-    private fun getWorkflowResourcesLoad(workflow: WorkflowR, allPerformanceData: List<DeploymentPerformanceData>): ResourceLoadData? {
+    private fun getWorkflowResourcesLoad(workflow: Workflow, allPerformanceData: List<DeploymentPerformanceData>): ResourceLoadData? {
         val now = Instant.now().toEpochMilli()
         return workflowDeployments[workflow.id]?.let { deployments ->
             val utilization = mutableListOf<Double>()
@@ -217,11 +217,11 @@ class DeploymentsManager : KoinComponent {
         return workflowDeployments[workflowId]?.first { it.id == deploymentId }
     }
 
-    fun getWorkflows(): Collection<WorkflowR> {
+    fun getWorkflows(): Collection<Workflow> {
         return workflows.values.map { it.workflow }
     }
 
-    fun createWorkflow(workflow: WorkflowR) {
+    fun createWorkflow(workflow: Workflow) {
         log.debug("creating workflow: {}", workflow)
         storage.createWorkflow(workflow)
         workflows[workflow.id] = WorkflowData(workflow)

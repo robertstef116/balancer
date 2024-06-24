@@ -43,16 +43,8 @@ export const getWorkers = async () => {
   throw new Error('Get workers failed!');
 };
 
-export const addWorker = async ({ alias, host, port }) => {
-  const res = await axios.post(`${API_URL}/worker`, { alias, host, port });
-  if (res.status === 200) {
-    return res.data;
-  }
-  throw new Error('Add worker failed!');
-};
-
-export const updateWorker = async ({ id, alias, port }) => {
-  const res = await axios.put(`${API_URL}/worker/${id}`, { alias, port });
+export const updateWorker = async ({ id, alias, state }) => {
+  const res = await axios.put(`${API_URL}/worker/${id}`, { alias, state });
   if (res.status === 200) {
     return res.data;
   }
@@ -83,16 +75,16 @@ export const getWorkflows = async () => {
   throw new Error('Get workflows failed!');
 };
 
-export const addWorkflow = async ({ image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping }) => {
-  const res = await axios.post(`${API_URL}/workflow`, { image, memoryLimit, algorithm, minDeployments, maxDeployments, pathMapping });
+export const addWorkflow = async ({ image, memoryLimit, cpuLimit, algorithm, minDeployments, maxDeployments, pathMapping }) => {
+  const res = await axios.post(`${API_URL}/workflow`, { image, memoryLimit, cpuLimit, algorithm, minDeployments, maxDeployments, pathMapping });
   if (res.status === 200) {
     return res.data;
   }
   throw new Error('Add workflow failed!');
 };
 
-export const updateWorkflow = async ({ id, algorithm, minDeployments, maxDeployments, upScaling, downScaling }) => {
-  const res = await axios.put(`${API_URL}/workflow/${id}`, { algorithm, minDeployments, maxDeployments, upScaling, downScaling });
+export const updateWorkflow = async ({ id, algorithm, minDeployments, maxDeployments }) => {
+  const res = await axios.put(`${API_URL}/workflow/${id}`, { algorithm, minDeployments, maxDeployments });
   if (res.status === 200) {
     return res.data;
   }

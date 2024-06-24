@@ -6,10 +6,10 @@ import com.robert.annotations.SchedulerConsumer
 import com.robert.api.response.ResourceLoadData
 import com.robert.enums.LBAlgorithms
 import com.robert.exceptions.NotFoundException
-import com.robert.persistance.DAORepository
-import com.robert.scaller.WorkerR
-import com.robert.scaller.WorkerStatusR
-import com.robert.scaller.WorkflowR
+import com.robert.persistence.DAORepository
+import com.robert.scaller.Worker
+import com.robert.scaller.WorkerState
+import com.robert.scaller.Workflow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -22,7 +22,7 @@ class ScalingManager : KoinComponent {
     private val skipsBetweenScalingChecks = 3
     private var checkCount = 0
 
-    @SchedulerConsumer(name = "ScalingManager", interval = "\${${Constants.HEALTH_CHECK_INTERVAL}:30s}")
+    @SchedulerConsumer(name = "ScalingManager", interval = "\${${Constants.RESCALE_INTERVAL}:30s}")
     fun check() {
         val workerFailed = healthChecker.checkWorkers()
         if (checkCount == 0 || workerFailed) {
@@ -36,12 +36,12 @@ class ScalingManager : KoinComponent {
         return deploymentsManager.getResourcesLoad()
     }
 
-    fun getWorkflows(): Collection<WorkflowR> {
+    fun getWorkflows(): Collection<Workflow> {
         return deploymentsManager.getWorkflows()
     }
 
     fun createWorkflow(image: String, memoryLimit: Long?, cpuLimit: Long?, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms, pathsMapping: MutableMap<String, Int>) {
-        val workflow = WorkflowR(
+        val workflow = Workflow(
             UUID.randomUUID(),
             image,
             memoryLimit,
@@ -71,8 +71,8 @@ class ScalingManager : KoinComponent {
         }
     }
 
-    fun createWorker(alias: String, host: String, port: Int, status: WorkerStatusR) {
-        val worker = WorkerR(
+    fun createWorker(alias: String, host: String, port: Int, status: WorkerState) {
+        val worker = Worker(
             UUID.randomUUID(),
             alias,
             host,
@@ -83,7 +83,7 @@ class ScalingManager : KoinComponent {
         repository.createWorker(worker)
     }
 
-    fun updateWorker(id: UUID, alias: String?, status: WorkerStatusR?) {
+    fun updateWorker(id: UUID, alias: String?, status: WorkerState?) {
         var updated = healthChecker.updateWorker(id, alias, status)
         updated = updated || repository.updateWorker(id, alias, status)
         if (!updated) {

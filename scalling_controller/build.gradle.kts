@@ -18,7 +18,6 @@ plugins {
 dependencies {
     implementation(project(":model"))
     implementation(project(":utils"))
-    implementation(project(":rabbitmq"))
     implementation(project("scalling_api"))
 
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")

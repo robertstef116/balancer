@@ -2,13 +2,12 @@ package com.robert
 
 import com.robert.balancing.TargetData
 import com.robert.enums.LBAlgorithms
-import com.robert.enums.WorkerStatus
+import com.robert.enums.WorkerStatusDepr
 import com.robert.enums.WorkflowAnalyticsEventType
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ServerException
 import com.robert.resources.Deployment
 import com.robert.resources.Worker
-import com.robert.resources.Workflow
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
@@ -20,7 +19,7 @@ class Storage {
         private val log = LoggerFactory.getLogger(Storage::class.java)
     }
 
-    fun getWorkers(status: WorkerStatus = WorkerStatus.STARTED): List<Worker> {
+    fun getWorkers(status: WorkerStatusDepr = WorkerStatusDepr.STARTED): List<Worker> {
         log.debug("get workers")
         val query = "SELECT id, alias, host, port FROM workers where status='$status'"
         val workers = ArrayList<Worker>()
@@ -45,7 +44,7 @@ class Storage {
         return workers
     }
 
-    fun disableWorker(id: String, status: WorkerStatus = WorkerStatus.STOPPED) {
+    fun disableWorker(id: String, status: WorkerStatusDepr = WorkerStatusDepr.STOPPED) {
         log.debug("disable worker with id {}, new status will be {}", id, status)
         DBConnector.getTransactionConnection().use { conn ->
             try {
@@ -69,7 +68,7 @@ class Storage {
     fun enableWorker(id: String) {
         log.debug("enable worker with id {}", id)
         DBConnector.getConnection().prepareStatement("UPDATE workers set status = ? WHERE id = ?").use { st ->
-            st.setString(1, WorkerStatus.STARTED.toString())
+            st.setString(1, WorkerStatusDepr.STARTED.toString())
             st.setString(2, id)
             StorageUtils.executeUpdate(st)
         }

@@ -3,6 +3,7 @@ import { Button, Modal } from 'react-bootstrap';
 
 export const SimpleModalTypes = {
   WARNING: 'WARNING',
+  INFO: 'INFO',
   CONFIRMATION: 'CONFIRMATION',
 };
 
@@ -29,7 +30,8 @@ export function SimpleModal({ title, description, type = SimpleModalTypes.WARNIN
         {description}
       </Modal.Body>
       <Modal.Footer>
-        {type === SimpleModalTypes.WARNING && <Button onClick={() => onDismiss(false)}>Ok</Button>}
+        {type === SimpleModalTypes.INFO && <Button onClick={() => onDismiss(false)}>Ok</Button>}
+        {type === SimpleModalTypes.WARNING && <Button onClick={() => onDismiss(false)}>Close</Button>}
         {type === SimpleModalTypes.CONFIRMATION && (
         <>
           <Button onClick={() => onDismiss(true)}>Yes</Button>

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import TableWidget from '../generic-components/TableWidget';
-import { addWorker, deleteWorker, disableWorker, getWorkers, updateWorker } from '../redux/actions';
+import { deleteWorker, getWorkers, updateWorker } from '../redux/actions';
 import useWidgetUtils from '../custom-hooks/useWidgetUtils';
 import ModalWrapper from '../generic-components/ModalWrapper';
 import FormBuilder from '../generic-components/FormBuilder';
@@ -9,18 +9,13 @@ import { SimpleModal, SimpleModalTypes } from './SimpleModal';
 import { Icons, ModalFormModes, WorkerNodeStatus } from '../constants';
 
 const aliasValidator = (data) => data.alias && data.alias.length >= 1 && data.alias.length <= 50;
-const hostValidator = (data) => data.host && data.host.length >= 1 && data.host.length <= 50;
-const portValidator = (data) => {
-  if (!data.port) {
-    return false;
-  }
-  const port = parseInt(data.port, 10);
-  return (`${port}` === `${data.port}`) && port > 0 && port < 65535;
-};
 
-const aliasConfig = { key: 'alias', label: 'Alias', info: 'Alias can have a maximum length of 50 characters', validator: aliasValidator };
-const hostConfig = { key: 'host', label: 'Host', info: 'Worker host address', validator: hostValidator };
-const portConfig = { key: 'port', label: 'Port', info: 'Worker controller port', type: 'number', validator: portValidator };
+const aliasConfig = {
+  key: 'alias',
+  label: 'Alias',
+  info: 'Alias can have a maximum length of 50 characters',
+  validator: aliasValidator,
+};
 
 const defaultFormModalConfig = { title: '', fields: [], submit: null };
 
@@ -52,14 +47,6 @@ function WorkersTable({ className }) {
     setModalNotificationConfigs({});
   };
 
-  const onAddClick = () => {
-    if (!widgetProps.error) {
-      setModalData({ port: 8081 }); // set default values
-    }
-    setValid(false);
-    setModalFormMode(ModalFormModes.ADD);
-  };
-
   const onUpdateClick = () => {
     if (ensureWorkerSelected('Update worker')) {
       const worker = getSelectedWorker();
@@ -68,16 +55,6 @@ function WorkersTable({ className }) {
       setModalFormMode(ModalFormModes.UPDATE);
     }
   };
-
-  const onSave = useCallback(() => {
-    actionWrapper({
-      action: addWorker,
-      params: modalData,
-      cb: () => {
-        setModalFormMode(null);
-      },
-    });
-  }, [modalData]);
 
   const onUpdate = useCallback(() => {
     actionWrapper({
@@ -89,18 +66,19 @@ function WorkersTable({ className }) {
     });
   }, [modalData]);
 
-  const onDisable = () => {
-    const worker = getSelectedWorker();
-    const actionName = worker.status === WorkerNodeStatus.STARTED || worker.status === WorkerNodeStatus.STARTING ? 'Disable' : 'Enable';
-    const title = `${actionName} worker`;
-    if (ensureWorkerSelected('Disable worker')) {
+  const onUpdateStateClick = () => {
+    if (ensureWorkerSelected('Update worker state')) {
+      const worker = getSelectedWorker();
+      const updatedState = worker.state === WorkerNodeStatus.ONLINE || worker.state === WorkerNodeStatus.OFFLINE ? WorkerNodeStatus.DISABLED : WorkerNodeStatus.OFFLINE;
+      const actionName = worker.state === WorkerNodeStatus.ONLINE || worker.state === WorkerNodeStatus.OFFLINE ? 'Disable' : 'Enable';
+      const title = `${actionName} worker`;
       setModalNotificationConfigs({
         title,
-        description: `Are you sure you want to ${actionName.toLowerCase()} the worker "${worker.alias || ''}", this action might be destructive?`,
+        description: `Are you sure you want to ${actionName.toLowerCase()} the worker "${worker.alias || ''} - ${worker.id}", this action might be destructive?`,
         type: SimpleModalTypes.CONFIRMATION,
         dismiss: (res) => {
           if (res) {
-            actionWrapper({ action: disableWorker, params: { id: selectedWorkerId } });
+            actionWrapper({ action: updateWorker, params: { id: selectedWorkerId, state: updatedState } });
           }
           dismissModalNotification();
         },
@@ -108,13 +86,13 @@ function WorkersTable({ className }) {
     }
   };
 
-  const onDelete = () => {
+  const onDeleteClick = () => {
     const title = 'Delete worker';
     if (ensureWorkerSelected('Delete worker')) {
       const worker = getSelectedWorker();
       setModalNotificationConfigs({
         title,
-        description: `Are you sure you want to remove the worker "${worker.alias || ''}", this action is permanent?`,
+        description: `Are you sure you want to remove the worker "${worker.alias || ''} - ${worker.id}", this action is permanent?`,
         type: SimpleModalTypes.CONFIRMATION,
         dismiss: (res) => {
           if (res) {
@@ -127,35 +105,35 @@ function WorkersTable({ className }) {
     }
   };
 
+  const onDescribeClick = () => {
+    if (ensureWorkerSelected('Describe worker')) {
+      const worker = getSelectedWorker();
+      setModalNotificationConfigs({
+        title: `Worker ${worker.alias} description`,
+        description: `The identification id of the worker is ${worker.id}`,
+        type: SimpleModalTypes.INFO,
+      });
+    }
+  };
+
   useEffect(() => {
     actionWrapper({ action: getWorkers });
   }, []);
 
   useEffect(() => {
     switch (modalFormMode) {
-      case ModalFormModes.ADD:
-        return setModalFormConfig({
-          title: 'Add workflow',
-          fields: [
-            aliasConfig,
-            hostConfig,
-            portConfig,
-          ],
-          submit: onSave,
-        });
       case ModalFormModes.UPDATE:
         return setModalFormConfig({
-          title: 'Update workflow',
+          title: 'Update worker',
           fields: [
             aliasConfig,
-            portConfig,
           ],
           submit: onUpdate,
         });
       default:
         return setModalFormConfig(defaultFormModalConfig);
     }
-  }, [modalFormMode, onSave, onUpdate]);
+  }, [modalFormMode, onUpdate]);
 
   return (
     <>
@@ -165,16 +143,15 @@ function WorkersTable({ className }) {
         widgetProps={!modalFormMode && widgetProps}
         onRefresh={onRefresh}
         cols={[
-          { key: 'statusIcon', type: 'Icon', width: '20px', titleKey: 'statusTitle' },
+          { key: 'stateIcon', type: 'Icon', width: '20px', titleKey: 'stateTitle' },
           { header: 'Alias', key: 'alias' },
-          { header: 'Host', key: 'host' },
-          { header: 'Port', key: 'port', width: '70px' }]}
+          { header: 'State', key: 'state' }]}
         rows={workers}
         actions={[
-          { title: 'Add worker', icon: Icons.ADD, onClick: onAddClick },
           { title: 'Update worker', icon: Icons.EDIT, onClick: onUpdateClick },
-          { title: 'Disable worker', icon: Icons.FREEZE, onClick: onDisable },
-          { title: 'Delete worker', icon: Icons.DELETE, onClick: onDelete },
+          { title: 'Disable worker', icon: Icons.FREEZE, onClick: onUpdateStateClick },
+          { title: 'Delete worker', icon: Icons.DELETE, onClick: onDeleteClick },
+          { title: 'Describe worker', icon: Icons.INFO, onClick: onDescribeClick },
         ]}
         activeRowKey={selectedWorkerId}
         onRowClick={setSelectedWorkerId}
@@ -187,7 +164,12 @@ function WorkersTable({ className }) {
         valid={valid}
         onSubmit={modalFormConfig.submit}
       >
-        <FormBuilder data={modalData} setData={setModalData} configs={modalFormConfig.fields} changeValidity={setValid} />
+        <FormBuilder
+          data={modalData}
+          setData={setModalData}
+          configs={modalFormConfig.fields}
+          changeValidity={setValid}
+        />
       </ModalWrapper>
       <SimpleModal dismiss={dismissModalNotification} {...modalNotificationConfigs} />
     </>

@@ -20,22 +20,21 @@ export const Icons = {
   EDIT: 'bi bi-pencil',
   DELETE: 'bi bi-x-lg',
   FREEZE: 'bi bi-snow',
+  START: 'bi bi-play-circle',
   REFRESH: 'bi bi-arrow-clockwise',
   ARROW_RIGHT: 'bi bi-arrow-right',
-  NODE_STARTED: 'bi bi-play-circle text-success',
-  NODE_STARTING: 'bi bi-cloud-arrow-up text-info',
-  NODE_STOPPED: 'bi bi-stop-circle text-danger',
-  NODE_STOPPING: 'bi bi-cloud-arrow-down text-info',
+  NODE_ONLINE: 'bi bi-cloud-arrow-up text-success',
+  NODE_OFFLINE: 'bi bi-cloud-arrow-down text-danger',
+  NODE_DISABLED: 'bi bi-stop-circle text-info',
   SAVE: 'bi bi-check-lg',
   ERROR: 'bi bi-x-circle-fill',
   INFO: 'bi bi-info-circle',
 };
 
 export const WorkerNodeStatus = {
-  STARTED: 'STARTED',
-  STARTING: 'STARTING',
-  STOPPING: 'STOPPING',
-  STOPPED: 'STOPPED',
+  ONLINE: 'ONLINE',
+  OFFLINE: 'OFFLINE',
+  DISABLED: 'DISABLED',
 };
 
 export const algorithms = [

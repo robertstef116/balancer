@@ -2,7 +2,7 @@ package com.robert
 
 import com.robert.resources.Deployment
 import com.robert.resources.Worker
-import com.robert.resources.Workflow
+import com.robert.scaller.Workflow
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.time.Instant

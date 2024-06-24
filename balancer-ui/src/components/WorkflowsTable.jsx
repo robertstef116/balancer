@@ -11,13 +11,20 @@ import { convertFormMapToMap } from '../utils';
 
 const defaultFormModalConfig = { title: '', fields: [], submit: null };
 
-const imageValidator = (data) => data.image && /[a-z][a-z0-9]+:[a-z0-9]+/.test(data.image);
+const imageValidator = (data) => data.image && /^[a-z][a-z0-9]+:[a-z0-9.\-$]+/.test(data.image);
 const memoryValidator = (data) => {
-  if (data.memoryLimit) {
-    const memoryLimit = parseInt(data.memoryLimit, 10);
-    return (typeof data.memoryLimit !== 'string' || `${memoryLimit}` === data.memoryLimit) && memoryLimit >= 10000;
+  if (!data.memoryLimit) {
+    return false;
   }
-  return true;
+  const memoryLimit = parseInt(data.memoryLimit, 10);
+  return (typeof data.memoryLimit !== 'string' || `${memoryLimit}` === data.memoryLimit) && memoryLimit >= 6291456;
+};
+const cpuValidator = (data) => {
+  if (!data.cpuLimit) {
+    return false;
+  }
+  const cpuLimit = parseInt(data.cpuLimit, 10);
+  return (typeof data.memoryLimit !== 'string' || `${cpuLimit}` === data.cpuLimit) && cpuLimit >= 100;
 };
 const algorithmValidator = (data) => !!data.algorithm;
 const minDeploymentsValidator = (data) => {
@@ -32,21 +39,6 @@ const maxDeploymentsValidator = (data) => {
     const minDeployments = parseInt(data.minDeployments, 10) || 1;
     const maxDeployments = parseInt(data.maxDeployments, 10);
     return (typeof data.maxDeployments !== 'string' || `${maxDeployments}` === data.maxDeployments) && maxDeployments >= minDeployments;
-  }
-  return true;
-};
-const downScalingValidator = (data) => {
-  if (data.downScaling) {
-    const downScaling = parseInt(data.downScaling, 10);
-    return (typeof data.downScaling !== 'string' || `${downScaling}` === data.downScaling) && downScaling >= 10;
-  }
-  return true;
-};
-const upScalingValidator = (data) => {
-  if (data.upScaling) {
-    const downScaling = parseInt(data.downScaling, 10) || 10;
-    const upScaling = parseInt(data.upScaling, 10);
-    return (typeof data.upScaling !== 'string' || `${upScaling}` === data.upScaling) && upScaling >= downScaling && upScaling < 95;
   }
   return true;
 };
@@ -67,12 +59,11 @@ const pathMappingValidator = (data) => {
 };
 
 const imageConfig = { key: 'image', label: 'Image', info: 'Docker image name ran by the workflow (image:tag)', validator: imageValidator };
-const memoryConfig = { key: 'memoryLimit', label: 'Memory limit', type: 'number', info: 'Maximum memory in b allowed to be used', validator: memoryValidator };
+const memoryLimitConfig = { key: 'memoryLimit', label: 'Memory limit', type: 'number', info: 'Maximum memory in b allowed to be used', validator: memoryValidator };
+const cpuLimitConfig = { key: 'cpuLimit', label: 'Cpu limit', type: 'number', info: 'Maximum memory in b allowed to be used', validator: cpuValidator }; // TODO: update this later
 const algorithmConfig = { key: 'algorithm', label: 'Algorithm', type: 'dropdown', options: algorithms, info: 'Algorithm used for load balancing', validator: algorithmValidator };
 const minDeploymentsConfig = { key: 'minDeployments', label: 'Minimum scaling', type: 'number', info: 'Minimum number of deployments', validator: minDeploymentsValidator };
 const maxDeploymentsConfig = { key: 'maxDeployments', label: 'Maximum scaling', type: 'number', info: 'Maximum number of deployments', validator: maxDeploymentsValidator };
-const upScalingConfig = { key: 'upScaling', label: 'Up scale threshold', type: 'number', info: 'Average utilization percentage threshold for up scaling < 95%', validator: upScalingValidator };
-const downScalingConfig = { key: 'downScaling', label: 'Down scale threshold', type: 'number', info: 'Average utilization percentage threshold for down scaling > 10%', validator: downScalingValidator };
 const pathMappingConfig = { key: 'pathMapping', label: 'Mapping', type: 'map', mapValueType: 'number', info: 'Resource mapping (path -> port)', validator: pathMappingValidator };
 
 function WorkflowsTable({ className }) {
@@ -170,12 +161,11 @@ function WorkflowsTable({ className }) {
           title: 'Add workflow',
           fields: [
             imageConfig,
-            memoryConfig,
+            memoryLimitConfig,
+            cpuLimitConfig,
             algorithmConfig,
             minDeploymentsConfig,
             maxDeploymentsConfig,
-            upScalingConfig,
-            downScalingConfig,
             pathMappingConfig,
           ],
           submit: onSave,
@@ -187,8 +177,6 @@ function WorkflowsTable({ className }) {
             algorithmConfig,
             minDeploymentsConfig,
             maxDeploymentsConfig,
-            upScalingConfig,
-            downScalingConfig,
           ],
           submit: onUpdate,
         });
@@ -207,10 +195,9 @@ function WorkflowsTable({ className }) {
         cols={[
           { header: 'Image', key: 'image', maxWidth: '200px' },
           { header: 'Memory Limit(b)', key: 'memoryLimit' },
+          { header: 'Cpu Limit', key: 'cpuLimit' }, // TODO: update this later
           { header: 'Min', key: 'minDeployments' },
           { header: 'Max', key: 'maxDeployments' },
-          { header: 'Up scale', key: 'upScaling' },
-          { header: 'Down scale', key: 'downScaling' },
           { header: 'Algorithm', key: 'algorithmDisplay' },
           { header: 'Mapping', key: 'mapping', type: 'InfoIcon' }]}
         rows={workflows}

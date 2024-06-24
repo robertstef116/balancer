@@ -4,9 +4,9 @@ import com.robert.Constants
 import com.robert.Env
 import com.robert.HttpClient
 import com.robert.api.response.WorkerResourceResponse
-import com.robert.persistance.DAORepository
-import com.robert.scaller.WorkerR
-import com.robert.scaller.WorkerStatusR
+import com.robert.persistence.DAORepository
+import com.robert.scaller.Worker
+import com.robert.scaller.WorkerState
 import io.ktor.client.call.*
 import io.ktor.util.logging.*
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 class WorkerData(
-    val worker: WorkerR
+    val worker: Worker
 ) {
     val lock = ReentrantLock()
     var removed = false
@@ -31,7 +31,7 @@ class HealthChecker : KoinComponent {
         private val log = KtorSimpleLogger(this::class.java.name)
         private val checkTimeout = Env.getLong(Constants.HEALTH_CHECK_TIMEOUT, 10000L)
 
-        private suspend fun doHealthCheck(worker: WorkerR): WorkerResourceResponse {
+        private suspend fun doHealthCheck(worker: Worker): WorkerResourceResponse {
             log.debug("Health check on worker {}", worker.alias)
             val url = "http://${worker.host}:${worker.port}/resource"
             return HttpClient.get(url, checkTimeout).body()
@@ -57,13 +57,13 @@ class HealthChecker : KoinComponent {
             async {
                 workers[workerId]?.let {
                     val health = getWorkerHealthData(workerId)
-                    if (it.worker.status == WorkerStatusR.DISABLED) {
+                    if (it.worker.state == WorkerState.DISABLED) {
                         return@async false
                     }
                     try {
                         val workerData = doHealthCheck(it.worker)
                         it.lock.withLock {
-                            if (it.removed || it.worker.status == WorkerStatusR.DISABLED) {
+                            if (it.removed || it.worker.state == WorkerState.DISABLED) {
                                 workersHealthData.remove(workerId)
                                 return@async false
                             }
@@ -95,7 +95,7 @@ class HealthChecker : KoinComponent {
 
     }
 
-    fun createWorker(worker: WorkerR) {
+    fun createWorker(worker: Worker) {
         log.debug("creating worker: {}", worker)
         workers[worker.id] = WorkerData(worker)
     }
@@ -112,7 +112,7 @@ class HealthChecker : KoinComponent {
         return false
     }
 
-    fun updateWorker(id: UUID, alias: String?, status: WorkerStatusR?): Boolean {
+    fun updateWorker(id: UUID, alias: String?, status: WorkerState?): Boolean {
         log.debug("updating worker {}: ", id)
         workers[id]?.let {
             it.lock.withLock {
@@ -123,8 +123,8 @@ class HealthChecker : KoinComponent {
                     it.worker.alias = alias
                 }
                 if (status != null) {
-                    it.worker.status = status
-                    if (status == WorkerStatusR.DISABLED) {
+                    it.worker.state = status
+                    if (status == WorkerState.DISABLED) {
                         workersHealthData.remove(id)
                     }
                 }
@@ -134,9 +134,9 @@ class HealthChecker : KoinComponent {
         return false
     }
 
-    fun getWorker(id: UUID): WorkerR? {
+    fun getWorker(id: UUID): Worker? {
         return workers[id]?.let {
-            if (it.worker.status == WorkerStatusR.DISABLED) {
+            if (it.worker.state == WorkerState.DISABLED) {
                 return null
             }
             return it.worker

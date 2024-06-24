@@ -6,7 +6,7 @@ val dockerJdkBaseVersion: String by project
 plugins {
     application
     kotlin("jvm")
-    id("com.palantir.docker")
+//    id("com.palantir.docker")
     id("com.github.johnrengelman.shadow")
 }
 
@@ -43,13 +43,13 @@ tasks.register<Copy>("setUpDockerContext") {
     }
 }
 
-tasks.dockerPrepare {
-    dependsOn("setUpDockerContext")
-}
+//tasks.dockerPrepare {
+//    dependsOn("setUpDockerContext")
+//}
 
-docker {
-    name = "$dockerImagePrefix/load_balancer:$buildVersion"
-    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
-    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
-    noCache(true)
-}
+//docker {
+//    name = "$dockerImagePrefix/load_balancer:$buildVersion"
+//    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
+//    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
+//    noCache(true)
+//}

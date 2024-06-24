@@ -7,17 +7,20 @@ val dockerJdkBaseVersion: String by project
 plugins {
     application
     kotlin("jvm")
-    id("com.palantir.docker")
+//    id("com.palantir.docker")
     id("com.github.johnrengelman.shadow")
 }
 
 application {
-    mainClass.set("com.robert.ApplicationKt")
+    mainClass.set("com.robert.api.ApplicationKt")
 }
 
 dependencies {
     implementation(project(":model"))
     implementation(project(":utils"))
+    implementation(project(":persistence"))
+    implementation(project(":master_controller:client"))
+    implementation(project(":scaling_controller:client"))
     implementation("commons-validator:commons-validator:1.7")
     implementation("org.postgresql:postgresql:42.5.1")
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
@@ -30,6 +33,12 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:2.2.4")
     implementation("io.ktor:ktor-server-sessions-jvm:2.2.4")
     implementation("io.ktor:ktor-server-netty-jvm:2.2.4")
+    implementation(libs.grpc.netty)
+
+    implementation(libs.bundles.exposed)
+    implementation(libs.koin.core)
+    implementation(libs.koin.ktor)
+    implementation(libs.protobuf)
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel"){}
@@ -60,13 +69,13 @@ tasks.register<Copy>("setUpDockerContext") {
     }
 }
 
-tasks.dockerPrepare {
-    dependsOn("setUpDockerContext")
-}
-
-docker {
-    name = "$dockerImagePrefix/balancer-master:$buildVersion"
-    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
-    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
-    noCache(true)
-}
+//tasks.dockerPrepare {
+//    dependsOn("setUpDockerContext")
+//}
+//
+//docker {
+//    name = "$dockerImagePrefix/balancer-master:$buildVersion"
+//    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
+//    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
+//    noCache(true)
+//}

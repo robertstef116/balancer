@@ -12,7 +12,7 @@ import kotlin.time.Duration
 
 class SchedulerService : KoinComponent {
     companion object {
-        private val LOG = LoggerFactory.getLogger(this::class.java)
+        val LOG by logger()
     }
     private val jobs = arrayListOf<Job>()
 
@@ -31,8 +31,12 @@ class SchedulerService : KoinComponent {
                         LOG.info("Initializing scheduler {} with interval {}", clazz.canonicalName, schedulerConsumer.interval)
                         val job = CoroutineScope(Dispatchers.IO).launch {
                             while (true) {
-                                method.invoke(scheduler)
-                                LOG.info("Scheduler '{}' done, next check in {} ms", schedulerName, executionInterval)
+                                try {
+                                    method.invoke(scheduler)
+                                    LOG.info("Scheduler '{}' done, next check in {} ms", schedulerName, executionInterval)
+                                } catch (e: Exception) {
+                                    LOG.warn("Unable to execute scheduler '{}', retrying in {} ms", schedulerName, executionInterval, e)
+                                }
                                 delay(executionInterval)
                             }
                         }

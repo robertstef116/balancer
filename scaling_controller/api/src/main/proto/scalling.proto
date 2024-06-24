@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.robert.scaling.grpc";
+
+import "google/protobuf/empty.proto";
+
+service ScalingService {
+  rpc ConnectWorkerStatusController(WorkerStatus) returns (google.protobuf.Empty) {}
+  rpc WaitForScalingRequests(google.protobuf.Empty) returns (stream DeploymentRequest) {}
+
+  rpc UpdateWorkerStatus(WorkerStatus) returns (DeploymentRequestList) {}
+
+  rpc UpdateWorker(WorkerData) returns (google.protobuf.Empty) {}
+  rpc RemoveWorker(IdData) returns (google.protobuf.Empty) {}
+
+  rpc AddWorkflow(WorkflowData) returns (google.protobuf.Empty) {}
+  rpc UpdateWorkflow(WorkflowUpdateData) returns (google.protobuf.Empty) {}
+  rpc RemoveWorkflow(IdData) returns (google.protobuf.Empty) {}
+}
+
+message IdData {
+  string id = 1;
+}
+
+message WorkerData {
+  string id = 1;
+  WorkerStateGrpc state = 10;
+}
+
+message WorkflowData {
+  string id = 1;
+  string image = 10;
+  int64 cpuLimit = 12;
+  int64 memoryLimit = 13;
+  int32 minDeployments = 20;
+  int32 maxDeployments = 21;
+  WorkflowAlgorithm algorithm = 30;
+  map<string, int32> pathsMapping = 40;
+}
+
+message WorkflowUpdateData {
+  string id = 1;
+  int32 minDeployments = 10;
+  int32 maxDeployments = 11;
+  WorkflowAlgorithm algorithm = 12;
+}
+
+message WorkerStatus {
+  string id = 1;
+  string alias = 5;
+  double cpuLoad = 10;
+  double memoryLoad = 12;
+  int64 availableMemory = 11;
+  repeated DeploymentStatus deployments = 20;
+}
+
+message DeploymentStatus {
+  string containerId = 1;
+  string workflowId = 2;
+  double cpuUsage = 10;
+  double memoryUsage = 11;
+  repeated PortMapping portsMapping = 12;
+}
+
+message DeploymentRequest {
+  string id = 1;
+  string workflowId = 2;
+  string image = 10;
+  repeated int32 ports = 11;
+  int64 cpuLimit = 12;
+  int64 memoryLimit = 13;
+  DeploymentRequestTypeGrpc type = 40;
+}
+
+message DeploymentRequestList {
+  repeated DeploymentRequest requests = 1;
+}
+
+message PortMapping {
+  int32 publicPort = 1;
+  int32 privatePort = 2;
+}
+
+enum DeploymentStateGrpc {
+  OK = 0;
+  FAILED = 1;
+  CREATING = 2;
+}
+
+enum WorkerStateGrpc {
+  ONLINE = 0;
+  OFFLINE = 1;
+  DISABLED = 2;
+}
+
+enum DeploymentRequestTypeGrpc {
+  UP = 0;
+  DOWN = 1;
+}
+
+enum WorkflowAlgorithm {
+  RANDOM = 0;
+  LEAST_CONNECTION = 1;
+  ROUND_ROBIN = 2;
+  WEIGHTED_RESPONSE_TIME = 3;
+  ADAPTIVE = 4;
+}

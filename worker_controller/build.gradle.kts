@@ -1,14 +1,9 @@
-val ktorVersion: String by project
 val buildVersion: String by project
-val kotlinVersion: String by project
-val dockerImagePrefix: String by project
-val dockerJdkBaseVersion: String by project
-val logbackVersion: String by project
 
 plugins {
     application
     kotlin("jvm")
-    id("com.palantir.docker")
+//    id("com.palantir.docker")
     id("com.github.johnrengelman.shadow")
 }
 
@@ -17,22 +12,23 @@ application {
 }
 
 dependencies {
+
     implementation(project(":model"))
     implementation(project(":utils"))
-    implementation("com.github.oshi:oshi-core:6.4.0") {
+    implementation(project(":scaling_controller:client"))
+    implementation(project(":scaling_controller:api"))
+    implementation(libs.slf4j)
+    implementation(libs.koin.core)
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.grpc.netty)
+    implementation("com.github.docker-java:docker-java:3.3.6")
+    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.3.6")
+    implementation("com.github.oshi:oshi-core:6.5.0") {
         exclude("org.slf4j", "slf4j-api")
     }
-    implementation("com.spotify:docker-client:8.16.0"){
-        exclude("org.slf4j", "slf4j-api")
-    }
-    implementation("io.ktor:ktor-server-auth-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-call-logging-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-jackson-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+//    implementation("com.spotify:docker-client:8.16.0"){
+//        exclude("org.slf4j", "slf4j-api")
+//    }
 }
 
 tasks.register<Task>("prepareKotlinBuildScriptModel"){}
@@ -53,14 +49,14 @@ tasks.register<Copy>("setUpDockerContext") {
         versionFile.writeText(buildVersion)
     }
 }
+//
+//tasks.dockerPrepare {
+//    dependsOn("setUpDockerContext")
+//}
 
-tasks.dockerPrepare {
-    dependsOn("setUpDockerContext")
-}
-
-docker {
-    name = "$dockerImagePrefix/balancer-worker:$buildVersion"
-    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
-    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
-    noCache(true)
-}
+//docker {
+//    name = "$dockerImagePrefix/balancer-worker:$buildVersion"
+//    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
+//    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
+//    noCache(true)
+//}

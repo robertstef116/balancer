@@ -12,16 +12,14 @@ const INITIAL_STATE = {
   configs: null,
 };
 
-const getWorkerNodeStatusIcon = (status) => {
+const getWorkerNodeStateIcon = (status) => {
   switch (status) {
-    case WorkerNodeStatus.STARTED:
-      return Icons.NODE_STARTED;
-    case WorkerNodeStatus.STARTING:
-      return Icons.NODE_STARTING;
-    case WorkerNodeStatus.STOPPED:
-      return Icons.NODE_STOPPED;
-    case WorkerNodeStatus.STOPPING:
-      return Icons.NODE_STOPPING;
+    case WorkerNodeStatus.ONLINE:
+      return Icons.NODE_ONLINE;
+    case WorkerNodeStatus.OFFLINE:
+      return Icons.NODE_OFFLINE;
+    case WorkerNodeStatus.DISABLED:
+      return Icons.NODE_DISABLED;
     default:
       return '';
   }
@@ -29,12 +27,10 @@ const getWorkerNodeStatusIcon = (status) => {
 
 const createWorkerData = (worker) => ({
   id: worker.id,
-  status: worker.status,
-  statusIcon: getWorkerNodeStatusIcon(worker.status),
-  statusTitle: worker.status.charAt(0).toUpperCase() + worker.status.slice(1).toLowerCase(),
+  state: worker.state,
+  stateIcon: getWorkerNodeStateIcon(worker.state),
+  stateTitle: worker.state.charAt(0).toUpperCase() + worker.state.slice(1).toLowerCase(),
   alias: worker.alias,
-  host: worker.host,
-  port: worker.port,
 });
 
 const getAlgorithmDisplay = (alg) => {
@@ -52,10 +48,9 @@ const createWorkflowData = (workflow) => {
     image: workflow.image,
     workerId: workflow.workerId,
     memoryLimit: workflow.memoryLimit,
+    cpuLimit: workflow.cpuLimit,
     minDeployments: workflow.minDeployments,
     maxDeployments: workflow.maxDeployments,
-    upScaling: workflow.upScaling,
-    downScaling: workflow.downScaling,
     algorithm: workflow.algorithm,
     algorithmDisplay: getAlgorithmDisplay(workflow.algorithm),
     mapping,
@@ -85,8 +80,6 @@ export default (state = INITIAL_STATE, { type, payload }) => {
       updWorkflow.algorithmDisplay = getAlgorithmDisplay(payload.algorithm);
       updWorkflow.minDeployments = payload.minDeployments;
       updWorkflow.maxDeployments = payload.maxDeployments;
-      updWorkflow.upScaling = payload.upScaling;
-      updWorkflow.downScaling = payload.downScaling;
       return {
         ...state,
         workflows: [
@@ -105,30 +98,12 @@ export default (state = INITIAL_STATE, { type, payload }) => {
         ...state,
         workers: workers.map(createWorkerData),
       };
-    case types.ADD_WORKER:
-      return {
-        ...state,
-        workers: [
-          ...state.workers,
-          createWorkerData(payload.worker),
-        ],
-      };
     case types.UPDATE_WORKER:
       const updWorker = state.workers.find((w) => w.id === payload.id);
-      updWorker.alias = payload.alias;
-      updWorker.port = payload.port;
-      return {
-        ...state,
-        workers: [
-          ...state.workers,
-        ],
-      };
-    case types.DISABLE_WORKER:
-      const disWorker = state.workers.find((w) => w.id === payload.id);
-      disWorker.status = disWorker.status === WorkerNodeStatus.STARTED || disWorker.status === WorkerNodeStatus.STARTING
-        ? WorkerNodeStatus.STOPPING
-        : WorkerNodeStatus.STARTING;
-      disWorker.statusIcon = getWorkerNodeStatusIcon(disWorker.status);
+      updWorker.alias = payload.alias || updWorker.alias;
+      updWorker.state = payload.state || updWorker.state;
+      updWorker.stateIcon = getWorkerNodeStateIcon(updWorker.state);
+      updWorker.stateTitle = updWorker.state.charAt(0).toUpperCase() + updWorker.state.slice(1).toLowerCase();
       return {
         ...state,
         workers: [

@@ -6,7 +6,6 @@ import com.robert.balancing.TargetData
 import com.robert.docker.DockerContainerPorts
 import com.robert.resources.Deployment
 import com.robert.resources.Worker
-import com.robert.resources.Workflow
 import io.ktor.client.call.*
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory

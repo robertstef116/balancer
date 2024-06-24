@@ -1,9 +1,7 @@
 export const LOGIN_ERROR = 'Invalid username or password';
 export const GET_WORKERS_ERROR = 'Unable to fetch workers';
-export const ADD_WORKERS_ERROR = 'Unable to add worker';
 export const UPDATE_WORKERS_ERROR = 'Unable to update the worker';
 export const DELETE_WORKERS_ERROR = 'Unable to delete the worker';
-export const DISABLE_WORKER_ERROR = 'Unable to perform the disable operation';
 export const GET_WORKFLOWS_ERROR = 'Unable to fetch workflows';
 export const ADD_WORKFLOWS_ERROR = 'Unable to add workflow';
 export const UPDATE_WORKFLOWS_ERROR = 'Unable to update workflow';

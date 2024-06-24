@@ -1,10 +1,16 @@
 package com.robert.docker
 
+import java.util.*
+
 data class DockerContainer(
-    val id: String,
-    val name: String,
-    val image: String,
-    val created: Long,
-    val status: String,
-    val ports: Map<Int, Int>
+    val containerID: String,
+    val workflowId: UUID,
+    val cpuUsage: Double,
+    val memoryUsage: Double,
+    val ports: List<DockerPortMapping>
+)
+
+data class DockerPortMapping(
+    val publicPort: Int,
+    val privatePort: Int,
 )
