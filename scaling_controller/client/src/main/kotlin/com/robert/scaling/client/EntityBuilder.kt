@@ -2,7 +2,6 @@ package com.robert.scaling.client
 
 import com.robert.docker.DockerContainer
 import com.robert.enums.LBAlgorithms
-import com.robert.scaling.client.model.DeploymentScalingRequest
 import com.robert.scaling.grpc.*
 import com.robert.scaller.Worker
 import com.robert.scaller.WorkerState
@@ -10,10 +9,11 @@ import com.robert.scaller.Workflow
 import java.util.*
 
 internal object EntityBuilder {
-    fun newWorkerStatus(id: String, alias: String, cpuLoad: Double, memoryLoad: Double, availableMemory: Long, managedContainers: List<DockerContainer>): WorkerStatus {
+    fun newWorkerStatus(id: String, alias: String, host: String, cpuLoad: Double, memoryLoad: Double, availableMemory: Long, managedContainers: List<DockerContainer>): WorkerStatus {
         val workerStatusBuilder = WorkerStatus.newBuilder()
             .setId(id)
             .setAlias(alias)
+            .setHost(host)
             .setCpuLoad(cpuLoad)
             .setAvailableMemory(availableMemory)
             .setMemoryLoad(memoryLoad)
@@ -42,7 +42,7 @@ internal object EntityBuilder {
             .setImage(workflow.image)
             .setMemoryLimit(workflow.memoryLimit)
             .setCpuLimit(workflow.cpuLimit)
-            .setAlgorithm(WorkflowAlgorithm.valueOf(workflow.algorithm.value))
+            .setAlgorithm(WorkflowAlgorithm.valueOf(workflow.algorithm.toString()))
             .putAllPathsMapping(workflow.pathsMapping)
 
         workflow.minDeployments?.let { builder.setMinDeployments(it) }
@@ -54,7 +54,7 @@ internal object EntityBuilder {
     fun newWorkflowUpdateData(id: UUID, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms): WorkflowUpdateData {
         val builder = WorkflowUpdateData.newBuilder()
             .setId(id.toString())
-            .setAlgorithm(WorkflowAlgorithm.valueOf(algorithm.value))
+            .setAlgorithm(WorkflowAlgorithm.valueOf(algorithm.toString()))
 
         minDeployments?.let { builder.setMinDeployments(it) }
         maxDeployments?.let { builder.setMaxDeployments(it) }

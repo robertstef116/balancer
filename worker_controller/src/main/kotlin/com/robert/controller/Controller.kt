@@ -10,6 +10,7 @@ import com.robert.service.DockerService
 import com.robert.service.ResourceService
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.InetAddress
 
 @Scheduler
 class Controller : KoinComponent {
@@ -22,12 +23,13 @@ class Controller : KoinComponent {
     private val scalingClient: ScalingClient by inject()
     private val id = "c2351bbf-57d8-487c-8511-a9756b9bae7d" // TODO: better id mechanism
     private val alias = "boo" // TODO: better alias mechanism
+    private val host = InetAddress.getLocalHost().hostAddress
 
     @SchedulerConsumer(name = "WorkerStatus", interval = "\${${Constants.WORKER_STATUS_INTERVAL}:30s}")
     fun runWorkerStatus() {
         val status = resourceService.getResources()
         val managedContainers = dockerService.getManagedContainers()
-        scalingClient.updateWorkerStatus(id, alias, status.cpuLoad, 1.0 - status.availableMemory / status.totalMemory, status.availableMemory, managedContainers)
+        scalingClient.updateWorkerStatus(id, alias, host, status.cpuLoad, 1.0 - status.availableMemory / status.totalMemory, status.availableMemory, managedContainers)
             .forEach { scalingRequest ->
                 try {
                     when (scalingRequest.type) {

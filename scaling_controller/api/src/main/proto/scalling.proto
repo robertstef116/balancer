@@ -6,10 +6,11 @@ option java_package = "com.robert.scaling.grpc";
 import "google/protobuf/empty.proto";
 
 service ScalingService {
-  rpc ConnectWorkerStatusController(WorkerStatus) returns (google.protobuf.Empty) {}
-  rpc WaitForScalingRequests(google.protobuf.Empty) returns (stream DeploymentRequest) {}
+  //  rpc ConnectWorkerStatusController(WorkerStatus) returns (google.protobuf.Empty) {}
+  //  rpc WaitForScalingRequests(google.protobuf.Empty) returns (stream DeploymentRequest) {}
 
   rpc UpdateWorkerStatus(WorkerStatus) returns (DeploymentRequestList) {}
+  rpc GetAvailableWorkflowDeploymentsData(google.protobuf.Empty) returns (WorkflowDeploymentsDataList) {}
 
   rpc UpdateWorker(WorkerData) returns (google.protobuf.Empty) {}
   rpc RemoveWorker(IdData) returns (google.protobuf.Empty) {}
@@ -49,6 +50,7 @@ message WorkflowUpdateData {
 message WorkerStatus {
   string id = 1;
   string alias = 5;
+  string host = 6;
   double cpuLoad = 10;
   double memoryLoad = 12;
   int64 availableMemory = 11;
@@ -75,6 +77,18 @@ message DeploymentRequest {
 
 message DeploymentRequestList {
   repeated DeploymentRequest requests = 1;
+}
+
+message WorkflowDeploymentsData {
+  string path = 1;
+  string host = 2;
+  int32 port = 3;
+  WorkflowAlgorithm algorithm = 4;
+  double score = 10;
+}
+
+message WorkflowDeploymentsDataList {
+  repeated WorkflowDeploymentsData requests = 1;
 }
 
 message PortMapping {

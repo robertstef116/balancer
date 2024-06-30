@@ -111,16 +111,16 @@ class HealthChecker(
                         }
 
                         // update deploymentPerformance data
-                        addMetric(
-                            deploymentPerformance.latestAvailableCpus,
-                            100 - containerStats.cpuLoad,
-                            relevantPerformanceMetricsNumber
-                        )
-                        addMetric(
-                            deploymentPerformance.latestAvailableMemories,
-                            containerStats.availableMemory,
-                            relevantPerformanceMetricsNumber
-                        )
+//                        addMetric(
+//                            deploymentPerformance.latestAvailableCpus,
+//                            100 - containerStats.cpuLoad,
+//                            relevantPerformanceMetricsNumber
+//                        )
+//                        addMetric(
+//                            deploymentPerformance.latestAvailableMemories,
+//                            containerStats.availableMemory,
+//                            relevantPerformanceMetricsNumber
+//                        )
                     }
 
                     deploymentsPerformance = deploymentsPerformance + deploymentsPerformanceToAdd

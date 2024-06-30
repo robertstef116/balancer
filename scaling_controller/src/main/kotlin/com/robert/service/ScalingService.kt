@@ -6,6 +6,7 @@ import com.robert.docker.DockerContainer
 import com.robert.docker.DockerPortMapping
 import com.robert.logger
 import com.robert.scaling.client.model.DeploymentScalingRequest
+import com.robert.scaling.client.model.WorkflowDeploymentData
 import com.robert.scaling.grpc.*
 import com.robert.scaller.WorkerState
 import org.koin.core.component.KoinComponent
@@ -15,59 +16,18 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 //https://github.com/grpc/grpc-kotlin/blob/master/examples/server/src/main/kotlin/io/grpc/examples/routeguide/RouteGuideServer.kt
-class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext) :
-    ScalingServiceGrpcKt.ScalingServiceCoroutineImplBase(coroutineContext), KoinComponent {
+class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext) : ScalingServiceGrpcKt.ScalingServiceCoroutineImplBase(coroutineContext), KoinComponent {
     companion object {
         val LOG by logger()
     }
 
     private val scalingController: ScalingController by inject()
 
-//    override fun registerWorker(requests: Flow<WorkerStatus>): Flow<DeploymentRequest> {
-//        var id: UUID? = null
-//        var terminate = false
-//        val deploymentScalingRequestFlow = flow<DeploymentRequest> {
-//            while (!terminate) {
-//                delay(scalingRequestsProcessingIntervalMillis)
-//                id?.let {
-//
-//                }
-//            }
-//        }
-//
-//        CoroutineScope(Dispatchers.IO).launch {
-//            requests
-//                .conflate()
-//                .collect { workerStatus ->
-//                    if (id == null) {
-//                        UUID.fromString(workerStatus.id).let {
-//                            id = it
-//                            scalingController.registerWorker(it)
-//                        }
-//                    }
-//                    id?.let { id ->
-//                        scalingController.updateWorkerStatus(id, workerStatus.cpuLoad, workerStatus.memoryLoad, workerStatus.availableMemory, workerStatus.deploymentsList.map {
-//                            DockerContainer(
-//                                it.workflowId,
-//                                it.cpuUsage,
-//                                it.memoryUsage,
-//                                it.portsMappingList.map { mapping -> DockerPortMapping(mapping.publicPort, mapping.privatePort) }
-//                            )
-//                        })
-//                    }
-//                }
-//            terminate = true
-//            id?.let { scalingController.unregisterWorker(it) }
-//        }
-//
-//        return deploymentScalingRequestFlow
-//    }
-
     override suspend fun updateWorkerStatus(request: WorkerStatus): DeploymentRequestList {
         LOG.info("Received status update from worker {} ({})", request.id, request.alias)
         try {
             val id = UUID.fromString(request.id)
-            scalingController.updateWorkerStatus(id, request.alias, request.cpuLoad, request.memoryLoad, request.availableMemory, request.deploymentsList.map {
+            scalingController.updateWorkerStatus(id, request.alias, request.host, request.cpuLoad, request.memoryLoad, request.availableMemory, request.deploymentsList.map {
                 DockerContainer(
                     it.containerId,
                     UUID.fromString(it.workflowId),
@@ -82,6 +42,11 @@ class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext)
             LOG.error("Unable to update worker status", e)
         }
         return DeploymentRequestList.getDefaultInstance()
+    }
+
+    override suspend fun getAvailableWorkflowDeploymentsData(request: Empty): WorkflowDeploymentsDataList {
+        LOG.info("Requested available workflow deployment data")
+        return newWorkflowDeploymentsDataList(scalingController.getAvailableWorkflowDeploymentsData())
     }
 
     override suspend fun updateWorker(request: WorkerData): Empty {
@@ -131,61 +96,23 @@ class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext)
         return workflowScalingRequestsListBuilder.build()
     }
 
-    //    override suspend fun connectWorkerStatusController(requests: Flow<WorkerStatus>): Empty {
-//        flow<WorkerStatus> {
-//            requests.collect { ws ->
-//                val workerStatus = InternalWorkerStatus(UUID.fromString(ws.id), ws.cpuLoad, ws.availableMemory)
-//                val deploymentsStatus = ws.deploymentsList.map { ds ->
-//                    InternalDeploymentStatus(
-//                        UUID.fromString(ds.id),
-//                        UUID.fromString(ds.workflowId),
-//                        UUID.fromString(ws.id),
-//                        scalingController.computeScore(ds.cpuUsage, ds.memoryUsage),
-//                        ds.port
-//                    )
-//                }
-//                scalingControllerMtx.withLock {
-//                    scalingController.updateWorkerStatus(workerStatus, deploymentsStatus)
-//                }
-//            }
-//        }
-//        return Empty.getDefaultInstance()
-//    }
-//
-//    override fun connectWorkerController(requests: Flow<DeploymentUpdateResponse>): Flow<DeploymentRequest> =
-//        flow {
-//            requests.collect { dr ->
-//                if (dr.type == DeploymentUpdateResponseType.CONNECTED) {
-//                    scalingControllerMtx.withLock {
-//                        scalingController.connectWorkerDeploymentCreator(UUID.fromString(dr.workerId)) { id, image, cpuLimit, memoryLimit ->
-//                            CoroutineScope(Dispatchers.IO).launch {
-//                                emit(
-//                                    DeploymentRequest.newBuilder()
-//                                        .setId(id.toString())
-//                                        .setImage(image)
-//                                        .setCpuLimit(cpuLimit)
-//                                        .setMemoryLimit(memoryLimit)
-//                                        .setType(DeploymentRequestType.CREATE)
-//                                        .build()
-//                                )
-//                            }
-//                        }
-//                        scalingController.connectWorkerDeploymentDestroyer(UUID.fromString(dr.workerId)) { deploymentId ->
-//                            CoroutineScope(Dispatchers.IO).launch {
-//                                emit(
-//                                    DeploymentRequest.newBuilder()
-//                                        .setId(deploymentId.toString())
-//                                        .setType(DeploymentRequestType.DESTROY)
-//                                        .build()
-//                                )
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    scalingControllerMtx.withLock {
-//
-//                    }
-//                }
-//            }
-//        }
+    private fun newWorkflowDeploymentsDataList(data: List<WorkflowDeploymentData>): WorkflowDeploymentsDataList {
+        if (data.isEmpty()) {
+            return WorkflowDeploymentsDataList.getDefaultInstance()
+        }
+
+        val workflowDeploymentsDataListBuilder = WorkflowDeploymentsDataList.newBuilder()
+        data.forEach {
+            workflowDeploymentsDataListBuilder.addRequests(
+                WorkflowDeploymentsData.newBuilder()
+                    .setPath(it.path)
+                    .setHost(it.host)
+                    .setPort(it.port)
+                    .setAlgorithm(WorkflowAlgorithm.valueOf(it.algorithm.toString()))
+                    .setScore(it.score)
+                    .build()
+            )
+        }
+        return workflowDeploymentsDataListBuilder.build()
+    }
 }

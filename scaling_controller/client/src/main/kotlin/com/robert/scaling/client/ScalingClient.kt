@@ -1,10 +1,12 @@
 package com.robert.scaling.client
 
+import com.google.protobuf.Empty
 import com.robert.Env
 import com.robert.docker.DockerContainer
 import com.robert.enums.LBAlgorithms
 import com.robert.logger
 import com.robert.scaling.client.model.DeploymentScalingRequest
+import com.robert.scaling.client.model.WorkflowDeploymentData
 import com.robert.scaling.grpc.DeploymentRequestTypeGrpc
 import com.robert.scaling.grpc.ScalingServiceGrpcKt
 import com.robert.scaller.WorkerState
@@ -39,9 +41,9 @@ class ScalingClient : Closeable {
         return this
     }
 
-    fun updateWorkerStatus(id: String, alias: String, cpuLoad: Double, memoryLoad: Double, availableMemory: Long, managedContainers: List<DockerContainer>): List<DeploymentScalingRequest> =
+    fun updateWorkerStatus(id: String, alias: String, host: String, cpuLoad: Double, memoryLoad: Double, availableMemory: Long, managedContainers: List<DockerContainer>): List<DeploymentScalingRequest> =
         runBlocking {
-            return@runBlocking client.updateWorkerStatus(EntityBuilder.newWorkerStatus(id, alias, cpuLoad, memoryLoad, availableMemory, managedContainers))
+            return@runBlocking client.updateWorkerStatus(EntityBuilder.newWorkerStatus(id, alias, host, cpuLoad, memoryLoad, availableMemory, managedContainers))
                 .requestsList
                 .mapNotNull {
                     val type = when (it.type ?: DeploymentRequestTypeGrpc.UNRECOGNIZED) {
@@ -58,6 +60,14 @@ class ScalingClient : Closeable {
                     }
                 }
         }
+
+    fun getAvailableWorkflowDeploymentsData(): List<WorkflowDeploymentData> = runBlocking {
+        return@runBlocking client.getAvailableWorkflowDeploymentsData(Empty.getDefaultInstance())
+            .requestsList
+            .map {
+                WorkflowDeploymentData(it.path, it.host, it.port, LBAlgorithms.valueOf(it.algorithm.toString()), it.score)
+            }
+    }
 
     fun updateWorker(id: UUID, status: WorkerState) = runBlocking {
         client.updateWorker(EntityBuilder.newWorkerData(id, status))

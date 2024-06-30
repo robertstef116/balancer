@@ -6,7 +6,11 @@ import com.robert.annotations.SchedulerConsumer
 import com.robert.docker.DockerContainer
 import com.robert.logger
 import com.robert.scaling.client.model.DeploymentScalingRequest
-import com.robert.scaller.*
+import com.robert.scaling.client.model.WorkflowDeploymentData
+import com.robert.scaller.InternalWorkerStatus
+import com.robert.scaller.Worker
+import com.robert.scaller.WorkerState
+import com.robert.scaller.Workflow
 import com.robert.storage.repository.WorkerRepository
 import com.robert.storage.repository.WorkflowRepository
 import org.koin.core.component.KoinComponent
@@ -36,7 +40,6 @@ class ScalingController : KoinComponent {
     private val workflowRepository: WorkflowRepository by inject()
 
     private val workflows = workflowRepository.getAll()
-    private val deploymentsStatus = mutableMapOf<UUID, InternalDeploymentStatus>()
 
     private val workersStatus = mutableMapOf<UUID, InternalWorkerStatus>()
     private val workersStates = mutableMapOf<UUID, WorkerState>()
@@ -55,7 +58,7 @@ class ScalingController : KoinComponent {
     }
 
     @Synchronized
-    fun updateWorkerStatus(id: UUID, alias: String, cpuLoad: Double, memoryLoad: Double, availableMemory: Long, activeDeployments: List<DockerContainer>) {
+    fun updateWorkerStatus(id: UUID, alias: String, host: String, cpuLoad: Double, memoryLoad: Double, availableMemory: Long, activeDeployments: List<DockerContainer>) {
         when (workersStates[id]) {
             null -> {
                 LOG.info("Discovered new worker {}", id)
@@ -77,7 +80,7 @@ class ScalingController : KoinComponent {
             WorkerState.ONLINE -> {}
         }
 
-        workersStatus[id] = InternalWorkerStatus(id, cpuLoad, memoryLoad, availableMemory, now(), activeDeployments)
+        workersStatus[id] = InternalWorkerStatus(id, host, cpuLoad, memoryLoad, availableMemory, now(), activeDeployments)
     }
 
     @Synchronized
@@ -100,6 +103,27 @@ class ScalingController : KoinComponent {
     }
 
     @Synchronized
+    fun getAvailableWorkflowDeploymentsData(): List<WorkflowDeploymentData> {
+        val workflowCache = mutableMapOf<UUID, Workflow?>()
+        val data = mutableListOf<WorkflowDeploymentData>()
+        workersStatus.values.forEach { workerData ->
+            workerData.activeDeployments.forEach { deploymentData ->
+                workflowCache.computeIfAbsent(deploymentData.workflowId) {
+                    workflows.find { it.id == deploymentData.workflowId }
+                }?.let { workflowData ->
+                    workflowData.pathsMapping.forEach { (path, privatePort) ->
+                        deploymentData.ports
+                            .find { it.privatePort == privatePort }
+                            ?.let { (publicPort, _) -> data.add(WorkflowDeploymentData(path, workerData.host, publicPort, workflowData.algorithm, computeScore(deploymentData.cpuUsage, deploymentData.memoryUsage))) }
+                            ?: LOG.warn("Port mapping of {} not found for workflow {} on worker {}", privatePort, workflowData.id, workerData.host)
+                    }
+                } ?: LOG.warn("Workflow {} not found", deploymentData.workflowId)
+            }
+        }
+        return data
+    }
+
+    @Synchronized
     fun removeWorker(id: UUID) {
         workerRepository.delete(id)
         workersStatus.remove(id)
@@ -107,7 +131,7 @@ class ScalingController : KoinComponent {
     }
 
     @Synchronized
-    @SchedulerConsumer(name = "ScalingManager", interval = "\${${Constants.HEALTH_CHECK_INTERVAL}:30s}")
+    @SchedulerConsumer(name = "ScalingManager", interval = "\${${Constants.HEALTH_CHECK_INTERVAL}:30s}") // TODO: Wrong constant
     fun scale() {
         checkWorkersStatusAge()
 
@@ -155,7 +179,7 @@ class ScalingController : KoinComponent {
             LOG.info("Initializing state of worker {}", id)
             workersStates[id] = WorkerState.OFFLINE
             workerRepository.update(id, null, WorkerState.OFFLINE)
-            workersStatus[id] = InternalWorkerStatus(id, -1.0, -1.0, -1, now(), listOf())
+            workersStatus[id] = InternalWorkerStatus(id, "", -1.0, -1.0, -1, now(), listOf())
         } else {
             workersStates[id] = WorkerState.DISABLED
         }

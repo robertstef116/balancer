@@ -92,6 +92,7 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
 
             do {
                 bytesRead = input.readAvailable(buffer)
+                log.info(buffer.toString())
                 if (bytesRead >= 0) {
                     output.writeAvailable(buffer, 0, bytesRead);
                 }
@@ -153,23 +154,25 @@ class LoadBalancer(private val resourcesManager: ResourcesManager, private val s
                     streamFromClient = clientSocket.openReadChannel()
 
                     header = processHeader(streamFromClient, buffer)
+                    log.info(header.toString())
+                    log.info(header.bufferRead.toString(Charsets.UTF_8))
                     log.trace(resourcesManager.pathsMapping.toString())
-                    workerSocketInfo = getWorkerSocket(header, resourcesManager.pathsMapping.keys)
-                    workerSocket = workerSocketInfo.socket
-                    val routePrefixLength = workerSocketInfo.routePrefix.length
+//                    workerSocketInfo = getWorkerSocket(header, resourcesManager.pathsMapping.keys)
+//                    workerSocket = workerSocketInfo.socket
+//                    val routePrefixLength = workerSocketInfo.routePrefix.length
 
-                    streamToWorker = workerSocket.openWriteChannel(true)
-                    redirectProcessedHeader(streamToWorker, routePrefixLength, header)
+//                    streamToWorker = workerSocket.openWriteChannel(true)
+//                    redirectProcessedHeader(streamToWorker, routePrefixLength, header)
 
-                    streamFromWorker = workerSocket.openReadChannel()
+//                    streamFromWorker = workerSocket.openReadChannel()
                     streamToClient = clientSocket.openWriteChannel(true)
 
                     if (streamFromClient.availableForRead > 0) {
-                        redirect(streamFromClient, streamToWorker, buffer)
+                        redirect(streamFromClient, streamToClient, buffer)
                     }
 
-                    redirect(streamFromWorker, streamToClient, buffer)
-                    service.persistAnalytics(workerSocketInfo.deploymentInfo.targetResource)
+//                    redirect(streamFromWorker, streamToClient, buffer)
+//                    service.persistAnalytics(workerSocketInfo.deploymentInfo.targetResource)
                 } catch (e: ValidationException) {
                     log.debug("Received an invalid request")
                 } catch (e: NotFoundException) {

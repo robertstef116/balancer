@@ -37,8 +37,8 @@ class ResourcesManager(private val storage: Storage) : UpdateAwareManager(Consta
     var workers: List<Worker> = emptyList()
     var healthChecks: List<HealthChecker> = emptyList()
 
-    fun getWorkflows() = storage.getWorkflows()
-    fun getDeployments() = storage.getDeployments()
+//    fun getWorkflows() = storage.getWorkflows()
+//    fun getDeployments() = storage.getDeployments()
 
     fun reloadDynamicConfigs() {
         log.debug("reload dynamic configs")

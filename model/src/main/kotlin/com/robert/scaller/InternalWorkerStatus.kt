@@ -5,6 +5,7 @@ import java.util.UUID
 
 data class InternalWorkerStatus(
     val id: UUID,
+    val host: String,
     var cpuLoad: Double,
     var memoryLoad: Double,
     var availableMemory: Long,

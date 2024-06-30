@@ -19,39 +19,39 @@ class Service(private val storage: Storage) {
 
     private lateinit var updateAwareServicesMetadata: Map<String, Long>
 
-    fun deployWorkflow(worker: Worker, workflow: Workflow): Deployment? {
-        return runBlocking {
-            val url = "http://${worker.host}:${worker.port}/docker"
-            var dockerContainerResponse: DockerCreateContainerResponse? = null
-            val deploymentId = UUID.randomUUID().toString()
-            try {
-                dockerContainerResponse = HttpClient.post(
-                    url,
-                    DockerCreateContainerRequest(
-                        deploymentId,
-                        workflow.image,
-                        workflow.memoryLimit,
-                        workflow.pathsMapping.values.toList().distinct()
-                    )
-                ).body()
-                return@runBlocking storage.addDeployment(
-                    deploymentId,
-                    worker.id,
-                    workflow.id,
-                    dockerContainerResponse!!.id,
-                    dockerContainerResponse.ports
-                )
-            } catch (e: Exception) {
-                log.error("error deploying workflow, err = {}", e.message)
-                if (dockerContainerResponse != null) {
-                    HttpClient.delete("$url?id=${dockerContainerResponse.id}")
-                } else {
-                    // empty
-                }
-            }
-            return@runBlocking null
-        }
-    }
+//    fun deployWorkflow(worker: Worker, workflow: Workflow): Deployment? {
+//        return runBlocking {
+//            val url = "http://${worker.host}:${worker.port}/docker"
+//            var dockerContainerResponse: DockerCreateContainerResponse? = null
+//            val deploymentId = UUID.randomUUID().toString()
+//            try {
+//                dockerContainerResponse = HttpClient.post(
+//                    url,
+//                    DockerCreateContainerRequest(
+//                        deploymentId,
+//                        workflow.image,
+//                        workflow.memoryLimit,
+//                        workflow.pathsMapping.values.toList().distinct()
+//                    )
+//                ).body()
+//                return@runBlocking storage.addDeployment(
+//                    deploymentId,
+//                    worker.id,
+//                    workflow.id,
+//                    dockerContainerResponse!!.id,
+//                    dockerContainerResponse.ports
+//                )
+//            } catch (e: Exception) {
+//                log.error("error deploying workflow, err = {}", e.message)
+//                if (dockerContainerResponse != null) {
+//                    HttpClient.delete("$url?id=${dockerContainerResponse.id}")
+//                } else {
+//                    // empty
+//                }
+//            }
+//            return@runBlocking null
+//        }
+//    }
 
     fun removeDeployment(worker: Worker, id: String, containerId: String): Boolean {
         return runBlocking {
@@ -105,22 +105,22 @@ class Service(private val storage: Storage) {
 
     @Synchronized
     fun syncWorkers() {
-        val workers = storage.getWorkers()
+//        val workers = storage.getWorkers()
         runBlocking {
             withContext(Dispatchers.IO) {// waits for all child coroutines to finish
-                for (worker in workers) {
-                    launch {
-                        for (i in 1..10) {
-                            try {
-                                syncWorker(worker)
-                                break;
-                            } catch (e: Exception) {
-                                log.warn("unable to sync worker {} {}, try again...", worker, e.message)
-                                delay(i * 5000L)
-                            }
-                        }
-                    }
-                }
+//                for (worker in workers) {
+//                    launch {
+//                        for (i in 1..10) {
+//                            try {
+//                                syncWorker(worker)
+//                                break;
+//                            } catch (e: Exception) {
+//                                log.warn("unable to sync worker {} {}, try again...", worker, e.message)
+//                                delay(i * 5000L)
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
         log.debug("workers synced")
