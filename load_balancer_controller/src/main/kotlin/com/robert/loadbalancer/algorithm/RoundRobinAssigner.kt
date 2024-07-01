@@ -3,10 +3,12 @@ package com.robert.loadbalancer.algorithm
 import com.robert.exceptions.NotFoundException
 import com.robert.loadbalancer.model.HostPortPair
 import com.robert.scaling.client.model.WorkflowDeploymentData
+import java.util.concurrent.atomic.AtomicInteger
 
-class RandomAssigner : BalancingAlgorithm {
+class RoundRobinAssigner : BalancingAlgorithm {
     @Volatile
     private var targets = listOf<WorkflowDeploymentData>()
+    private val currentIdx = AtomicInteger(0)
 
     override fun updateData(data: List<WorkflowDeploymentData>) {
         targets = data
@@ -17,7 +19,10 @@ class RandomAssigner : BalancingAlgorithm {
             if (targets.isEmpty()) {
                 throw NotFoundException()
             }
-            return targets[(targets.indices).random()].let { HostPortPair(it.workflowId, it.host, it.port) }
+            val targetIdx = currentIdx.getAndIncrement() % targets.size
+            return targets[targetIdx].let {
+                HostPortPair(it.workflowId, it.host, it.port)
+            }
         }
     }
 

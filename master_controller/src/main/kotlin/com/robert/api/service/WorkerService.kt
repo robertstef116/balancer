@@ -11,7 +11,7 @@ import java.util.*
 class WorkerService: KoinComponent {
     private val workerRepository by inject<WorkerRepository>()
     private val scalingClient by inject<ScalingClient>()
-
+    // TODO: use returns
     fun get(id: UUID): Worker? {
         return workerRepository.find(id)
     }

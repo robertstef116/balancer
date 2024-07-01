@@ -6,7 +6,9 @@ import com.robert.annotations.SchedulerConsumer
 import com.robert.enums.LBAlgorithms
 import com.robert.exceptions.NotFoundException
 import com.robert.loadbalancer.algorithm.BalancingAlgorithm
+import com.robert.loadbalancer.algorithm.LeastConnectionAssigner
 import com.robert.loadbalancer.algorithm.RandomAssigner
+import com.robert.loadbalancer.algorithm.RoundRobinAssigner
 import com.robert.logger
 import com.robert.scaling.client.ScalingClient
 import com.robert.scaling.client.model.WorkflowDeploymentData
@@ -16,7 +18,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Scheduler
 class RequestHandlerProvider : KoinComponent {
-    private val LOG by logger()
+    companion object {
+        private val LOG by logger()
+    }
+
     private val scalingClient by inject<ScalingClient>()
 
     private val assigner = ConcurrentHashMap<String, BalancingAlgorithm>()
@@ -33,19 +38,20 @@ class RequestHandlerProvider : KoinComponent {
                 .add(it)
         }
 
+        // TODO: algorithm update!
         assigner.entries.removeIf { !mappedDeploymentData.containsKey(it.key) }
         mappedDeploymentData.forEach { (path, deploymentDataList) ->
             assigner.computeIfAbsent(path) { getAlgorithmAssigner(deploymentDataList.first().algorithm) }
                 .updateData(deploymentDataList)
         }
-        LOG.info("{} active paths", assigner.size)
+        LOG.debug("{} active paths", assigner.size)
     }
 
     private fun getAlgorithmAssigner(algorithm: LBAlgorithms): BalancingAlgorithm {
         return when (algorithm) {
             LBAlgorithms.RANDOM -> RandomAssigner()
-            LBAlgorithms.LEAST_CONNECTION -> RandomAssigner()
-            LBAlgorithms.ROUND_ROBIN -> RandomAssigner()
+            LBAlgorithms.LEAST_CONNECTION -> LeastConnectionAssigner()
+            LBAlgorithms.ROUND_ROBIN -> RoundRobinAssigner()
             LBAlgorithms.WEIGHTED_RESPONSE_TIME -> RandomAssigner()
             LBAlgorithms.ADAPTIVE -> RandomAssigner()
         }

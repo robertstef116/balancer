@@ -73,9 +73,8 @@ class WorkflowService : KoinComponent {
             }
         }
 
-        val workflow = Workflow(UUID.randomUUID(), image, memoryLimit, cpuLimit, minDeployments, maxDeployments, algorithm, pathMapping)
+        val workflow = Workflow(UUID.randomUUID(), image, cpuLimit, memoryLimit, minDeployments, maxDeployments, algorithm, pathMapping)
         scalingClient.addWorkflow(workflow)
-        workflowRepository.create(workflow)
         return workflow
     }
 
@@ -84,11 +83,9 @@ class WorkflowService : KoinComponent {
             throw ValidationException("Invalid deployment limits")
         }
         scalingClient.updateWorkflow(id, minDeployments, maxDeployments, algorithm)
-        workflowRepository.update(id, minDeployments, maxDeployments, algorithm)
     }
 
     fun delete(id: UUID) {
         scalingClient.deleteWorkflow(id)
-        workflowRepository.delete(id)
     }
 }

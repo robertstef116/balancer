@@ -28,8 +28,8 @@ class WorkflowRepositoryImpl : WorkflowRepository {
                         Workflow(
                             id = id,
                             image = row[Workflows.image],
-                            memoryLimit = row[Workflows.memoryLimit],
                             cpuLimit = row[Workflows.cpuLimit],
+                            memoryLimit = row[Workflows.memoryLimit],
                             minDeployments = row[Workflows.minDeployments],
                             maxDeployments = row[Workflows.maxDeployments],
                             algorithm = row[Workflows.algorithm],
@@ -37,7 +37,7 @@ class WorkflowRepositoryImpl : WorkflowRepository {
                         )
                     )
                     pathMapping
-                }.let {
+                }.also {
                     it[row[WorkflowMappings.path]] = row[WorkflowMappings.port]
                 }
             }
@@ -78,8 +78,8 @@ class WorkflowRepositoryImpl : WorkflowRepository {
                     workflow = Workflow(
                         id = id,
                         image = row[Workflows.image],
-                        memoryLimit = row[Workflows.memoryLimit],
                         cpuLimit = row[Workflows.cpuLimit],
+                        memoryLimit = row[Workflows.memoryLimit],
                         minDeployments = row[Workflows.minDeployments],
                         maxDeployments = row[Workflows.maxDeployments],
                         algorithm = row[Workflows.algorithm],

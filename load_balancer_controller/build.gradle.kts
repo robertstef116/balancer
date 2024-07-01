@@ -6,6 +6,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":persistence"))
     implementation(project(":model"))
     implementation(project(":utils"))
     implementation(project(":scaling_controller:client"))

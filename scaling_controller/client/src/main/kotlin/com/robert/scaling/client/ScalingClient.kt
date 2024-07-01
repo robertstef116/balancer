@@ -65,28 +65,29 @@ class ScalingClient : Closeable {
         return@runBlocking client.getAvailableWorkflowDeploymentsData(Empty.getDefaultInstance())
             .requestsList
             .map {
-                WorkflowDeploymentData(it.path, it.host, it.port, LBAlgorithms.valueOf(it.algorithm.toString()), it.score)
+                WorkflowDeploymentData(UUID.fromString(it.workflowId), it.path, it.host, it.port, LBAlgorithms.valueOf(it.algorithm.toString()), it.score)
             }
     }
 
-    fun updateWorker(id: UUID, status: WorkerState) = runBlocking {
-        client.updateWorker(EntityBuilder.newWorkerData(id, status))
+    // TODO: use returns
+    fun updateWorker(id: UUID, status: WorkerState):Boolean = runBlocking {
+        return@runBlocking client.updateWorker(EntityBuilder.newWorkerData(id, status)).ok
     }
 
-    fun deleteWorker(id: UUID) = runBlocking {
-        client.removeWorker(EntityBuilder.newIdData(id))
+    fun deleteWorker(id: UUID): Boolean = runBlocking {
+        return@runBlocking client.removeWorker(EntityBuilder.newIdData(id)).ok
     }
 
-    fun addWorkflow(workflow: Workflow) = runBlocking {
-        client.addWorkflow(EntityBuilder.newWorkflowData(workflow))
+    fun addWorkflow(workflow: Workflow): Boolean = runBlocking {
+        return@runBlocking client.addWorkflow(EntityBuilder.newWorkflowData(workflow)).ok
     }
 
-    fun updateWorkflow(id: UUID, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms) = runBlocking {
-        client.updateWorkflow(EntityBuilder.newWorkflowUpdateData(id, minDeployments, maxDeployments, algorithm))
+    fun updateWorkflow(id: UUID, minDeployments: Int?, maxDeployments: Int?, algorithm: LBAlgorithms): Boolean = runBlocking {
+        return@runBlocking client.updateWorkflow(EntityBuilder.newWorkflowUpdateData(id, minDeployments, maxDeployments, algorithm)).ok
     }
 
-    fun deleteWorkflow(id: UUID) = runBlocking {
-        client.removeWorkflow(EntityBuilder.newIdData(id))
+    fun deleteWorkflow(id: UUID): Boolean = runBlocking {
+        return@runBlocking client.removeWorkflow(EntityBuilder.newIdData(id)).ok
     }
 
     @Synchronized

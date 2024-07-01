@@ -10,5 +10,6 @@ data class InternalWorkerStatus(
     var memoryLoad: Double,
     var availableMemory: Long,
     var lastUpdate: Long,
+    var state: WorkerState,
     var activeDeployments: List<DockerContainer>
 )

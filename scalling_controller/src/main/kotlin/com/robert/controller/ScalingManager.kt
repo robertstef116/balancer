@@ -44,8 +44,8 @@ class ScalingManager : KoinComponent {
         val workflow = Workflow(
             UUID.randomUUID(),
             image,
-            memoryLimit,
             cpuLimit,
+            memoryLimit,
             minDeployments,
             maxDeployments,
             algorithm,

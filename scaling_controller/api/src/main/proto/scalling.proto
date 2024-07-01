@@ -12,16 +12,20 @@ service ScalingService {
   rpc UpdateWorkerStatus(WorkerStatus) returns (DeploymentRequestList) {}
   rpc GetAvailableWorkflowDeploymentsData(google.protobuf.Empty) returns (WorkflowDeploymentsDataList) {}
 
-  rpc UpdateWorker(WorkerData) returns (google.protobuf.Empty) {}
-  rpc RemoveWorker(IdData) returns (google.protobuf.Empty) {}
+  rpc UpdateWorker(WorkerData) returns (OkData) {}
+  rpc RemoveWorker(IdData) returns (OkData) {}
 
-  rpc AddWorkflow(WorkflowData) returns (google.protobuf.Empty) {}
-  rpc UpdateWorkflow(WorkflowUpdateData) returns (google.protobuf.Empty) {}
-  rpc RemoveWorkflow(IdData) returns (google.protobuf.Empty) {}
+  rpc AddWorkflow(WorkflowData) returns (OkData) {}
+  rpc UpdateWorkflow(WorkflowUpdateData) returns (OkData) {}
+  rpc RemoveWorkflow(IdData) returns (OkData) {}
 }
 
 message IdData {
   string id = 1;
+}
+
+message OkData {
+  bool ok = 1;
 }
 
 message WorkerData {
@@ -80,11 +84,12 @@ message DeploymentRequestList {
 }
 
 message WorkflowDeploymentsData {
-  string path = 1;
-  string host = 2;
-  int32 port = 3;
-  WorkflowAlgorithm algorithm = 4;
-  double score = 10;
+  string workflowId = 1;
+  string path = 10;
+  string host = 11;
+  int32 port = 12;
+  WorkflowAlgorithm algorithm = 13;
+  double score = 20;
 }
 
 message WorkflowDeploymentsDataList {

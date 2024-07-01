@@ -1,11 +1,15 @@
 package com.robert.loadbalancer
 
 import com.robert.Env
+import com.robert.balancing.LoadBalancerAnalytic
+import com.robert.balancing.LoadBalancerResponseType
 import com.robert.exceptions.ConnectionClosedException
 import com.robert.exceptions.NotFoundException
 import com.robert.exceptions.ValidationException
+import com.robert.loadbalancer.algorithm.BalancingAlgorithm
 import com.robert.loadbalancer.model.HostPortPair
 import com.robert.logger
+import com.robert.storage.repository.LoadBalancerAnalyticRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -16,6 +20,8 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.net.ServerSocket
 import java.net.Socket
+import java.time.Instant
+import kotlin.system.measureTimeMillis
 
 class LoadBalancer : KoinComponent {
     companion object {
@@ -47,6 +53,7 @@ class LoadBalancer : KoinComponent {
     }
 
     private val requestHandlerProvider by inject<RequestHandlerProvider>()
+    private val loadBalancerAnalyticRepository by inject<LoadBalancerAnalyticRepository>()
 
     private val processingSocketBufferLength = Env.getInt("PROCESSING_SOCKET_BUFFER_LENGTH", 1000)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -59,58 +66,78 @@ class LoadBalancer : KoinComponent {
         val serverSocket = ServerSocket(port, backlog)
 
         while (true) {
-            LOG.info("Waiting new connection")
+            LOG.trace("Waiting new connection")
             handleRequest(serverSocket.accept())
         }
     }
 
     private fun handleRequest(socket: Socket) {
         scope.launch {
-            socket.use {
+            var lbUri = ""
+            var target: HostPortPair? = null
+            var assigner: BalancingAlgorithm? = null
+            var responseType = LoadBalancerResponseType.OK
+
+            val responseTime = measureTimeMillis {
                 try {
-                    socket.getInputStream().use { input ->
-                        socket.getOutputStream().use { output ->
-                            var lbUri = ""
-                            var version = DEFAULT_HTTP_VERSION
-                            try {
-                                val buffer = ByteArray(processingSocketBufferLength)
-                                val (requestHeaders, requestBody) = readFromStream(input, buffer)
-                                updateRequestLineHeader(requestHeaders).also {
-                                    lbUri += it.first
-                                    version += it.second
-                                }
+                    socket.use {
+                        socket.getInputStream().use { input ->
+                            socket.getOutputStream().use { output ->
+                                var version = DEFAULT_HTTP_VERSION
+                                try {
+                                    val buffer = ByteArray(processingSocketBufferLength)
+                                    val (requestHeaders, requestBody) = readFromStream(input, buffer)
+                                    updateRequestLineHeader(requestHeaders).also {
+                                        lbUri += it.first
+                                        version += it.second
+                                    }
 
-//                                val target = requestHandlerProvider.getAssigner(lbUri).getTarget()
-                                val target = HostPortPair("127.0.1.1", 32770)
-                                LOG.info("Selected target {}", target)
-                                Socket(target.host, target.port).use { targetSocket ->
-                                    targetSocket.getOutputStream().use { targetOutputStream ->
-                                        writeToStream(targetOutputStream, requestHeaders, requestBody)
+                                    assigner = requestHandlerProvider.getAssigner(lbUri).also { assigner ->
+                                        target = assigner.getTarget().also {
+                                            LOG.info("Selected target {}", it)
+                                            Socket(it.host, it.port).use { targetSocket ->
+                                                targetSocket.getOutputStream().use { targetOutputStream ->
+                                                    writeToStream(targetOutputStream, requestHeaders, requestBody)
 
-                                        targetSocket.getInputStream().use { targetInputStream ->
-                                            val (responseHeaders, responseBody) = readFromStream(targetInputStream, buffer)
-                                            writeToStream(output, responseHeaders, responseBody)
+                                                    targetSocket.getInputStream().use { targetInputStream ->
+                                                        val (responseHeaders, responseBody) = readFromStream(targetInputStream, buffer)
+                                                        writeToStream(output, responseHeaders, responseBody)
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
+                                    LOG.trace("Done on path {}", lbUri)
+                                } catch (e: ConnectionClosedException) {
+                                    responseType = LoadBalancerResponseType.CONNECTION_CLOSED
+                                    LOG.debug("Client closed the connection on path: {}", lbUri)
+                                } catch (e: NotFoundException) {
+                                    responseType = LoadBalancerResponseType.NOT_FOUND
+                                    LOG.warn("Received request to unknown path: {}", lbUri)
+                                    writeContentToStream(NOT_FOUND_CONTENT_TEMPL.format(version), output)
+                                } catch (e: ValidationException) {
+                                    responseType = LoadBalancerResponseType.INVALID
+                                    LOG.warn("Received an invalid request: {}", e.message)
+                                    writeContentToStream(BAD_REQUEST_ERROR_CONTENT_TEMPL.format(version), output)
+                                } catch (e: Exception) {
+                                    responseType = LoadBalancerResponseType.SERVER_ERROR
+                                    LOG.warn("Error", e)
+                                    writeContentToStream(INTERNAL_SERVER_ERROR_CONTENT_TEMPL.format(version), output)
                                 }
-                                LOG.info("Done")
-                            }catch (e: ConnectionClosedException) {
-                                LOG.debug("Client closed the connection on path: {}", lbUri)
-                            } catch (e: NotFoundException) {
-                                LOG.warn("Received request to unknown path: {}", lbUri)
-                                writeContentToStream(NOT_FOUND_CONTENT_TEMPL.format(version), output)
-                            } catch (e: ValidationException) {
-                                LOG.warn("Received an invalid request: {}", e.message)
-                                writeContentToStream(BAD_REQUEST_ERROR_CONTENT_TEMPL.format(version), output)
-                            } catch (e: Exception) {
-                                LOG.warn("Error", e)
-                                writeContentToStream(INTERNAL_SERVER_ERROR_CONTENT_TEMPL.format(version), output)
                             }
                         }
                     }
                 } catch (e: Exception) {
+                    responseType = LoadBalancerResponseType.ERROR
                     LOG.error("Unexpected error occurred", e)
                 }
+            }
+
+            if (responseType != LoadBalancerResponseType.OK) {
+                assigner?.also { it.addResponseTimeData(responseTime) }
+            }
+            if (lbUri.isNotEmpty()) {
+                target?.also { loadBalancerAnalyticRepository.create(LoadBalancerAnalytic(it.workflowId, lbUri, responseTime, Instant.now().toEpochMilli(), responseType)) }
             }
         }
     }
@@ -198,7 +225,7 @@ class LoadBalancer : KoinComponent {
 
     private fun readFromStreamRaw(input: InputStream, buffer: ByteArray): Int {
         return input.read(buffer).also {
-            if (it == -1) { // TODO: connection terminated instead
+            if (it == -1) {
                 throw ConnectionClosedException()
             }
         }

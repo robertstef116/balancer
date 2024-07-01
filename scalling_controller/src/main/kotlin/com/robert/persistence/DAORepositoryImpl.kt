@@ -54,8 +54,8 @@ class DAORepositoryImpl : DAORepository {
             Workflow(
                 id = row[Workflows.id],
                 image = row[Workflows.image],
-                memoryLimit = row[Workflows.memoryLimit],
                 cpuLimit = row[Workflows.cpuLimit],
+                memoryLimit = row[Workflows.memoryLimit],
                 minDeployments = row[Workflows.minDeployments],
                 maxDeployments = row[Workflows.maxDeployments],
                 algorithm = row[Workflows.algorithm],

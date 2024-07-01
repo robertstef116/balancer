@@ -2,8 +2,11 @@ package com.robert.service
 
 import com.google.protobuf.Empty
 import com.robert.controller.ScalingController
+import com.robert.controller.WorkerController
+import com.robert.controller.WorkflowController
 import com.robert.docker.DockerContainer
 import com.robert.docker.DockerPortMapping
+import com.robert.enums.LBAlgorithms
 import com.robert.logger
 import com.robert.scaling.client.model.DeploymentScalingRequest
 import com.robert.scaling.client.model.WorkflowDeploymentData
@@ -15,19 +18,20 @@ import java.util.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-//https://github.com/grpc/grpc-kotlin/blob/master/examples/server/src/main/kotlin/io/grpc/examples/routeguide/RouteGuideServer.kt
 class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext) : ScalingServiceGrpcKt.ScalingServiceCoroutineImplBase(coroutineContext), KoinComponent {
     companion object {
         val LOG by logger()
     }
 
     private val scalingController: ScalingController by inject()
+    private val workerController: WorkerController by inject()
+    private val workflowController: WorkflowController by inject()
 
     override suspend fun updateWorkerStatus(request: WorkerStatus): DeploymentRequestList {
         LOG.info("Received status update from worker {} ({})", request.id, request.alias)
         try {
             val id = UUID.fromString(request.id)
-            scalingController.updateWorkerStatus(id, request.alias, request.host, request.cpuLoad, request.memoryLoad, request.availableMemory, request.deploymentsList.map {
+            workerController.updateWorkerStatus(id, request.alias, request.host, request.cpuLoad, request.memoryLoad, request.availableMemory, request.deploymentsList.map {
                 DockerContainer(
                     it.containerId,
                     UUID.fromString(it.workflowId),
@@ -49,31 +53,39 @@ class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext)
         return newWorkflowDeploymentsDataList(scalingController.getAvailableWorkflowDeploymentsData())
     }
 
-    override suspend fun updateWorker(request: WorkerData): Empty {
-        LOG.info("got updateWorker $request")
-        scalingController.updateWorkerState(UUID.fromString(request.id), WorkerState.valueOf(request.state.toString()))
-        return Empty.getDefaultInstance()
+    override suspend fun updateWorker(request: WorkerData): OkData {
+        LOG.info("Updating state of worker with id {} to {}", request.id, request.state)
+        return buildOkData(scalingController.updateWorkerState(UUID.fromString(request.id), WorkerState.valueOf(request.state.toString())))
     }
 
-    override suspend fun removeWorker(request: IdData): Empty {
-        LOG.info("got removeWorker $request")
-        scalingController.removeWorker(UUID.fromString(request.id))
-        return Empty.getDefaultInstance()
+    override suspend fun removeWorker(request: IdData): OkData {
+        LOG.info("Removing worker with id {}", request.id)
+        return buildOkData(workerController.removeWorker(UUID.fromString(request.id)))
     }
 
-    override suspend fun addWorkflow(request: WorkflowData): Empty {
-        LOG.info("got addWorkflow $request")
-        return Empty.getDefaultInstance()
+    override suspend fun addWorkflow(request: WorkflowData): OkData {
+        LOG.trace("Received add workflow request: {}", request.id)
+        return buildOkData(workflowController.addWorkflow(
+                UUID.fromString(request.id),
+                request.image,
+                request.cpuLimit,
+                request.memoryLimit,
+                request.minDeployments,
+                request.maxDeployments,
+                LBAlgorithms.valueOf(request.algorithm.toString()),
+                request.pathsMappingMap
+            )
+        )
     }
 
-    override suspend fun updateWorkflow(request: WorkflowUpdateData): Empty {
-        LOG.info("got updateWorkflow $request")
-        return Empty.getDefaultInstance()
+    override suspend fun updateWorkflow(request: WorkflowUpdateData): OkData {
+        LOG.trace("Received update workflow request: {}", request.id)
+        return buildOkData(workflowController.updateWorkflow(UUID.fromString(request.id), request.minDeployments, request.maxDeployments, LBAlgorithms.valueOf(request.algorithm.toString())))
     }
 
-    override suspend fun removeWorkflow(request: IdData): Empty {
-        LOG.info("got removeWorkflow $request")
-        return Empty.getDefaultInstance()
+    override suspend fun removeWorkflow(request: IdData): OkData {
+        LOG.trace("Received remove workflow request: {}", request.id)
+        return buildOkData(workflowController.removeWorkflow(UUID.fromString(request.id)))
     }
 
     private fun newWorkflowScalingRequest(requests: List<DeploymentScalingRequest>?): DeploymentRequestList {
@@ -105,6 +117,7 @@ class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext)
         data.forEach {
             workflowDeploymentsDataListBuilder.addRequests(
                 WorkflowDeploymentsData.newBuilder()
+                    .setWorkflowId(it.workflowId.toString())
                     .setPath(it.path)
                     .setHost(it.host)
                     .setPort(it.port)
@@ -114,5 +127,11 @@ class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext)
             )
         }
         return workflowDeploymentsDataListBuilder.build()
+    }
+
+    private fun buildOkData(ok: Boolean): OkData {
+        return OkData.newBuilder()
+            .setOk(ok)
+            .build()
     }
 }

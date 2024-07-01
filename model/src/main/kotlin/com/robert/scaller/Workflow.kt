@@ -6,8 +6,8 @@ import java.util.UUID
 data class Workflow(
     val id: UUID,
     val image: String,
-    val memoryLimit: Long,
     val cpuLimit: Long,
+    val memoryLimit: Long,
     var minDeployments: Int?,
     var maxDeployments: Int?,
     var algorithm: LBAlgorithms,
