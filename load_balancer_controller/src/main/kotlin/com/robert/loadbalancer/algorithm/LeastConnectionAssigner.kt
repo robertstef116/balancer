@@ -1,5 +1,7 @@
 package com.robert.loadbalancer.algorithm
 
+import com.robert.balancing.LoadBalancerResponseType
+import com.robert.enums.LBAlgorithms
 import com.robert.exceptions.NotFoundException
 import com.robert.loadbalancer.model.HostPortPair
 import com.robert.scaling.client.model.WorkflowDeploymentData
@@ -8,6 +10,10 @@ import java.util.concurrent.atomic.AtomicLong
 class LeastConnectionAssigner : BalancingAlgorithm {
     @Volatile
     private var targets = listOf<LeastConnectionWorkflowDeploymentData>()
+
+    override fun getAlgorithmType(): LBAlgorithms {
+        return LBAlgorithms.LEAST_CONNECTION
+    }
 
     override fun updateData(data: List<WorkflowDeploymentData>) {
         targets.also { currentTargets ->
@@ -31,10 +37,15 @@ class LeastConnectionAssigner : BalancingAlgorithm {
         }
     }
 
-    override fun addResponseTimeData(responseTime: Long) {
-        // NOP
+    override fun addResponseTimeData(target: HostPortPair, responseTime: Long, responseType: LoadBalancerResponseType) {
+        targets.find { it.workflowDeploymentData.host == target.host && it.workflowDeploymentData.port == it.workflowDeploymentData.port }
+            ?.activeRequestsCounter
+            ?.decrementAndGet()
     }
 
-    private inner class LeastConnectionWorkflowDeploymentData(val workflowDeploymentData: WorkflowDeploymentData, val activeRequestsCounter: AtomicLong)
+    private inner class LeastConnectionWorkflowDeploymentData(
+        val workflowDeploymentData: WorkflowDeploymentData,
+        val activeRequestsCounter: AtomicLong
+    )
 }
 

@@ -5,10 +5,7 @@ import com.robert.annotations.Scheduler
 import com.robert.annotations.SchedulerConsumer
 import com.robert.enums.LBAlgorithms
 import com.robert.exceptions.NotFoundException
-import com.robert.loadbalancer.algorithm.BalancingAlgorithm
-import com.robert.loadbalancer.algorithm.LeastConnectionAssigner
-import com.robert.loadbalancer.algorithm.RandomAssigner
-import com.robert.loadbalancer.algorithm.RoundRobinAssigner
+import com.robert.loadbalancer.algorithm.*
 import com.robert.logger
 import com.robert.scaling.client.ScalingClient
 import com.robert.scaling.client.model.WorkflowDeploymentData
@@ -38,10 +35,15 @@ class RequestHandlerProvider : KoinComponent {
                 .add(it)
         }
 
-        // TODO: algorithm update!
-        assigner.entries.removeIf { !mappedDeploymentData.containsKey(it.key) }
+        assigner.entries.removeIf {
+            !mappedDeploymentData.containsKey(it.key) || mappedDeploymentData[it.key]?.first()?.algorithm != it.value.getAlgorithmType()
+        }
         mappedDeploymentData.forEach { (path, deploymentDataList) ->
-            assigner.computeIfAbsent(path) { getAlgorithmAssigner(deploymentDataList.first().algorithm) }
+            assigner.computeIfAbsent(path) {
+                val algorithm = deploymentDataList.first().algorithm
+                LOG.debug("Initializing algorithm of type {} for path {}", algorithm, path)
+                getAlgorithmAssigner(algorithm)
+            }
                 .updateData(deploymentDataList)
         }
         LOG.debug("{} active paths", assigner.size)
@@ -52,7 +54,7 @@ class RequestHandlerProvider : KoinComponent {
             LBAlgorithms.RANDOM -> RandomAssigner()
             LBAlgorithms.LEAST_CONNECTION -> LeastConnectionAssigner()
             LBAlgorithms.ROUND_ROBIN -> RoundRobinAssigner()
-            LBAlgorithms.WEIGHTED_RESPONSE_TIME -> RandomAssigner()
+            LBAlgorithms.WEIGHTED_RESPONSE_TIME -> WeightedResponseTimeAssigner()
             LBAlgorithms.ADAPTIVE -> RandomAssigner()
         }
     }

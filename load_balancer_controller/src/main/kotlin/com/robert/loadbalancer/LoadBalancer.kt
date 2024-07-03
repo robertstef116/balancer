@@ -133,11 +133,11 @@ class LoadBalancer : KoinComponent {
                 }
             }
 
-            if (responseType != LoadBalancerResponseType.OK) {
-                assigner?.also { it.addResponseTimeData(responseTime) }
-            }
-            if (lbUri.isNotEmpty()) {
-                target?.also { loadBalancerAnalyticRepository.create(LoadBalancerAnalytic(it.workflowId, lbUri, responseTime, Instant.now().toEpochMilli(), responseType)) }
+            target?.also { targetData ->
+                assigner?.also { it.addResponseTimeData(targetData, responseTime, responseType) }
+                if (lbUri.isNotEmpty()) {
+                    targetData.also { loadBalancerAnalyticRepository.create(LoadBalancerAnalytic(it.workflowId, lbUri, responseTime, Instant.now().toEpochMilli(), responseType)) }
+                }
             }
         }
     }
