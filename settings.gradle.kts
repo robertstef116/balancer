@@ -8,13 +8,14 @@ dependencyResolutionManagement {
             version("grpc", "1.62.2")
             version("exposed", "0.48.0")
             version("postgresql", "42.7.3")
+            version("ktor", "2.3.12")
 
             library("grpc-protobuf","io.grpc", "grpc-protobuf").versionRef("grpc")
             library("grpc-netty","io.grpc", "grpc-netty").versionRef("grpc")
-            library("grpc-kotlin-stub", "io.grpc:grpc-kotlin-stub:1.4.1")
+            library("grpc-kotlinStub", "io.grpc:grpc-kotlin-stub:1.4.1")
             bundle("grpc", listOf(
                 "grpc-protobuf",
-                "grpc-kotlin-stub"
+                "grpc-kotlinStub"
             ))
 
             library("exposed-core","org.jetbrains.exposed", "exposed-core").versionRef("exposed")
@@ -26,6 +27,20 @@ dependencyResolutionManagement {
                 "exposed-dao",
                 "exposed-jdbc",
                 "hikari"
+            ))
+
+            library("ktor-statusPages", "io.ktor", "ktor-server-status-pages").versionRef("ktor")
+            library("ktor-contentNegotiation", "io.ktor", "ktor-server-content-negotiation").versionRef("ktor")
+            library("ktor-gson", "io.ktor", "ktor-serialization-gson").versionRef("ktor")
+            library("ktor-netty", "io.ktor", "ktor-server-netty-jvm").versionRef("ktor")
+            library("ktor-jwt", "io.ktor", "ktor-server-auth-jwt").versionRef("ktor")
+            library("ktor-logging", "io.ktor", "ktor-server-call-logging").versionRef("ktor")
+            library("ktor-cors", "io.ktor", "ktor-server-cors").versionRef("ktor")
+            bundle("ktor", listOf(
+                "ktor-statusPages",
+                "ktor-contentNegotiation",
+                "ktor-gson",
+                "ktor-netty",
             ))
 
             library("protobuf", "com.google.protobuf:protobuf-kotlin:3.25.3")
@@ -41,7 +56,6 @@ dependencyResolutionManagement {
 
             library("postgresql", "org.postgresql", "postgresql").versionRef("postgresql")
 //            library("protoc-gen-kotlin", "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar")
-//            library("protoc-gen-kotlin", "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar")
         }
     }
 }
@@ -51,15 +65,13 @@ rootProject.name = "balancer"
 include("model")
 include("utils")
 include("worker_controller")
-include("master_controller")
-include("load_balancer")
 include("test_image")
 include("performance_tester")
-include("balancer-ui")
+include("balancer_ui")
 include("persistence")
 include("scaling_controller")
 include("scaling_controller:client")
 include("scaling_controller:api")
-include("master_controller")
-include("master_controller:client")
+include("balancer_api")
+include("balancer_api:client")
 include("load_balancer_controller")

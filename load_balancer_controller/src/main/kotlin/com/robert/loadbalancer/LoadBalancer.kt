@@ -18,6 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.ConnectException
 import java.net.ServerSocket
 import java.net.Socket
 import java.time.Instant
@@ -93,16 +94,26 @@ class LoadBalancer : KoinComponent {
                                     }
 
                                     assigner = requestHandlerProvider.getAssigner(lbUri).also { assigner ->
-                                        target = assigner.getTarget().also {
-                                            LOG.info("Selected target {}", it)
-                                            Socket(it.host, it.port).use { targetSocket ->
-                                                targetSocket.getOutputStream().use { targetOutputStream ->
-                                                    writeToStream(targetOutputStream, requestHeaders, requestBody)
+                                        var connected = false
+                                        val unresponsiveTargets = mutableSetOf<HostPortPair>()
+                                        while (!connected) {
+                                            target = assigner.getTarget(unresponsiveTargets).also {
+                                                LOG.debug("Selected target {}", it)
+                                                try {
+                                                    Socket(it.host, it.port).use { targetSocket ->
+                                                        targetSocket.getOutputStream().use { targetOutputStream ->
+                                                            writeToStream(targetOutputStream, requestHeaders, requestBody)
 
-                                                    targetSocket.getInputStream().use { targetInputStream ->
-                                                        val (responseHeaders, responseBody) = readFromStream(targetInputStream, buffer)
-                                                        writeToStream(output, responseHeaders, responseBody)
+                                                            targetSocket.getInputStream().use { targetInputStream ->
+                                                                val (responseHeaders, responseBody) = readFromStream(targetInputStream, buffer)
+                                                                writeToStream(output, responseHeaders, responseBody)
+                                                            }
+                                                        }
                                                     }
+                                                    connected = true
+                                                } catch (e: ConnectException) {
+                                                    LOG.warn("Unable to connect to target {}, selecting different target", target)
+                                                    unresponsiveTargets.add(it)
                                                 }
                                             }
                                         }

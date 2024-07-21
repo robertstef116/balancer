@@ -5,5 +5,6 @@ enum class LBAlgorithms {
     LEAST_CONNECTION,
     ROUND_ROBIN,
     WEIGHTED_RESPONSE_TIME,
+    WEIGHTED_SCORE,
     ADAPTIVE,
 }

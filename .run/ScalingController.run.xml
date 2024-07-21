@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ScalingController" type="JetRunConfigurationType">
+    <envs>
+      <env name="DB_HOST" value="localhost" />
+      <env name="DB_PORT" value="6000" />
+      <env name="DB_NAME" value="balancer_db" />
+      <env name="DB_USER" value="balanceradmin" />
+      <env name="DB_PASSWORD" value="PA55W0rD" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.robert.MainKt" />
+    <module name="balancer.scaling_controller.main" />
+    <target name="WSL - Ubuntu" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

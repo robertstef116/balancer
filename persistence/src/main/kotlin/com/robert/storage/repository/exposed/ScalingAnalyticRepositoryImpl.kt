@@ -13,6 +13,8 @@ class ScalingAnalyticRepositoryImpl : ScalingAnalyticRepository {
             ScalingAnalytic(
                 workflowId = it[ScalingAnalytics.workflowId],
                 replicas = it[ScalingAnalytics.replicas],
+                avgCpu = it[ScalingAnalytics.avgCpu],
+                avgMemory = it[ScalingAnalytics.avgMemory],
                 timestamp = it[ScalingAnalytics.timestamp],
             )
         }
@@ -22,6 +24,8 @@ class ScalingAnalyticRepositoryImpl : ScalingAnalyticRepository {
         ScalingAnalytics.insert {
             it[workflowId] = analytics.workflowId
             it[replicas] = analytics.replicas
+            it[avgCpu] = analytics.avgCpu
+            it[avgMemory] = analytics.avgMemory
             it[timestamp] = analytics.timestamp
         }
     }

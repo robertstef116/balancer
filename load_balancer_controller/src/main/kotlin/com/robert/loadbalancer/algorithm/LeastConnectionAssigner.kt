@@ -3,6 +3,7 @@ package com.robert.loadbalancer.algorithm
 import com.robert.balancing.LoadBalancerResponseType
 import com.robert.enums.LBAlgorithms
 import com.robert.exceptions.NotFoundException
+import com.robert.loadbalancer.model.BalancingAlgorithmData
 import com.robert.loadbalancer.model.HostPortPair
 import com.robert.scaling.client.model.WorkflowDeploymentData
 import java.util.concurrent.atomic.AtomicLong
@@ -26,14 +27,14 @@ class LeastConnectionAssigner : BalancingAlgorithm {
         }
     }
 
-    override fun getTarget(): HostPortPair {
-        targets.also { targets ->
+    override fun getTarget(blacklistedTargets: Set<HostPortPair>): HostPortPair {
+        BalancingAlgorithm.getAvailableTargets(targets, blacklistedTargets).also { targets ->
             if (targets.isEmpty()) {
                 throw NotFoundException()
             }
             val minTarget = targets.minBy { it.activeRequestsCounter.get() }
             minTarget.activeRequestsCounter.incrementAndGet()
-            return HostPortPair(minTarget.workflowDeploymentData.workflowId, minTarget.workflowDeploymentData.host, minTarget.workflowDeploymentData.port)
+            return minTarget.getHostInfo()
         }
     }
 
@@ -46,6 +47,10 @@ class LeastConnectionAssigner : BalancingAlgorithm {
     private inner class LeastConnectionWorkflowDeploymentData(
         val workflowDeploymentData: WorkflowDeploymentData,
         val activeRequestsCounter: AtomicLong
-    )
+    ) : BalancingAlgorithmData() {
+        override fun getWorkflowDeploymentData(): WorkflowDeploymentData {
+            return workflowDeploymentData
+        }
+    }
 }
 

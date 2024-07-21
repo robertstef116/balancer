@@ -30,6 +30,8 @@ class ScalingController : KoinComponent {
             val workerId: UUID,
             val containerId: String,
             val score: Double,
+            val cpuUsage: Double,
+            val memoryUsage: Double,
         )
     }
 
@@ -43,9 +45,22 @@ class ScalingController : KoinComponent {
 
     @Synchronized
     fun getScalingRequestForWorker(workerId: UUID): List<DeploymentScalingRequest>? {
-        val scalingRequests = scalingRequestsQueue.remove(workerId)
-        LOG.debug("{} scaling requests pending for worker {}", scalingRequests?.size ?: 0, workerId)
-        return scalingRequests
+        val registeredScalingRequests = mutableListOf<DeploymentScalingRequest>()
+        val unregisteredScalingRequests = mutableListOf<DeploymentScalingRequest>()
+        scalingRequestsQueue[workerId]?.forEach {
+            if (it.registered) {
+                registeredScalingRequests.add(it)
+            } else {
+                unregisteredScalingRequests.add(it)
+            }
+        }
+        if (unregisteredScalingRequests.isEmpty()) {
+            scalingRequestsQueue.remove(workerId)
+        } else {
+            scalingRequestsQueue[workerId] = unregisteredScalingRequests
+        }
+        LOG.debug("{} scaling requests pending and {} unregistered for worker {}", registeredScalingRequests.size, unregisteredScalingRequests.size, workerId)
+        return registeredScalingRequests
     }
 
     @Synchronized
@@ -62,29 +77,37 @@ class ScalingController : KoinComponent {
         val workflowCache = mutableMapOf<UUID, Workflow?>()
         val data = mutableListOf<WorkflowDeploymentData>()
         workerController.getOnlineWorkersStatus().forEach { workerData ->
-            workerData.activeDeployments.forEach { deploymentData ->
-                workflowCache.computeIfAbsent(deploymentData.workflowId) {
-                    workflowController.getWorkflow(deploymentData.workflowId)
-                }?.let { workflowData ->
-                    workflowData.pathsMapping.forEach { (path, privatePort) ->
-                        deploymentData.ports
-                            .find { it.privatePort == privatePort }
-                            ?.let { (publicPort, _) ->
-                                data.add(
-                                    WorkflowDeploymentData(
-                                        workflowData.id,
-                                        path,
-                                        workerData.host,
-                                        publicPort,
-                                        workflowData.algorithm,
-                                        computeScore(deploymentData.cpuUsage, deploymentData.memoryUsage)
+            workerData.activeDeployments
+                .filter { deploymentData ->
+                    scalingRequestsQueue[workerData.id]?.find {
+                        it.containerId == deploymentData.containerID && it.type == DeploymentScalingRequest.Type.DOWN
+                    }?.also {
+                        it.registered = true // marking the request as registered meaning it can be processed by the worker
+                    } == null
+                }
+                .forEach { deploymentData ->
+                    workflowCache.computeIfAbsent(deploymentData.workflowId) {
+                        workflowController.getWorkflow(deploymentData.workflowId)
+                    }?.let { workflowData ->
+                        workflowData.pathsMapping.forEach { (path, privatePort) ->
+                            deploymentData.ports
+                                .find { it.privatePort == privatePort }
+                                ?.let { (publicPort, _) ->
+                                    data.add(
+                                        WorkflowDeploymentData(
+                                            workflowData.id,
+                                            path,
+                                            workerData.host,
+                                            publicPort,
+                                            workflowData.algorithm,
+                                            computeScore(deploymentData.cpuUsage, deploymentData.memoryUsage)
+                                        )
                                     )
-                                )
-                            }
-                            ?: LOG.warn("Port mapping of {} not found for workflow {} on worker {}", privatePort, workflowData.id, workerData.host)
-                    }
-                } ?: LOG.warn("Workflow {} not found", deploymentData.workflowId)
-            }
+                                }
+                                ?: LOG.warn("Port mapping of {} not found for workflow {} on worker {}", privatePort, workflowData.id, workerData.host)
+                        }
+                    } ?: LOG.warn("Workflow {} not found", deploymentData.workflowId)
+                }
         }
         return data
     }
@@ -100,7 +123,15 @@ class ScalingController : KoinComponent {
             val workerScore = computeScore(it.cpuLoad, it.memoryLoad)
             it.activeDeployments.forEach { deployment ->
                 workflowDeploymentsMetadata.getOrPut(deployment.workflowId) { mutableListOf() }
-                    .add(WorkflowMetadata(it.id, deployment.containerID, 0.2 * workerScore + 0.8 * computeScore(deployment.cpuUsage, deployment.memoryUsage)))
+                    .add(
+                        WorkflowMetadata(
+                            it.id,
+                            deployment.containerID,
+                            0.2 * workerScore + 0.8 * computeScore(deployment.cpuUsage, deployment.memoryUsage),
+                            deployment.cpuUsage,
+                            deployment.memoryUsage
+                        )
+                    )
             }
         }
 
@@ -131,7 +162,7 @@ class ScalingController : KoinComponent {
         workflowDeploymentsMetadata.forEach { workflowMetadata ->
             workflowMetadata.value.forEach {
                 LOG.info("Discovered dandling container on worker {}, removing it", it.workerId)
-                scaleDownDeployment(it.workerId, it.containerId)
+                scaleDownDeployment(it.workerId, workflowMetadata.key, it.containerId)
             }
         }
     }
@@ -205,7 +236,7 @@ class ScalingController : KoinComponent {
         availableWorkerStatuses.forEach {
             val workerWeight = computeScore(it.cpuLoad, it.memoryLoad)
             if (rndWeight < workerWeight) {
-                scaleDownDeployment(it.id, it.activeDeployments.first { activeDeployment ->
+                scaleDownDeployment(it.id, workflowId, it.activeDeployments.first { activeDeployment ->
                     activeDeployment.workflowId == workflowId
                 }.containerID)
                 workflowScalingThresholdBreachCounts.remove(workflowId)
@@ -227,15 +258,16 @@ class ScalingController : KoinComponent {
                     workflow.pathsMapping.map { it.value },
                     workflow.cpuLimit,
                     workflow.memoryLimit,
-                    DeploymentScalingRequest.Type.UP
+                    DeploymentScalingRequest.Type.UP,
+                    true
                 )
             )
     }
 
-    private fun scaleDownDeployment(workerId: UUID, containerId: String) {
+    private fun scaleDownDeployment(workerId: UUID, workflowId: UUID, containerId: String) {
         LOG.info("Scaling down worker {}", workerId)
         scalingRequestsQueue.getOrPut(workerId) { mutableListOf() }
-            .add(DeploymentScalingRequest(containerId, null, null, null, null, null, DeploymentScalingRequest.Type.DOWN))
+            .add(DeploymentScalingRequest(containerId, null, null, null, null, null, DeploymentScalingRequest.Type.DOWN, false))
     }
 
     private fun getScalingRequestsForWorkflow(workflowId: UUID): DeploymentScalingRequest? {
@@ -260,11 +292,25 @@ class ScalingController : KoinComponent {
 
     private fun saveScalingAnalyticsData(data: Map<UUID, List<WorkflowMetadata>>) {
         data.forEach { (workflowId, data) ->
-            scalingAnalyticRepository.create(ScalingAnalytic(workflowId, data.size, Instant.now().toEpochMilli()))
+            scalingAnalyticRepository.create(
+                ScalingAnalytic(
+                    workflowId,
+                    data.size,
+                    data.sumOf { it.cpuUsage } / data.size,
+                    data.sumOf { it.memoryUsage } / data.size,
+                    Instant.now().toEpochMilli()
+                )
+            )
         }
     }
 
     private fun computeScore(cpuUsage: Double, memoryUsage: Double): Double {
         return cpuUsage * 0.3 + memoryUsage * 0.6// TODO: parametrize this
     }
+
+    private data class WorkerWorkflowContainerIdPair(
+        val workerId: UUID,
+        val workflowId: UUID,
+        val containerId: String
+    )
 }

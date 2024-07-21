@@ -55,7 +55,8 @@ class RequestHandlerProvider : KoinComponent {
             LBAlgorithms.LEAST_CONNECTION -> LeastConnectionAssigner()
             LBAlgorithms.ROUND_ROBIN -> RoundRobinAssigner()
             LBAlgorithms.WEIGHTED_RESPONSE_TIME -> WeightedResponseTimeAssigner()
-            LBAlgorithms.ADAPTIVE -> RandomAssigner()
+            LBAlgorithms.WEIGHTED_SCORE -> WeightedScoreAssigner()
+            LBAlgorithms.ADAPTIVE -> AdaptiveAssigner()
         }
     }
 }

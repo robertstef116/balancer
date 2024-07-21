@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Worker" type="JetRunConfigurationType">
+    <envs>
+      <env name="SCALING_CONTROLLER_HOST" value="localhost" />
+      <env name="SCALING_CONTROLLER_PORT" value="123" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.robert.MainKt" />
+    <module name="balancer.worker_controller.main" />
+    <target name="WSL - Ubuntu" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

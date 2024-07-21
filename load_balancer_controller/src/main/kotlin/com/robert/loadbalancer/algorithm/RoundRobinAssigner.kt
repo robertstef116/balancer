@@ -19,8 +19,8 @@ class RoundRobinAssigner : BalancingAlgorithm {
         targets = data
     }
 
-    override fun getTarget(): HostPortPair {
-        targets.also { targets ->
+    override fun getTarget(blacklistedTargets: Set<HostPortPair>): HostPortPair {
+        BalancingAlgorithm.getAvailableTargets(targets, blacklistedTargets).also { targets ->
             if (targets.isEmpty()) {
                 throw NotFoundException()
             }

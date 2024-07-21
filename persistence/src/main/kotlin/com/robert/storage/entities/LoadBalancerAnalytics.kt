@@ -4,7 +4,7 @@ import com.robert.balancing.LoadBalancerResponseType
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 
-object LoadBalancerAnalytics : Table() {
+object LoadBalancerAnalytics : Table("load_balancer_analytics") {
     val workflowId = reference("workflow_id", Workflows.id, onDelete = ReferenceOption.CASCADE)
     val path = varchar("path", 35)
     val responseTime = long("response_time_ms")

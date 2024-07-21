@@ -1,6 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="LoadBalancer" type="JetRunConfigurationType">
     <envs>
+      <env name="DB_HOST" value="localhost" />
+      <env name="DB_NAME" value="balancer_db" />
+      <env name="DB_PASSWORD" value="PA55W0rD" />
+      <env name="DB_PORT" value="6000" />
+      <env name="DB_USER" value="balanceradmin" />
       <env name="SCALING_CONTROLLER_HOST" value="localhost" />
       <env name="SCALING_CONTROLLER_PORT" value="123" />
     </envs>

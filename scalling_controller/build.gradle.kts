@@ -35,7 +35,6 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("io.insert-koin:koin-ktor:3.4.1")
-    implementation("org.postgresql:postgresql:42.5.1")
     implementation("com.zaxxer:HikariCP:$hikaricpVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

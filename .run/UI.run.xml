@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="UI" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/balancer_ui/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="start" />
+    </scripts>
+    <node-interpreter value="project" />
+    <envs>
+      <env name="REACT_APP_API_URL" value="http://localhost:8010/api/v1" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

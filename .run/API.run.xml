@@ -10,7 +10,7 @@
       <env name="SCALING_CONTROLLER_PORT" value="123" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.robert.api.ApplicationKt" />
-    <module name="balancer.master_controller.main" />
+    <module name="balancer.balancer_api.main" />
     <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />

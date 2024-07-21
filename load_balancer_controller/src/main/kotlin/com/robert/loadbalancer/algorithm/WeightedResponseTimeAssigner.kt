@@ -3,6 +3,7 @@ package com.robert.loadbalancer.algorithm
 import com.robert.balancing.LoadBalancerResponseType
 import com.robert.enums.LBAlgorithms
 import com.robert.exceptions.NotFoundException
+import com.robert.loadbalancer.model.BalancingAlgorithmData
 import com.robert.loadbalancer.model.HostPortPair
 import com.robert.logger
 import com.robert.scaling.client.model.WorkflowDeploymentData
@@ -25,37 +26,32 @@ class WeightedResponseTimeAssigner : BalancingAlgorithm {
     override fun updateData(data: List<WorkflowDeploymentData>) {
         val newTargets = mutableListOf<WeightedResponseTimeWorkflowDeploymentData>()
         data.forEach { workflowDeploymentData ->
-            targets.find { it.workflowDeploymentData == workflowDeploymentData }
-                ?.let {
-                    it.workflowDeploymentData = workflowDeploymentData
-                    newTargets.add(it)
-                }
-                ?: also {
-                    newTargets.add(WeightedResponseTimeWorkflowDeploymentData(workflowDeploymentData, 0.0, 0, 0.0))
-                }
+            val target = targets.find { it.workflowDeploymentData == workflowDeploymentData }
+                ?: WeightedResponseTimeWorkflowDeploymentData()
+            target.workflowDeploymentData = workflowDeploymentData
+            newTargets.add(target)
         }
         val overallResponseTimeAverage = newTargets.sumOf { it.average }
         newTargets.forEach { it.weight = it.average / overallResponseTimeAverage }
         targets = newTargets
     }
 
-    override fun getTarget(): HostPortPair {
-        val rand = Random.nextDouble()
-        for (target in targets) {
+    override fun getTarget(blacklistedTargets: Set<HostPortPair>): HostPortPair {
+        var rand = Random.nextDouble()
+        val allTargets = BalancingAlgorithm.getAvailableTargets(targets, blacklistedTargets)
+        if (allTargets.isEmpty()) {
+            throw NotFoundException()
+        }
+        for (target in allTargets) {
             val weight = target.weight
             if (rand < weight) {
                 return HostPortPair(target.workflowDeploymentData.workflowId, target.workflowDeploymentData.host, target.workflowDeploymentData.port)
             }
+            rand -= weight
         }
 
         LOG.warn("Unable to pick a target by weight, selecting first if exists")
-        return targets.let {
-            if (it.isEmpty()) {
-                throw NotFoundException()
-            }
-            val target = it[0]
-            HostPortPair(target.workflowDeploymentData.workflowId, target.workflowDeploymentData.host, target.workflowDeploymentData.port)
-        }
+        return allTargets[0].getHostInfo()
     }
 
     override fun addResponseTimeData(target: HostPortPair, responseTime: Long, responseType: LoadBalancerResponseType) {
@@ -65,17 +61,21 @@ class WeightedResponseTimeAssigner : BalancingAlgorithm {
         }
     }
 
-    private inner class WeightedResponseTimeWorkflowDeploymentData(
+    private inner class WeightedResponseTimeWorkflowDeploymentData: BalancingAlgorithmData() {
         @Volatile
-        var workflowDeploymentData: WorkflowDeploymentData,
-        var average: Double,
-        var count: Int,
-        var weight: Double
-    ) {
+        lateinit var workflowDeploymentData: WorkflowDeploymentData
+        var average = 0.0
+        var count = 0
+        var weight = 0.0
+
         @Synchronized
         fun addResponseTime(responseTime: Long) {
             average = (average * count + responseTime) / (count + 1)
             count = (count + 1) % RESPONSE_TIMES_USED_COUNT
+        }
+
+        override fun getWorkflowDeploymentData(): WorkflowDeploymentData {
+            return workflowDeploymentData
         }
     }
 }

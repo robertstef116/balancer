@@ -56,7 +56,7 @@ class ScalingClient : Closeable {
                         LOG.warn("Not able to process deployment request of unknown type")
                         null
                     } else {
-                        DeploymentScalingRequest(it.id, UUID.fromString(it.workflowId), it.image, it.portsList, it.cpuLimit, it.memoryLimit, type)
+                        DeploymentScalingRequest(it.id, UUID.fromString(it.workflowId), it.image, it.portsList, it.cpuLimit, it.memoryLimit, type, it.registered)
                     }
                 }
         }

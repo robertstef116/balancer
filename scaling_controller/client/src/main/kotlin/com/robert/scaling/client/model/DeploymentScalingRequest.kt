@@ -10,6 +10,7 @@ data class DeploymentScalingRequest(
     val cpuLimit: Long?,
     val memoryLimit: Long?,
     val type: Type,
+    var registered: Boolean
 ) {
     enum class Type {
         UP,
