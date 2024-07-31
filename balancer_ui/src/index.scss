@@ -117,7 +117,8 @@ $form-label-font-weight: bold;
 }
 
 .widgets-container {
-  @extend .col;
+  @extend .col-12;
+  @extend .col-xl-8;
   @extend .p-0;
 }
 

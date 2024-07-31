@@ -24,14 +24,14 @@ function HomePage() {
 
   return (
     <PageWrapper>
-      <div className="row">
+      <div className="row m-0">
         <ResourcesList classname="widget-4 wh-2" onSelectionChanged={selectedResourcePathChanged} />
         <div className="widgets-container">
           <BalancingHistoryChart classNames="wh-1" workflowId={workflowId} path={path} />
           <ScalingDataChart classname="wh-1" title="Scaling cpu data" metric="avg_cpu" workflowId={workflowId} />
         </div>
       </div>
-      <div className="row flex-xl-row-reverse">
+      <div className="row m-0 flex-xl-row-reverse">
         <ScalingDataChart
           classname="widget-8 wh-1"
           title="Scaling memory data"

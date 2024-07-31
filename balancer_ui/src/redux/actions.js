@@ -83,7 +83,6 @@ export const getWorkers = ({ reload }, cb) => async (dispatch, getState) => {
     }
     cb();
   } catch (e) {
-    console.log(e);
     cb(errors.GET_WORKERS_ERROR);
   }
 };
