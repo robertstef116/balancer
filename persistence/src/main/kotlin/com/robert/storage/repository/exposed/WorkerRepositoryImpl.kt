@@ -1,7 +1,7 @@
 package com.robert.storage.repository.exposed
 
-import com.robert.scaller.Worker
-import com.robert.scaller.WorkerState
+import com.robert.resources.Worker
+import com.robert.enums.WorkerState
 import com.robert.storage.entities.Workers
 import com.robert.storage.repository.WorkerRepository
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq

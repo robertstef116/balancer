@@ -6,7 +6,6 @@ import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
 import org.reflections.Reflections
 import org.reflections.scanners.Scanners
-import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.time.Duration
 
@@ -14,6 +13,7 @@ class SchedulerService : KoinComponent {
     companion object {
         val LOG by logger()
     }
+
     private val jobs = arrayListOf<Job>()
 
     fun createSchedulers() {
@@ -22,20 +22,20 @@ class SchedulerService : KoinComponent {
             .map { clazz ->
                 Arrays.stream(clazz.methods)
                     .filter { it.isAnnotationPresent(SchedulerConsumer::class.java) }
-                    .forEach{method ->
+                    .forEach { method ->
                         val schedulerConsumer = method.getAnnotation(SchedulerConsumer::class.java)
                         val scheduler = get<Any>(clazz.kotlin)
                         val schedulerName = schedulerConsumer.name
                         val interval = Env.get(schedulerConsumer.interval)
                         val executionInterval = Duration.parse(interval).inWholeMilliseconds
-                        LOG.info("Initializing scheduler {} with interval {}", clazz.canonicalName, schedulerConsumer.interval)
+                        LOG.info("Initializing scheduler {} with the interval of {}", clazz.canonicalName, interval)
                         val job = CoroutineScope(Dispatchers.IO).launch {
                             while (true) {
                                 try {
                                     method.invoke(scheduler)
-                                    LOG.info("Scheduler '{}' done, next check in {} ms", schedulerName, executionInterval)
+                                    LOG.info("Scheduler '{}' done, next check in {}", schedulerName, interval)
                                 } catch (e: Exception) {
-                                    LOG.warn("Unable to execute scheduler '{}', retrying in {} ms", schedulerName, executionInterval, e)
+                                    LOG.warn("Unable to execute scheduler '{}', retrying in {}: {}", schedulerName, interval, e.message ?: e.cause?.message ?: "")
                                 }
                                 delay(executionInterval)
                             }

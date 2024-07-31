@@ -5,7 +5,14 @@ import Spinner from '../components/Spinner';
 import { Icons } from '../constants';
 
 function ModalWrapper({
-  title, show, onHide, onSubmit, children, valid, widgetProps = { error: null, dismissError: null }, submitTitle = 'Save',
+  title,
+  show,
+  onHide,
+  onSubmit,
+  children,
+  valid,
+  widgetProps = { error: null, dismissError: null },
+  submitTitle = 'Save',
 }) {
   const { isLoading, error, dismissError } = widgetProps;
 

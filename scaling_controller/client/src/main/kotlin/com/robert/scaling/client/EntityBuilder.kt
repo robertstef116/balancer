@@ -1,11 +1,10 @@
 package com.robert.scaling.client
 
-import com.robert.docker.DockerContainer
+import com.robert.resources.DockerContainer
 import com.robert.enums.LBAlgorithms
 import com.robert.scaling.grpc.*
-import com.robert.scaller.Worker
-import com.robert.scaller.WorkerState
-import com.robert.scaller.Workflow
+import com.robert.enums.WorkerState
+import com.robert.resources.Workflow
 import java.util.*
 
 internal object EntityBuilder {
@@ -21,12 +20,6 @@ internal object EntityBuilder {
             workerStatusBuilder.addDeployments(newDeploymentStatus(container))
         }
         return workerStatusBuilder.build()
-    }
-
-    fun newWorkerData(worker: Worker): WorkerData {
-        return WorkerData.newBuilder()
-            .setId(worker.id.toString())
-            .build()
     }
 
     fun newWorkerData(id: UUID, state: WorkerState): WorkerData {

@@ -12,7 +12,7 @@ class ScalingServer {
         val LOG by logger()
     }
 
-    private val port: Int = Env.getInt("PORT", Env.getInt("PORT", 123))
+    private val port: Int = Env.getInt("PORT", 8000)
 
     private val server: Server =
         ServerBuilder

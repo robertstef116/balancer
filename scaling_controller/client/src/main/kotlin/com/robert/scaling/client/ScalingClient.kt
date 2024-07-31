@@ -2,15 +2,15 @@ package com.robert.scaling.client
 
 import com.google.protobuf.Empty
 import com.robert.Env
-import com.robert.docker.DockerContainer
+import com.robert.resources.DockerContainer
 import com.robert.enums.LBAlgorithms
 import com.robert.logger
 import com.robert.scaling.client.model.DeploymentScalingRequest
 import com.robert.scaling.client.model.WorkflowDeploymentData
 import com.robert.scaling.grpc.DeploymentRequestTypeGrpc
 import com.robert.scaling.grpc.ScalingServiceGrpcKt
-import com.robert.scaller.WorkerState
-import com.robert.scaller.Workflow
+import com.robert.enums.WorkerState
+import com.robert.resources.Workflow
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.runBlocking
@@ -41,8 +41,21 @@ class ScalingClient : Closeable {
         return this
     }
 
-    fun updateWorkerStatus(id: String, alias: String, host: String, cpuLoad: Double, memoryLoad: Double, availableMemory: Long, managedContainers: List<DockerContainer>): List<DeploymentScalingRequest> =
+    fun updateWorkerStatus(
+        id: String,
+        alias: String,
+        host: String,
+        cpuLoad: Double,
+        memoryLoad: Double,
+        availableMemory: Long,
+        managedContainers: List<DockerContainer>
+    ): List<DeploymentScalingRequest> =
         runBlocking {
+            LOG.debug("Updating worker status with: cpuLoad = {}, memoryLoad = {} and {} managed containers", cpuLoad, memoryLoad, managedContainers.size)
+            if (LOG.isTraceEnabled) {
+                LOG.trace("Managed containers: [{}]", managedContainers.joinToString(", ") { "{${it.containerID.take(6)} - cpuUsage: ${it.cpuUsage}, memoryUsage: ${it.memoryUsage}}" })
+            }
+
             return@runBlocking client.updateWorkerStatus(EntityBuilder.newWorkerStatus(id, alias, host, cpuLoad, memoryLoad, availableMemory, managedContainers))
                 .requestsList
                 .mapNotNull {
@@ -51,7 +64,6 @@ class ScalingClient : Closeable {
                         DeploymentRequestTypeGrpc.DOWN -> DeploymentScalingRequest.Type.DOWN
                         DeploymentRequestTypeGrpc.UNRECOGNIZED -> null
                     }
-                    // TODO: validate request: eg. needed field are not null
                     if (type == null) {
                         LOG.warn("Not able to process deployment request of unknown type")
                         null
@@ -69,8 +81,7 @@ class ScalingClient : Closeable {
             }
     }
 
-    // TODO: use returns
-    fun updateWorker(id: UUID, status: WorkerState):Boolean = runBlocking {
+    fun updateWorker(id: UUID, status: WorkerState): Boolean = runBlocking {
         return@runBlocking client.updateWorker(EntityBuilder.newWorkerData(id, status)).ok
     }
 

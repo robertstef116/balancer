@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Route, Routes, useLocation,
-} from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import HomePage from '../pages/Home';
 import Login from '../pages/Login';

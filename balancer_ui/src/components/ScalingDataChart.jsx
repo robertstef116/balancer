@@ -71,7 +71,17 @@ function ScalingDataChart({
       allowYAxisDecimals={false}
       noData={Object.keys(data).length === 0}
     >
-      {Object.keys(data).map((wid) => <Line key={wid} data={data[wid]} name={getWorkflowName(wid)} type="monotone" stroke={GetLineColor(wid)} dataKey="data" dot={false} />)}
+      {Object.keys(data).map((wid) => (
+        <Line
+          key={wid}
+          data={data[wid]}
+          name={getWorkflowName(wid)}
+          type="monotone"
+          stroke={GetLineColor(wid)}
+          dataKey="data"
+          dot={false}
+        />
+      ))}
       <Legend />
     </LineChartWrapper>
   );

@@ -1,6 +1,6 @@
 package com.robert.storage.repository.exposed
 
-import com.robert.balancing.LoadBalancerAnalytic
+import com.robert.analytics.LoadBalancerAnalytic
 import com.robert.storage.entities.LoadBalancerAnalytics
 import com.robert.storage.repository.LoadBalancerAnalyticRepository
 import org.jetbrains.exposed.sql.insert

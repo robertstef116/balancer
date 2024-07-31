@@ -1,7 +1,7 @@
 package com.robert.storage.repository
 
-import com.robert.scaller.Worker
-import com.robert.scaller.WorkerState
+import com.robert.resources.Worker
+import com.robert.enums.WorkerState
 import java.util.*
 
 interface WorkerRepository {

@@ -110,7 +110,7 @@ class AnalyticsRepositoryImpl : AnalyticsRepository {
             durationMs < 600_000 -> 10
             durationMs < 1_800_000 -> 8
             durationMs < 3_600_000 -> 6
-            durationMs < 10_800_000  -> 5
+            durationMs < 10_800_000 -> 5
             durationMs < 21_600_000 -> 4
             durationMs < 43_200_000 -> 3
             durationMs < 86_400_000 -> 2

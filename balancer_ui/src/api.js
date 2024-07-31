@@ -75,8 +75,24 @@ export const getWorkflows = async () => {
   throw new Error('Get workflows failed!');
 };
 
-export const addWorkflow = async ({ image, memoryLimit, cpuLimit, algorithm, minDeployments, maxDeployments, pathMapping }) => {
-  const res = await axios.post(`${API_URL}/workflow`, { image, memoryLimit, cpuLimit, algorithm, minDeployments, maxDeployments, pathMapping });
+export const addWorkflow = async ({
+  image,
+  memoryLimit,
+  cpuLimit,
+  algorithm,
+  minDeployments,
+  maxDeployments,
+  pathMapping,
+}) => {
+  const res = await axios.post(`${API_URL}/workflow`, {
+    image,
+    memoryLimit,
+    cpuLimit,
+    algorithm,
+    minDeployments,
+    maxDeployments,
+    pathMapping,
+  });
   if (res.status === 200) {
     return res.data;
   }

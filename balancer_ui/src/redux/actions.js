@@ -140,9 +140,25 @@ export const getWorkflows = ({ reload }, cb) => async (dispatch, getState) => {
   }
 };
 
-export const addWorkflow = ({ image, memoryLimit, cpuLimit, algorithm, minDeployments, maxDeployments, pathMapping }, cb) => async (dispatch) => {
+export const addWorkflow = ({
+  image,
+  memoryLimit,
+  cpuLimit,
+  algorithm,
+  minDeployments,
+  maxDeployments,
+  pathMapping,
+}, cb) => async (dispatch) => {
   try {
-    const workflow = await api.addWorkflow({ image, memoryLimit, cpuLimit, algorithm, minDeployments, maxDeployments, pathMapping });
+    const workflow = await api.addWorkflow({
+      image,
+      memoryLimit,
+      cpuLimit,
+      algorithm,
+      minDeployments,
+      maxDeployments,
+      pathMapping,
+    });
     dispatch({
       type: types.ADD_WORKFLOW,
       payload: {
@@ -257,7 +273,12 @@ export const getAnalyticsData = ({ durationMs, workflowId, metric, cancelToken }
   cb(null, res);
 }, errors.GET_ANALYTICS_ERROR, cb);
 
-export const getBalancingAnalyticsData = async ({ durationMs, workflowId, path, cancelToken }, cb) => errorWrapper(async () => {
+export const getBalancingAnalyticsData = async ({
+  durationMs,
+  workflowId,
+  path,
+  cancelToken,
+}, cb) => errorWrapper(async () => {
   const res = await api.getBalancingAnalyticsData({
     durationMs, workflowId, path, cancelToken,
   });

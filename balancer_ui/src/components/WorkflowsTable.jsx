@@ -11,20 +11,23 @@ import { convertFormMapToMap } from '../utils';
 
 const defaultFormModalConfig = { title: '', fields: [], submit: null };
 
-const imageValidator = (data) => data.image && /^[a-z][a-z0-9]+:[a-z0-9.\-$]+/.test(data.image);
+const MEMORY_LIMIT = 6291455;
+const CPU_LIMIT = 99;
+
+const imageValidator = (data) => data.image && /^[a-z][a-z0-9\-/]+:[a-z0-9.\-$]+/.test(data.image);
 const memoryValidator = (data) => {
   if (!data.memoryLimit) {
     return false;
   }
   const memoryLimit = parseInt(data.memoryLimit, 10);
-  return (typeof data.memoryLimit !== 'string' || `${memoryLimit}` === data.memoryLimit) && memoryLimit >= 6291456;
+  return (typeof data.memoryLimit !== 'string' || `${memoryLimit}` === data.memoryLimit) && memoryLimit > MEMORY_LIMIT;
 };
 const cpuValidator = (data) => {
   if (!data.cpuLimit) {
     return false;
   }
   const cpuLimit = parseInt(data.cpuLimit, 10);
-  return (typeof data.memoryLimit !== 'string' || `${cpuLimit}` === data.cpuLimit) && cpuLimit >= 100;
+  return (typeof data.memoryLimit !== 'string' || `${cpuLimit}` === data.cpuLimit) && cpuLimit > CPU_LIMIT;
 };
 const algorithmValidator = (data) => !!data.algorithm;
 const minDeploymentsValidator = (data) => {
@@ -58,13 +61,56 @@ const pathMappingValidator = (data) => {
   return true;
 };
 
-const imageConfig = { key: 'image', label: 'Image', info: 'Docker image name ran by the workflow (image:tag)', validator: imageValidator };
-const memoryLimitConfig = { key: 'memoryLimit', label: 'Memory limit', type: 'number', info: 'Maximum memory in b allowed to be used', validator: memoryValidator };
-const cpuLimitConfig = { key: 'cpuLimit', label: 'Cpu limit', type: 'number', info: 'Maximum memory in b allowed to be used', validator: cpuValidator }; // TODO: update this later
-const algorithmConfig = { key: 'algorithm', label: 'Algorithm', type: 'dropdown', options: algorithms, info: 'Algorithm used for load balancing', validator: algorithmValidator };
-const minDeploymentsConfig = { key: 'minDeployments', label: 'Minimum scaling', type: 'number', info: 'Minimum number of deployments', validator: minDeploymentsValidator };
-const maxDeploymentsConfig = { key: 'maxDeployments', label: 'Maximum scaling', type: 'number', info: 'Maximum number of deployments', validator: maxDeploymentsValidator };
-const pathMappingConfig = { key: 'pathMapping', label: 'Mapping', type: 'map', mapValueType: 'number', info: 'Resource mapping (path -> port)', validator: pathMappingValidator };
+const imageConfig = {
+  key: 'image',
+  label: 'Image',
+  info: 'Docker image name ran by the workflow (image:tag)',
+  validator: imageValidator,
+};
+const memoryLimitConfig = {
+  key: 'memoryLimit',
+  label: 'Memory limit',
+  type: 'number',
+  info: `Maximum memory in b allowed to be used (> ${MEMORY_LIMIT})`,
+  validator: memoryValidator,
+};
+const cpuLimitConfig = {
+  key: 'cpuLimit',
+  label: 'Cpu limit',
+  type: 'number',
+  info: `Maximum amount of cpu allowed to be used (> ${CPU_LIMIT})`,
+  validator: cpuValidator,
+};
+const algorithmConfig = {
+  key: 'algorithm',
+  label: 'Algorithm',
+  type: 'dropdown',
+  options: algorithms,
+  info: 'Algorithm used for load balancing',
+  validator: algorithmValidator,
+};
+const minDeploymentsConfig = {
+  key: 'minDeployments',
+  label: 'Minimum scaling',
+  type: 'number',
+  info: 'Minimum number of deployments',
+  validator: minDeploymentsValidator,
+};
+const maxDeploymentsConfig = {
+  key: 'maxDeployments',
+  label: 'Maximum scaling',
+  type: 'number',
+  info: 'Maximum number of deployments',
+  validator: maxDeploymentsValidator,
+};
+const pathMappingConfig = {
+  key: 'pathMapping',
+  label: 'Mapping',
+  type: 'map',
+  mapValueType: 'number',
+  info: 'Resource mapping (path -> port)',
+  validator: pathMappingValidator,
+};
 
 function WorkflowsTable({ className }) {
   const { widgetProps, actionWrapper } = useWidgetUtils();
@@ -95,7 +141,7 @@ function WorkflowsTable({ className }) {
   };
 
   const onAddClick = () => {
-    setModalData({});
+    setModalData({ memoryLimit: MEMORY_LIMIT, cpuLimit: CPU_LIMIT });
     setValid(false);
     setModalFormMode(ModalFormModes.ADD);
   };
@@ -195,7 +241,7 @@ function WorkflowsTable({ className }) {
         cols={[
           { header: 'Image', key: 'image', maxWidth: '200px' },
           { header: 'Memory Limit(b)', key: 'memoryLimit' },
-          { header: 'Cpu Limit', key: 'cpuLimit' }, // TODO: update this later
+          { header: 'Cpu Limit', key: 'cpuLimit' },
           { header: 'Min', key: 'minDeployments' },
           { header: 'Max', key: 'maxDeployments' },
           { header: 'Algorithm', key: 'algorithmDisplay' },
@@ -217,7 +263,12 @@ function WorkflowsTable({ className }) {
         valid={valid}
         onSubmit={modalFormConfig.submit}
       >
-        <FormBuilder data={modalData} setData={setModalData} configs={modalFormConfig.fields} changeValidity={setValid} />
+        <FormBuilder
+          data={modalData}
+          setData={setModalData}
+          configs={modalFormConfig.fields}
+          changeValidity={setValid}
+        />
       </ModalWrapper>
       <SimpleModal dismiss={dismissModalNotification} {...modalNotificationConfigs} />
     </>

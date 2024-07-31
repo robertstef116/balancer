@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Container, Nav, Navbar, NavDropdown,
-} from 'react-bootstrap';
+import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as actions from '../redux/actions';
@@ -22,7 +20,13 @@ function Header({ menus, activeMenuPath }) {
   return (
     <Navbar collapseOnSelect expand="sm" bg="dark" variant="dark">
       <Container fluid>
-        <Navbar.Brand className="logo"><img key="logo" src={`${process.env.PUBLIC_URL}/balancer-logo.png`} alt="BL" /></Navbar.Brand>
+        <Navbar.Brand className="logo">
+          <img
+            key="logo"
+            src={`${process.env.PUBLIC_URL}/balancer-logo.png`}
+            alt="BL"
+          />
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto" activeKey={activeMenuPath}>

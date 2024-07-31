@@ -11,7 +11,6 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 object HttpClient {
     val client: io.ktor.client.HttpClient by lazy {
@@ -58,11 +57,11 @@ object HttpClient {
             }
         }
 
-    inline fun <reified T> blockingPost(url: String, reqBody: Any, timeout: Long = Long.MAX_VALUE): T = runBlocking(Dispatchers.IO){
+    inline fun <reified T> blockingPost(url: String, reqBody: Any, timeout: Long = Long.MAX_VALUE): T = runBlocking(Dispatchers.IO) {
         post(url, reqBody, timeout).body()
     }
 
-    fun blockingDelete(url: String, timeout: Long=Long.MAX_VALUE): HttpResponse = runBlocking(Dispatchers.IO) {
+    fun blockingDelete(url: String, timeout: Long = Long.MAX_VALUE): HttpResponse = runBlocking(Dispatchers.IO) {
         delete(url, timeout)
     }
 }

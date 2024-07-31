@@ -1,6 +1,4 @@
-import React, {
-  useState, useEffect, createContext, useContext,
-} from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../redux/actions';
 

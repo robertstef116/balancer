@@ -3,7 +3,7 @@ package com.robert
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.sql.DriverManager
-import java.util.Properties
+import java.util.*
 
 object DBConnector {
     private val log = LoggerFactory.getLogger(this::class.java)

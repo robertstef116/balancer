@@ -1,6 +1,6 @@
 package com.robert.storage.repository.exposed
 
-import com.robert.scaller.ScalingAnalytic
+import com.robert.analytics.ScalingAnalytic
 import com.robert.storage.entities.ScalingAnalytics
 import com.robert.storage.repository.ScalingAnalyticRepository
 import org.jetbrains.exposed.sql.insert

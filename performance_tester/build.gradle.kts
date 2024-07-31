@@ -5,11 +5,11 @@ plugins {
 }
 
 application {
-    mainClass.set("com.robert.MainKt")
+    mainClass.set("com.robert.test.performance.MainKt")
 }
 
 dependencies {
     implementation(project(":utils"))
-    implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.ktor.client)
 }

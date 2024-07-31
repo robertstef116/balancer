@@ -1,18 +1,18 @@
 val buildVersion: String by project
+val dockerImagePrefix: String by project
 
 plugins {
     application
     kotlin("jvm")
-//    id("com.palantir.docker")
+    id("com.palantir.docker")
     id("com.github.johnrengelman.shadow")
 }
 
 application {
-    mainClass.set("com.robert.ApplicationKt")
+    mainClass.set("com.robert.MainKt")
 }
 
 dependencies {
-
     implementation(project(":model"))
     implementation(project(":utils"))
     implementation(project(":scaling_controller:client"))
@@ -21,21 +21,27 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.kotlin.coroutines)
     implementation(libs.grpc.netty)
-    implementation("com.github.docker-java:docker-java:3.3.6")
-    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.3.6")
-    implementation("com.github.oshi:oshi-core:6.5.0") {
-        exclude("org.slf4j", "slf4j-api")
-    }
-//    implementation("com.spotify:docker-client:8.16.0"){
+    implementation(libs.bundles.docker)
+    implementation(libs.oshi) {
 //        exclude("org.slf4j", "slf4j-api")
-//    }
+    }
 }
 
-tasks.register<Task>("prepareKotlinBuildScriptModel"){}
+docker {
+    name = "$dockerImagePrefix/balancer-worker:$buildVersion"
+    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
+    noCache(true)
+}
+
+tasks.shadowJar {
+    mergeServiceFiles() // https://github.com/grpc/grpc-java/issues/10853
+}
+
+tasks.getByName("dockerPrepare").dependsOn("setUpDockerContext")
 
 tasks.register<Copy>("setUpDockerContext") {
     val contextPath = "${project.projectDir}/build/docker"
-    destinationDir=file(contextPath)
+    destinationDir = file(contextPath)
 
     dependsOn("shadowJar")
     from("${project.projectDir}/build/libs") {
@@ -49,14 +55,3 @@ tasks.register<Copy>("setUpDockerContext") {
         versionFile.writeText(buildVersion)
     }
 }
-//
-//tasks.dockerPrepare {
-//    dependsOn("setUpDockerContext")
-//}
-
-//docker {
-//    name = "$dockerImagePrefix/balancer-worker:$buildVersion"
-//    buildArgs(mapOf("PARENT_VERSION" to dockerJdkBaseVersion))
-//    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
-//    noCache(true)
-//}

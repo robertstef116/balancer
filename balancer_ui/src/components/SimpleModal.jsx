@@ -33,10 +33,10 @@ export function SimpleModal({ title, description, type = SimpleModalTypes.WARNIN
         {type === SimpleModalTypes.INFO && <Button onClick={() => onDismiss(false)}>Ok</Button>}
         {type === SimpleModalTypes.WARNING && <Button onClick={() => onDismiss(false)}>Close</Button>}
         {type === SimpleModalTypes.CONFIRMATION && (
-        <>
-          <Button onClick={() => onDismiss(true)}>Yes</Button>
-          <Button onClick={() => onDismiss(false)}>No</Button>
-        </>
+          <>
+            <Button onClick={() => onDismiss(true)}>Yes</Button>
+            <Button onClick={() => onDismiss(false)}>No</Button>
+          </>
         )}
       </Modal.Footer>
     </Modal>

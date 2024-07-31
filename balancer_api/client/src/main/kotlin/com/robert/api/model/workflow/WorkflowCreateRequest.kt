@@ -2,7 +2,7 @@ package com.robert.api.model.workflow
 
 import com.robert.enums.LBAlgorithms
 
-data class WorkflowCreateRequest (
+data class WorkflowCreateRequest(
     val image: String,
     val memoryLimit: Long,
     val cpuLimit: Long,

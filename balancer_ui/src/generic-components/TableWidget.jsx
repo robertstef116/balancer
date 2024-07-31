@@ -10,7 +10,13 @@ function TableWidget({
   const renderCell = (data, col) => {
     switch (col.type) {
       case 'Icon':
-        return <td key={col.key} style={{ width: col.width }} title={col.titleKey ? data[col.titleKey] : ''}><i className={data[col.key]} /></td>;
+        return (
+          <td key={col.key} style={{ width: col.width }} title={col.titleKey ? data[col.titleKey] : ''}>
+            <i
+              className={data[col.key]}
+            />
+          </td>
+        );
       case 'InfoIcon':
         return (
           <td key={col.key} style={{ width: col.width }}>
@@ -19,7 +25,12 @@ function TableWidget({
         );
       default:
         return (
-          <td key={col.key} className="text-truncate" style={{ width: col.width, maxWidth: col.maxWidth }} title={col.maxWidth ? data[col.key] : ''}>
+          <td
+            key={col.key}
+            className="text-truncate"
+            style={{ width: col.width, maxWidth: col.maxWidth }}
+            title={col.maxWidth ? data[col.key] : ''}
+          >
             {data[col.key]}
           </td>
         );

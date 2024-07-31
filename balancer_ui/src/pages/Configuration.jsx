@@ -110,7 +110,12 @@ function ConfigurationPage() {
   return (
     <PageWrapper onRefresh={onRefresh} widgetProps={widgetProps}>
       <div className="row justify-content-center">
-        <ConfigWidget className="widget-6 wh-1" title="Balancing configs" configs={balancingConfigs} isLoading={widgetProps.isLoading} />
+        <ConfigWidget
+          className="widget-6 wh-1"
+          title="Balancing configs"
+          configs={balancingConfigs}
+          isLoading={widgetProps.isLoading}
+        />
         <ConfigWidget
           className="widget-6 wh-1"
           title="Algorithms configs"
@@ -122,4 +127,5 @@ function ConfigurationPage() {
     </PageWrapper>
   );
 }
+
 export default ConfigurationPage;

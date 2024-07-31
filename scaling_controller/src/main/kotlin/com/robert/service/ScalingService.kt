@@ -4,14 +4,14 @@ import com.google.protobuf.Empty
 import com.robert.controller.ScalingController
 import com.robert.controller.WorkerController
 import com.robert.controller.WorkflowController
-import com.robert.docker.DockerContainer
-import com.robert.docker.DockerPortMapping
+import com.robert.resources.DockerContainer
+import com.robert.resources.DockerPortMapping
 import com.robert.enums.LBAlgorithms
 import com.robert.logger
 import com.robert.scaling.client.model.DeploymentScalingRequest
 import com.robert.scaling.client.model.WorkflowDeploymentData
 import com.robert.scaling.grpc.*
-import com.robert.scaller.WorkerState
+import com.robert.enums.WorkerState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -31,16 +31,19 @@ class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext)
         LOG.info("Received status update from worker {} ({})", request.id, request.alias)
         try {
             val id = UUID.fromString(request.id)
-            workerController.updateWorkerStatus(id, request.alias, request.host, request.cpuLoad, request.memoryLoad, request.availableMemory, request.deploymentsList.map {
-                DockerContainer(
-                    it.containerId,
-                    UUID.fromString(it.workflowId),
-                    it.cpuUsage,
-                    it.memoryUsage,
-                    it.portsMappingList.map { mapping -> DockerPortMapping(mapping.publicPort, mapping.privatePort) }
-                )
-            })
-            return newWorkflowScalingRequest(scalingController.getScalingRequestForWorker(id))
+            val scalingRequests = scalingController.getScalingRequestForWorker(id)
+            workerController.updateWorkerStatus(id, request.alias, request.host, request.cpuLoad, request.memoryLoad, request.availableMemory, request.deploymentsList
+                .filter { deploymentStatus -> scalingRequests.find { it.containerId == deploymentStatus.containerId } == null }
+                .map {
+                    DockerContainer(
+                        it.containerId,
+                        UUID.fromString(it.workflowId),
+                        it.cpuUsage,
+                        it.memoryUsage,
+                        it.portsMappingList.map { mapping -> DockerPortMapping(mapping.publicPort, mapping.privatePort) }
+                    )
+                })
+            return newWorkflowScalingRequest(scalingRequests)
 
         } catch (e: Exception) {
             LOG.error("Unable to update worker status", e)
@@ -64,8 +67,9 @@ class ScalingService(coroutineContext: CoroutineContext = EmptyCoroutineContext)
     }
 
     override suspend fun addWorkflow(request: WorkflowData): OkData {
-        LOG.trace("Received add workflow request: {}", request.id)
-        return buildOkData(workflowController.addWorkflow(
+        LOG.trace("Received add workflow request: {}", request)
+        return buildOkData(
+            workflowController.addWorkflow(
                 UUID.fromString(request.id),
                 request.image,
                 request.cpuLimit,

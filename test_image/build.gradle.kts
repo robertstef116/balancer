@@ -1,33 +1,37 @@
-val ktorVersion: String by project
-val kotlinVersion: String by project
+val buildVersion: String by project
+val dockerImagePrefix: String by project
 
 plugins {
     application
     kotlin("jvm")
     id("com.github.johnrengelman.shadow")
-//    id("com.palantir.docker")
+    id("com.palantir.docker")
 }
 
 application {
-    mainClass.set("com.robert.ApplicationKt")
+    mainClass.set("com.robert.test.image.ApplicationKt")
 }
-
-//docker {
-//    name = "docker.io/r0bb3rt17/test-image:latest"
-//    tag("latest", "docker.io/r0bb3rt17/test-image:latest")
-//    files("./build/libs/test_image-all.jar")
-//}
-//
-//tasks.dockerPrepare {
-//    dependsOn("shadowJar")
-//}
 
 dependencies {
-    implementation(project(":model"))
-    implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty-jvm:2.2.4")
+    implementation(libs.logback)
+    implementation(libs.bundles.ktor)
 }
 
-tasks.register<Task>("prepareKotlinBuildScriptModel") {}
+docker {
+    name = "$dockerImagePrefix/test-image:latest"
+    setDockerfile(file("${project.rootDir}/docker/Dockerfile_kotlin"))
+    noCache(true)
+}
+
+tasks.getByName("dockerPrepare").dependsOn("setUpDockerContext")
+
+tasks.register<Copy>("setUpDockerContext") {
+    val contextPath = "${project.projectDir}/build/docker"
+    destinationDir = file(contextPath)
+
+    dependsOn("shadowJar")
+    from("${project.projectDir}/build/libs") {
+        into("app")
+        include("*-all.jar")
+    }
+}

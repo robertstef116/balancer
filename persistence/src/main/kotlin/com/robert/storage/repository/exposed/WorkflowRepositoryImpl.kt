@@ -1,7 +1,7 @@
 package com.robert.storage.repository.exposed
 
 import com.robert.enums.LBAlgorithms
-import com.robert.scaller.Workflow
+import com.robert.resources.Workflow
 import com.robert.storage.entities.WorkflowMappings
 import com.robert.storage.entities.Workflows
 import com.robert.storage.repository.WorkflowRepository

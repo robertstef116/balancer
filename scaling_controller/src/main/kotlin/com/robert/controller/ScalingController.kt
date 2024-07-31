@@ -1,15 +1,15 @@
 package com.robert.controller
 
-import com.robert.Constants
+import com.robert.Env
 import com.robert.annotations.Scheduler
 import com.robert.annotations.SchedulerConsumer
 import com.robert.logger
 import com.robert.scaling.client.model.DeploymentScalingRequest
 import com.robert.scaling.client.model.WorkflowDeploymentData
-import com.robert.scaller.InternalWorkerStatus
-import com.robert.scaller.ScalingAnalytic
-import com.robert.scaller.WorkerState
-import com.robert.scaller.Workflow
+import com.robert.model.InternalWorkerStatus
+import com.robert.analytics.ScalingAnalytic
+import com.robert.enums.WorkerState
+import com.robert.resources.Workflow
 import com.robert.storage.repository.ScalingAnalyticRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -22,7 +22,11 @@ class ScalingController : KoinComponent {
     companion object {
         val LOG by logger()
 
-        const val SCALING_EXCEEDS_COUNT = 3// TODO: parametrize this
+        private val CPU_WEIGHT = Env.getDouble("CPU_WEIGHT", 0.3)
+        private val MEMORY_WEIGHT = Env.getDouble("CPU_WEIGHT", 0.7)
+        private val SCALE_DOWN_THRESHOLD = Env.getDouble("SCALE_DOWN_THRESHOLD", 0.3)
+        private val SCALE_UP_THRESHOLD = Env.getDouble("SCALE_UP_THRESHOLD", 0.8)
+        private val SCORE_BREACH_COUNT = Env.getInt("SCORE_BREACH_COUNT", 3)
 
         private val rnd = Random()
 
@@ -44,7 +48,7 @@ class ScalingController : KoinComponent {
     private val scalingRequestsQueue = mutableMapOf<UUID, MutableList<DeploymentScalingRequest>>()
 
     @Synchronized
-    fun getScalingRequestForWorker(workerId: UUID): List<DeploymentScalingRequest>? {
+    fun getScalingRequestForWorker(workerId: UUID): List<DeploymentScalingRequest> {
         val registeredScalingRequests = mutableListOf<DeploymentScalingRequest>()
         val unregisteredScalingRequests = mutableListOf<DeploymentScalingRequest>()
         scalingRequestsQueue[workerId]?.forEach {
@@ -59,7 +63,7 @@ class ScalingController : KoinComponent {
         } else {
             scalingRequestsQueue[workerId] = unregisteredScalingRequests
         }
-        LOG.debug("{} scaling requests pending and {} unregistered for worker {}", registeredScalingRequests.size, unregisteredScalingRequests.size, workerId)
+        LOG.debug("{} scaling requests pending and {} unregistered requests for worker {}", registeredScalingRequests.size, unregisteredScalingRequests.size, workerId)
         return registeredScalingRequests
     }
 
@@ -82,7 +86,7 @@ class ScalingController : KoinComponent {
                     scalingRequestsQueue[workerData.id]?.find {
                         it.containerId == deploymentData.containerID && it.type == DeploymentScalingRequest.Type.DOWN
                     }?.also {
-                        it.registered = true // marking the request as registered meaning it can be processed by the worker
+                        it.registered = true // marking the request as registered meaning it can be processed by the worker and will no longer be used by the load balancer
                     } == null
                 }
                 .forEach { deploymentData ->
@@ -113,7 +117,7 @@ class ScalingController : KoinComponent {
     }
 
     @Synchronized
-    @SchedulerConsumer(name = "ScalingManager", interval = "\${${Constants.HEALTH_CHECK_INTERVAL}:30s}") // TODO: Wrong constant
+    @SchedulerConsumer(name = "ScalingManager", interval = "\${RESCALING_INTERVAL_SECONDS:30s}")
     fun scale() {
         workerController.pruneWorkersByAge()
 
@@ -135,10 +139,9 @@ class ScalingController : KoinComponent {
             }
         }
 
-        saveScalingAnalyticsData(workflowDeploymentsMetadata)
-
         workflowController.getWorkflows().forEach { workflow ->
             val metadata = workflowDeploymentsMetadata.remove(workflow.id)?.let { workflowMetadata ->
+                saveWorkflowScalingAnalyticsData(workflow.id, workflowMetadata)
                 val averageScore = workflowMetadata
                     .map { it.score }
                     .average()
@@ -146,9 +149,9 @@ class ScalingController : KoinComponent {
 
                 val min = workflow.minDeployments ?: 1
                 val max = workflow.maxDeployments ?: Int.MAX_VALUE
-                if ((averageScore < 0.3 && containersCount - 1 in min..max) || containersCount > max) {// TODO: parametrize this
+                if ((averageScore < SCALE_DOWN_THRESHOLD && containersCount - 1 in min..max) || containersCount > max) {
                     scaleDown(workflow.id, onlineWorkersStatus)
-                } else if ((averageScore > 0.8 && containersCount + 1 in min..max) || containersCount < min) {// TODO: parametrize this
+                } else if ((averageScore > SCALE_UP_THRESHOLD && containersCount + 1 in min..max) || containersCount < min) {
                     scaleUp(workflow, onlineWorkersStatus)
                 } else if (workflowScalingThresholdBreachCounts.remove(workflow.id) != null) {
                     LOG.info("Cleaning workflow breaches count")
@@ -161,7 +164,7 @@ class ScalingController : KoinComponent {
 
         workflowDeploymentsMetadata.forEach { workflowMetadata ->
             workflowMetadata.value.forEach {
-                LOG.info("Discovered dandling container on worker {}, removing it", it.workerId)
+                LOG.debug("Discovered dandling container on worker {}, removing it", it.workerId)
                 scaleDownDeployment(it.workerId, workflowMetadata.key, it.containerId)
             }
         }
@@ -174,7 +177,7 @@ class ScalingController : KoinComponent {
         if (force && thresholdBreachCount == 0) {
             LOG.info("Early scaling up required for workflow {}", workflow.id)
             earlyScaleUp = true
-        } else if (thresholdBreachCount <= SCALING_EXCEEDS_COUNT) {
+        } else if (thresholdBreachCount <= SCORE_BREACH_COUNT) {
             LOG.info("Scaling up workflow {}, but threshold is {}", workflow.id, thresholdBreachCount)
             return
         }
@@ -191,9 +194,10 @@ class ScalingController : KoinComponent {
         }
 
         val availableWorkerStatuses = onlineWorkersStatus.filter { it.availableMemory > workflow.memoryLimit }
-        var rndWeight = rnd.nextDouble() * availableWorkerStatuses.size
+        val weightSum = availableWorkerStatuses.sumOf { 5 - computeScore(it.cpuLoad, it.memoryLoad) }
+        var rndWeight = rnd.nextDouble() * weightSum
         availableWorkerStatuses.forEach {
-            val workerWeight = computeScore(it.cpuLoad, it.memoryLoad)
+            val workerWeight = 5 - computeScore(it.cpuLoad, it.memoryLoad)
             if (rndWeight < workerWeight) {
                 scaleUpDeployment(it.id, workflow)
                 if (!earlyScaleUp) {
@@ -207,10 +211,10 @@ class ScalingController : KoinComponent {
         workflowScalingThresholdBreachCounts[workflow.id] = thresholdBreachCount
     }
 
-    // Scaling down the workflow with higher score (smaller load)
+    // Scaling down the workflow with smaller score (smaller load)
     private fun scaleDown(workflowId: UUID, onlineWorkersStatus: List<InternalWorkerStatus>) {
         val thresholdBreachCount = workflowScalingThresholdBreachCounts.getOrDefault(workflowId, 0) - 1
-        if (abs(thresholdBreachCount) <= SCALING_EXCEEDS_COUNT) {
+        if (abs(thresholdBreachCount) <= SCORE_BREACH_COUNT) {
             LOG.info("Scaling down workflow {}, but threshold is {}", workflowId, thresholdBreachCount)
             workflowScalingThresholdBreachCounts[workflowId] = thresholdBreachCount
             return
@@ -232,9 +236,10 @@ class ScalingController : KoinComponent {
                 activeDeployment.workflowId == workflowId
             } != null
         }
-        var rndWeight = rnd.nextDouble() * availableWorkerStatuses.size
+        val weightSum = availableWorkerStatuses.sumOf { 5 - computeScore(it.cpuLoad, it.memoryLoad) }
+        var rndWeight = rnd.nextDouble() * weightSum
         availableWorkerStatuses.forEach {
-            val workerWeight = computeScore(it.cpuLoad, it.memoryLoad)
+            val workerWeight = 5 - computeScore(it.cpuLoad, it.memoryLoad)
             if (rndWeight < workerWeight) {
                 scaleDownDeployment(it.id, workflowId, it.activeDeployments.first { activeDeployment ->
                     activeDeployment.workflowId == workflowId
@@ -265,9 +270,11 @@ class ScalingController : KoinComponent {
     }
 
     private fun scaleDownDeployment(workerId: UUID, workflowId: UUID, containerId: String) {
-        LOG.info("Scaling down worker {}", workerId)
-        scalingRequestsQueue.getOrPut(workerId) { mutableListOf() }
-            .add(DeploymentScalingRequest(containerId, null, null, null, null, null, DeploymentScalingRequest.Type.DOWN, false))
+        val workerQueue = scalingRequestsQueue.getOrPut(workerId) { mutableListOf() }
+        if (workerQueue.find { it.containerId == containerId } == null) {
+            LOG.info("Register scaling deployment down request on worker {}", workerId)
+            workerQueue.add(DeploymentScalingRequest(containerId, workflowId, null, null, null, null, DeploymentScalingRequest.Type.DOWN, false))
+        }
     }
 
     private fun getScalingRequestsForWorkflow(workflowId: UUID): DeploymentScalingRequest? {
@@ -290,8 +297,8 @@ class ScalingController : KoinComponent {
         }
     }
 
-    private fun saveScalingAnalyticsData(data: Map<UUID, List<WorkflowMetadata>>) {
-        data.forEach { (workflowId, data) ->
+    private fun saveWorkflowScalingAnalyticsData(workflowId: UUID, data: List<WorkflowMetadata>) {
+        try {
             scalingAnalyticRepository.create(
                 ScalingAnalytic(
                     workflowId,
@@ -301,16 +308,12 @@ class ScalingController : KoinComponent {
                     Instant.now().toEpochMilli()
                 )
             )
+        } catch (e: Exception) {
+            LOG.warn("Unable to save scaling analytics for workflow {}: {}", workflowId, e.message)
         }
     }
 
     private fun computeScore(cpuUsage: Double, memoryUsage: Double): Double {
-        return cpuUsage * 0.3 + memoryUsage * 0.6// TODO: parametrize this
+        return cpuUsage * CPU_WEIGHT + memoryUsage * MEMORY_WEIGHT
     }
-
-    private data class WorkerWorkflowContainerIdPair(
-        val workerId: UUID,
-        val workflowId: UUID,
-        val containerId: String
-    )
 }

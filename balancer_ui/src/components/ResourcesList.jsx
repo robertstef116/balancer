@@ -30,7 +30,13 @@ function ResourcesList({ classname, onSelectionChanged }) {
   }, [workflows]);
 
   return (
-    <TreeList classname={classname} data={resourcesData} onSelectionChanged={onSelectionChanged} onRefresh={onRefresh} widgetProps={widgetProps} />
+    <TreeList
+      classname={classname}
+      data={resourcesData}
+      onSelectionChanged={onSelectionChanged}
+      onRefresh={onRefresh}
+      widgetProps={widgetProps}
+    />
   );
 }
 

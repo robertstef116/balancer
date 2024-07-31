@@ -23,8 +23,8 @@ class ResourceService {
     private var prevTicks = LongArray(CentralProcessor.TickType.entries.size)
 
     fun getResources(): SystemResources {
-        LOG.debug("getting container resources")
-        val cpuLoad = processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100
+        LOG.debug("Getting worker resources")
+        val cpuLoad = processor.getSystemCpuLoadBetweenTicks(prevTicks)
         prevTicks = processor.systemCpuLoadTicks
 
         return SystemResources(

@@ -1,6 +1,6 @@
 package com.robert.storage.repository
 
-import com.robert.balancing.LoadBalancerAnalytic
+import com.robert.analytics.LoadBalancerAnalytic
 
 interface LoadBalancerAnalyticRepository {
     fun getAll(): Collection<LoadBalancerAnalytic>

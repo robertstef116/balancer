@@ -1,6 +1,6 @@
 package com.robert.api.model.worker
 
-import com.robert.scaller.WorkerState
+import com.robert.enums.WorkerState
 
 data class WorkerUpdateRequest(
     val state: WorkerState,

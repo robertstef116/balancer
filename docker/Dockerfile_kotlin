@@ -1,5 +1,4 @@
-ARG PARENT_VERSION=latest
-FROM openjdk:$PARENT_VERSION
+FROM openjdk:17.0.2-jdk-slim
 
 COPY ./app/*.jar /app/server.jar
 

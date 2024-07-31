@@ -64,7 +64,16 @@ function BalancingHistoryChart({ classNames, workflowId, path }) {
       widgetProps={widgetProps}
       noData={Object.keys(data).length === 0}
     >
-      {Object.keys(data).map((key) => <Line key={key} name={geLineName(key)} type="monotone" stroke={GetLineColor(key.substring(0, 36))} dataKey="data" dot={false} />)}
+      {Object.keys(data).map((key) => (
+        <Line
+          key={key}
+          name={geLineName(key)}
+          type="monotone"
+          stroke={GetLineColor(key.substring(0, 36))}
+          dataKey="data"
+          dot={false}
+        />
+      ))}
     </LineChartWrapper>
   );
 }

@@ -11,7 +11,7 @@ function Spinner({ visible, small, transparent }) {
       >
         {small
           ? <BeatLoader color="#f97f05" />
-          : <HashLoader color="#f97f05" /> }
+          : <HashLoader color="#f97f05" />}
       </div>
     )
     : null;

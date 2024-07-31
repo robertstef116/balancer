@@ -12,9 +12,3 @@ dependencies {
     implementation(libs.bundles.grpc)
     implementation(libs.kotlin.coroutines)
 }
-
-
-//tasks.named<Jar>("jar") {
-//    archiveBaseName.set("scaling-controller-client")
-//    archiveVersion.set(project.version.toString())
-//}

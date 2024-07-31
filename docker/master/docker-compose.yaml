@@ -1,0 +1,102 @@
+services:
+  database:
+    container_name: balancer-database-svc
+    image: "postgres:${POSTGRES_VERSION}"
+    restart: always
+    ports:
+      - "2002:5432" # FOR LOCAL TESTING
+    environment:
+      - "POSTGRES_USER=${DB_ADMIN}"
+      - "POSTGRES_PASSWORD=${DB_ADMIN_PW}"
+      - "POSTGRES_DB=${DB_NAME}"
+    volumes:
+      - data:/var/lib/postgresql/data
+    networks:
+      - balancer-network
+
+  init-database: # https://stackoverflow.com/questions/70322031/does-docker-compose-support-init-container
+    container_name: balancer-database-init
+    image: "postgres:${POSTGRES_VERSION}"
+    command: /init-database.sh
+    restart: on-failure
+    environment:
+      - "DB_HOST=balancer-database-svc"
+      - "DB_PORT=5432"
+      - "DB_NAME=${DB_NAME}"
+      - "DB_USER=${DB_ADMIN}"
+      - "DB_PASSWORD=${DB_ADMIN_PW}"
+      - "BALANCER_ADMIN_PW=${BALANCER_ADMIN_PW}"
+    volumes:
+      - ../../scripts/init-database.sh:/init-database.sh
+      - ../../scripts/init-database.sql:/init-database.sql
+    depends_on:
+      database:
+        condition: service_started
+    networks:
+      - balancer-network
+
+  scaling-controller-svc:
+    container_name: scaling_controller
+    image: "r0bb3rt17/balancer-scaling-controller:${BALANCER_VERSION}"
+    restart: on-failure
+    ports:
+      - "${SCALING_CONTROLLER_PORT}:8000"
+    environment:
+      - "DB_HOST=balancer-database-svc"
+      - "DB_PORT=5432"
+      - "DB_NAME=${DB_NAME}"
+      - "DB_USER=${DB_ADMIN}"
+      - "DB_PASSWORD=${DB_ADMIN_PW}"
+    depends_on:
+      init-database:
+        condition: service_completed_successfully
+    networks:
+      - balancer-network
+
+  balancer-api:
+    container_name: balancer_api
+    image: "r0bb3rt17/balancer-api:${BALANCER_VERSION}"
+    restart: on-failure
+    ports:
+      - "${MASTER_EXTERNAL_PORT}:${MASTER_PORT}"
+    environment:
+      - "SCALING_CONTROLLER_HOST=scaling-controller-svc"
+      - "SCALING_CONTROLLER_PORT=8000"
+      - "DB_HOST=balancer-database-svc"
+      - "DB_PORT=5432"
+      - "DB_NAME=${DB_NAME}"
+      - "DB_USER=${DB_ADMIN}"
+      - "DB_PASSWORD=${DB_ADMIN_PW}"
+    depends_on:
+      init-database:
+        condition: service_completed_successfully
+      scaling-controller-svc:
+        condition: service_started
+    networks:
+      - balancer-network
+
+  load-balancer:
+    container_name: load_balancer
+    image: "r0bb3rt17/load-balancer:${BALANCER_VERSION}"
+    restart: on-failure
+    ports:
+      - "${BALANCER_EXTERNAL_PORT}:8001"
+    environment:
+      - "SCALING_CONTROLLER_HOST=scaling-controller-svc"
+      - "SCALING_CONTROLLER_PORT=8000"
+      - "DB_HOST=balancer-database-svc"
+      - "DB_PORT=5432"
+      - "DB_NAME=${DB_NAME}"
+      - "DB_USER=${DB_ADMIN}"
+      - "DB_PASSWORD=${DB_ADMIN_PW}"
+    depends_on:
+      scaling-controller-svc:
+        condition: service_started
+    networks:
+      - balancer-network
+networks:
+  balancer-network:
+    name: balancer_internal_network
+
+volumes:
+  data: { }

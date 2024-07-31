@@ -19,7 +19,7 @@ object DatabaseInitializer {
         val protocol = Env.get("DB_PROTOCOL", "jdbc:postgresql")
         val jdbcURL = "$protocol://$host:$port/$dbName"
         val username = Env.get("DB_USER")
-        val password = Env.get("DB_PASSWORD")
+        val password = Env.getSecret("DB_PASSWORD")
         val database = Database.connect(HikariDataSource(HikariConfig().apply {
             this.driverClassName = driverClassName
             this.jdbcUrl = jdbcURL

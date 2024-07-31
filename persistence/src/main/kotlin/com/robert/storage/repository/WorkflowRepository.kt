@@ -1,7 +1,7 @@
 package com.robert.storage.repository
 
 import com.robert.enums.LBAlgorithms
-import com.robert.scaller.Workflow
+import com.robert.resources.Workflow
 import java.util.*
 
 interface WorkflowRepository {

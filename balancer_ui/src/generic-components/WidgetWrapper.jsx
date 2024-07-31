@@ -4,7 +4,13 @@ import Spinner from '../components/Spinner';
 import { Icons } from '../constants';
 
 function WidgetWrapper({
-  className, children, title, customAction, widgetProps = { error: null, dismissError: null }, onRefresh = null, actions = [],
+  className,
+  children,
+  title,
+  customAction,
+  widgetProps = { error: null, dismissError: null },
+  onRefresh = null,
+  actions = [],
 }) {
   const { isLoading, error, dismissError } = widgetProps;
 
@@ -14,13 +20,13 @@ function WidgetWrapper({
         <div className="fw-bold d-flex align-items-center text-dark">{title}</div>
         <span className="ms-auto d-flex align-items-center">
           {onRefresh && (
-          <i
-            className={classNames('ps-1 widget-action', Icons.REFRESH, {
-              invisible: isLoading,
-            })}
-            title="Refresh"
-            onClick={onRefresh}
-          />
+            <i
+              className={classNames('ps-1 widget-action', Icons.REFRESH, {
+                invisible: isLoading,
+              })}
+              title="Refresh"
+              onClick={onRefresh}
+            />
           )}
           {actions.map((action) => (
             <i
@@ -41,12 +47,12 @@ function WidgetWrapper({
       )}
       >
         {error && (
-        <div className="bg-danger text-light px-1 d-inline-flex justify-content-between rounded m-1 text-truncate">
-          <span className="text-truncate" title={error}>
-            {error}
-          </span>
-          <i className={classNames('icon-button bi', Icons.DELETE)} onClick={dismissError} />
-        </div>
+          <div className="bg-danger text-light px-1 d-inline-flex justify-content-between rounded m-1 text-truncate">
+            <span className="text-truncate" title={error}>
+              {error}
+            </span>
+            <i className={classNames('icon-button bi', Icons.DELETE)} onClick={dismissError} />
+          </div>
         )}
         <div className="flex-grow-1 overflow-auto">
           {children}

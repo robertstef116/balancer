@@ -1,6 +1,6 @@
 package com.robert.controller
 
-import com.robert.Constants
+import com.robert.Env
 import com.robert.annotations.Scheduler
 import com.robert.annotations.SchedulerConsumer
 import com.robert.logger
@@ -10,7 +10,9 @@ import com.robert.service.DockerService
 import com.robert.service.ResourceService
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.File
 import java.net.InetAddress
+import java.util.*
 
 @Scheduler
 class Controller : KoinComponent {
@@ -21,15 +23,21 @@ class Controller : KoinComponent {
     private val resourceService: ResourceService by inject()
     private val dockerService: DockerService by inject()
     private val scalingClient: ScalingClient by inject()
-    private val id = "c2351bbf-57d8-487c-8511-a9756b9bae7d" // TODO: better id mechanism
-    private val alias = "boo" // TODO: better alias mechanism
+
+    private val workerIdPath = Env.get("WORKER_ID_PATH", "/worker_id")
+    private val id = loadWorkerId()
+    private val alias = Env.get("WORKER_ALIAS", InetAddress.getLocalHost().hostName)
     private val host = InetAddress.getLocalHost().hostAddress
 
-    @SchedulerConsumer(name = "WorkerStatus", interval = "\${${Constants.WORKER_STATUS_INTERVAL}:30s}")
+    init {
+        LOG.info("Starting worker {} ({})", id, alias)
+    }
+
+    @SchedulerConsumer(name = "WorkerStatus", interval = "\${WORKER_STATUS_INTERVAL_SECONDS:30s}")
     fun runWorkerStatus() {
         val status = resourceService.getResources()
         val managedContainers = dockerService.getManagedContainers()
-        scalingClient.updateWorkerStatus(id, alias, host, status.cpuLoad, 1.0 - status.availableMemory / status.totalMemory, status.availableMemory, managedContainers)
+        scalingClient.updateWorkerStatus(id, alias, host, status.cpuLoad, 1.0 - status.availableMemory / status.totalMemory.toDouble(), status.availableMemory, managedContainers)
             .forEach { scalingRequest ->
                 try {
                     when (scalingRequest.type) {
@@ -54,7 +62,7 @@ class Controller : KoinComponent {
     private fun processScaleUpRequest(workflowId: String, image: String, memoryLimit: Long, cpuLimit: Long, ports: List<Int>) {
         try {
             dockerService.startContainer(workflowId, image, memoryLimit, cpuLimit, ports)
-            LOG.info("Workflow $workflowId scaled up")
+            LOG.info("Workflow {} scaled up with image {} and ports {}", workflowId, image, ports)
         } catch (e: Exception) {
             LOG.error("Unable to fulfill scale up request for workflow {}", workflowId, e)
         }
@@ -66,6 +74,17 @@ class Controller : KoinComponent {
             LOG.info("Container $containerId was removed")
         } catch (e: Exception) {
             LOG.error("Unable to fulfill down request to remove container {}", containerId, e)
+        }
+    }
+
+    private fun loadWorkerId(): String {
+        try {
+            return File(workerIdPath).readText(Charsets.UTF_8)
+        } catch (e: Exception) {
+            val id = UUID.randomUUID()
+            LOG.warn("Failed to load worker id, generating new id - {} : {}", id, e.message)
+            File(workerIdPath).writeText(id.toString(), Charsets.UTF_8)
+            return id.toString()
         }
     }
 }

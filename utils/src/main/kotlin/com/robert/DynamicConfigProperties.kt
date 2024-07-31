@@ -44,7 +44,7 @@ object DynamicConfigProperties {
 
     @JvmStatic
     fun getDoublePropertyOrDefault(key: String, default: Double): Double {
-        val value = properties[key]?.toDouble()?: default
+        val value = properties[key]?.toDouble() ?: default
         log.trace("get property {} = {}", key, value)
         return value
     }

@@ -2,7 +2,7 @@ package com.robert.controller
 
 import com.robert.enums.LBAlgorithms
 import com.robert.logger
-import com.robert.scaller.Workflow
+import com.robert.resources.Workflow
 import com.robert.storage.repository.WorkflowRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

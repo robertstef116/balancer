@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 
 
 fun <R : Any> R.logger(): Lazy<Logger> {
-    return lazy {LoggerFactory.getLogger(unwrapCompanionClass(this.javaClass).name) }
+    return lazy { LoggerFactory.getLogger(unwrapCompanionClass(this.javaClass).name) }
 }
 
 fun <T : Any> unwrapCompanionClass(ofClass: Class<T>): Class<*> {

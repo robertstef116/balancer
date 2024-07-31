@@ -1,9 +1,9 @@
 package com.robert.storage.entities
 
-import com.robert.scaller.WorkerState
+import com.robert.enums.WorkerState
 import org.jetbrains.exposed.sql.Table
 
-object Workers: Table("workers") {
+object Workers : Table("workers") {
     val id = uuid("id").autoGenerate()
     val alias = varchar("alias", 50)
     val status = enumerationByName<WorkerState>("status", 10)

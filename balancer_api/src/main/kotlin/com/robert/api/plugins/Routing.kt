@@ -1,9 +1,11 @@
 package com.robert.api.plugins
 
 import com.robert.api.routes.*
-import com.robert.api.service.*
+import com.robert.api.service.AnalyticsService
+import com.robert.api.service.DeploymentService
+import com.robert.api.service.WorkerService
+import com.robert.api.service.WorkflowService
 import com.robert.exceptions.*
-import com.robert.exceptions.NotFoundException
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -33,11 +35,6 @@ fun Application.configureRouting() {
                 }
             }
         }
-
-//        // Static plugin. Try to access `/static/index.html`
-//        static("/ui") {
-//            resources("static")
-//        }
 
         singlePageApplication {
             applicationRoute = "/ui"

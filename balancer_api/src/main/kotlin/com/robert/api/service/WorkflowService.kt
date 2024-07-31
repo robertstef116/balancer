@@ -3,7 +3,7 @@ package com.robert.api.service
 import com.robert.enums.LBAlgorithms
 import com.robert.exceptions.ValidationException
 import com.robert.scaling.client.ScalingClient
-import com.robert.scaller.Workflow
+import com.robert.resources.Workflow
 import com.robert.storage.repository.WorkflowRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -11,11 +11,11 @@ import java.util.*
 
 class WorkflowService : KoinComponent {
     companion object {
-        fun validateImage(image: String) = Regex("[a-z][a-z0-9]+:[a-z0-9.-]+").matches(image)
+        fun validateImage(image: String) = Regex("[a-z][a-z0-9-/]+:[a-z0-9.-]+").matches(image)
         fun validatePath(path: String) = Regex("/[a-zA-Z0-9_-]+").matches(path)
         fun validatePort(port: Int) = port in 1..65535
-        fun validateMemory(memory: Long) = memory >= 6291456
-        fun validateCpu(cpu: Long) = cpu >= 100 // TODO: better validation
+        fun validateMemory(memory: Long) = memory > 6291455
+        fun validateCpu(cpu: Long) = cpu > 99
         fun validatePathMapping(pathMapping: Map<String, Int>) = pathMapping.isNotEmpty()
         fun validateDeploymentLimits(minDeployments: Int?, maxDeployments: Int?): Boolean {
             val minD = minDeployments ?: 1
@@ -74,7 +74,9 @@ class WorkflowService : KoinComponent {
         }
 
         val workflow = Workflow(UUID.randomUUID(), image, cpuLimit, memoryLimit, minDeployments, maxDeployments, algorithm, pathMapping)
-        scalingClient.addWorkflow(workflow)
+        if (!scalingClient.addWorkflow(workflow)) {
+            throw ValidationException("Unable to add workflow")
+        }
         return workflow
     }
 
@@ -82,10 +84,14 @@ class WorkflowService : KoinComponent {
         if (!validateDeploymentLimits(minDeployments, maxDeployments)) {
             throw ValidationException("Invalid deployment limits")
         }
-        scalingClient.updateWorkflow(id, minDeployments, maxDeployments, algorithm)
+        if (!scalingClient.updateWorkflow(id, minDeployments, maxDeployments, algorithm)) {
+            throw ValidationException("Unable to update workflow")
+        }
     }
 
     fun delete(id: UUID) {
-        scalingClient.deleteWorkflow(id)
+        if (!scalingClient.deleteWorkflow(id)) {
+            throw ValidationException("Unable to delete workflow")
+        }
     }
 }

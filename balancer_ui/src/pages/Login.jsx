@@ -46,10 +46,10 @@ function LoginPage() {
           <Form.Control type="password" placeholder="Enter password" />
         </Form.Group>
         {!!error && (
-        <div className="text-danger mb-4">
-          <i className={classNames('pe-1', Icons.ERROR)} />
-          {error}
-        </div>
+          <div className="text-danger mb-4">
+            <i className={classNames('pe-1', Icons.ERROR)} />
+            {error}
+          </div>
         )}
         <Button variant="primary" type="submit">
           Login

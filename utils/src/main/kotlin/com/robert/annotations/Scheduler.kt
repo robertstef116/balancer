@@ -1,5 +1,5 @@
 package com.robert.annotations
 
 @Retention(AnnotationRetention.RUNTIME)
-@Target(allowedTargets = [AnnotationTarget.CLASS])
+@Target(AnnotationTarget.CLASS)
 annotation class Scheduler()

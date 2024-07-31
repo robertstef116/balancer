@@ -32,8 +32,18 @@ function HomePage() {
         </div>
       </div>
       <div className="row flex-xl-row-reverse">
-        <ScalingDataChart classname="widget-8 wh-1" title="Scaling memory data" metric="avg_memory" workflowId={workflowId} />
-        <ScalingDataChart classname="widget-4 wh-1" title="Scaling replicas data" metric="replicas" workflowId={workflowId} />
+        <ScalingDataChart
+          classname="widget-8 wh-1"
+          title="Scaling memory data"
+          metric="avg_memory"
+          workflowId={workflowId}
+        />
+        <ScalingDataChart
+          classname="widget-4 wh-1"
+          title="Scaling replicas data"
+          metric="replicas"
+          workflowId={workflowId}
+        />
       </div>
     </PageWrapper>
   );

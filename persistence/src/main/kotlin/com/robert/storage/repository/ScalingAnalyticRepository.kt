@@ -1,6 +1,6 @@
 package com.robert.storage.repository
 
-import com.robert.scaller.ScalingAnalytic
+import com.robert.analytics.ScalingAnalytic
 
 interface ScalingAnalyticRepository {
     fun getAll(): Collection<ScalingAnalytic>

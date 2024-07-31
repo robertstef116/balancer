@@ -1,13 +1,15 @@
 package com.robert.controller
 
-import com.robert.docker.DockerContainer
+import com.robert.Env
+import com.robert.resources.DockerContainer
 import com.robert.logger
-import com.robert.scaller.InternalWorkerStatus
-import com.robert.scaller.Worker
-import com.robert.scaller.WorkerState
+import com.robert.model.InternalWorkerStatus
+import com.robert.resources.Worker
+import com.robert.enums.WorkerState
 import com.robert.storage.repository.WorkerRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.postgresql.util.PSQLException
 import java.time.Instant
 import java.util.*
 
@@ -15,7 +17,7 @@ class WorkerController : KoinComponent {
     companion object {
         val LOG by logger()
 
-        const val WORKER_STATUS_MAX_AGE_SECONDS = 120;
+        private val WORKER_STATUS_MAX_AGE_SECONDS = Env.getInt("WORKER_STATUS_MAX_AGE_SECONDS", 120)
     }
 
     private val workerRepository: WorkerRepository by inject()
@@ -37,7 +39,12 @@ class WorkerController : KoinComponent {
         when (workerStatus[id]?.state) {
             null -> {
                 LOG.info("Discovered new worker {}", id)
-                workerRepository.create(Worker(id, alias.take(50), WorkerState.ONLINE))
+                try {
+                    workerRepository.create(Worker(id, alias.take(50), WorkerState.ONLINE))
+                } catch (e: PSQLException) {
+                    LOG.warn("Failed to insert worker details, trying to update instead: {}", e.message)
+                    workerRepository.update(id, alias.take(50), WorkerState.ONLINE)
+                }
             }
 
             WorkerState.OFFLINE -> {
@@ -75,11 +82,11 @@ class WorkerController : KoinComponent {
     @Synchronized
     fun pruneWorkersByAge() {
         val now = now()
-        workerStatus.values.filter { now - it.lastUpdate > WORKER_STATUS_MAX_AGE_SECONDS }
+        workerStatus.values.filter { it.state == WorkerState.ONLINE && now - it.lastUpdate > WORKER_STATUS_MAX_AGE_SECONDS }
             .forEach {
-                workerStatus.remove(it.id)
                 workerRepository.update(it.id, null, WorkerState.OFFLINE)
-                LOG.info("Updated status of worker {} to OFFLINE since age threshold exceeded", it.id)
+                updateWorkerState(it.id, WorkerState.OFFLINE)
+                LOG.info("Updated status of worker {} to OFFLINE since age threshold was exceeded", it.id)
             }
     }
 
