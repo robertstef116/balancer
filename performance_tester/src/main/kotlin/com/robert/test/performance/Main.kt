@@ -9,16 +9,27 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
-val NO_REQUESTS_IN_BATCH = Env.getInt("NO_REQUESTS_IN_BATCH", 400)
-val NO_BATCHES = Env.getInt("NO_BATCHES", 300)
-val URL = Env.get("URL", "http://localhost:32778/test/1000?delta=0")
-val RESULTS_PATH = Env.get("RESULTS_PATH", "./test.csv")
+val NO_REQUESTS_IN_BATCH = Env.getInt("NO_REQUESTS_IN_BATCH", 1000)
+val NO_BATCHES = Env.getInt("NO_BATCHES", 10)
+val BASE_URL = Env.get("BASE_URL", "http://localhost:32778/test")
+val RESULTS_BASE_PATH = Env.get("RESULTS_PATH", ".")
 
-data class ReqData(val idx: Int, val time: Long, val err: String?)
+var TEST_COUNT = 0
 
 fun main() {
+    val time = measureTimeMillis {
+        executeTest(100, 0)
+        executeTest(50, 5000)
+        executeTest(2000, 0)
+    }
+    println("Test done in $time ms")
+}
+
+fun executeTest(baseTime: Long, timeDelta: Long) {
+    TEST_COUNT++
     val data = MutableList<ReqData?>(NO_REQUESTS_IN_BATCH * NO_BATCHES) { null }
     val failed = AtomicInteger(0)
 
@@ -29,17 +40,18 @@ fun main() {
                 val idx = i * NO_REQUESTS_IN_BATCH + j
                 requests.add(launch(Dispatchers.IO) {
                     try {
-                        val time = measureTimeMillis {
-                            val res = HttpClient.get(URL)
+                        val expectedTime = baseTime + if (timeDelta > 0) Random.nextLong(timeDelta) else 0L
+                        val actualTime = measureTimeMillis {
+                            val res = HttpClient.get("$BASE_URL/$expectedTime")
                             if (res.status != HttpStatusCode.OK) {
                                 throw IOException("$idx - ${res.status}")
                             }
                         }
-                        data[idx] = ReqData(idx, time, "")
+                        data[idx] = ReqData(idx, expectedTime, actualTime, "")
                     } catch (e: Exception) {
                         println("Error " + e.message)
                         failed.getAndIncrement()
-                        data[idx] = ReqData(idx, -1, e.message)
+                        data[idx] = ReqData(idx, -1, -1, e.message ?: "")
                     }
                 })
             }
@@ -49,18 +61,27 @@ fun main() {
         }
     }
 
-    println("Batches finished, writing results.")
+    println("Batches finished for test $TEST_COUNT, writing results.")
 
-    val file = File(RESULTS_PATH)
+    val resultPath = "$RESULTS_BASE_PATH/test_$TEST_COUNT.csv"
+    val file = File(resultPath)
     if (file.exists() && file.isFile) {
         file.delete()
     }
-    BufferedWriter(FileWriter(RESULTS_PATH, true)).use {
-        it.write("idx,time,err\n")
+    BufferedWriter(FileWriter(resultPath, true)).use {
+        it.write("idx,expectedTime,actualTime,overheadTime,err\n")
         for (res in data) {
-            it.write("${res!!.idx},${res.time},${res.err}\n")
+            it.write("${res!!.idx},${res.expectedTime},${res.actualTime},${res.actualTime - res.expectedTime},${res.err}\n")
         }
     }
 
     println(failed.get().toString() + " requests failed.")
+    println("---------------------------")
 }
+
+data class ReqData(
+    val idx: Int,
+    val expectedTime: Long,
+    val actualTime: Long,
+    val err: String
+)

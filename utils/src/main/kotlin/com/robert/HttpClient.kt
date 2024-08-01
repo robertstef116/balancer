@@ -15,14 +15,17 @@ import kotlinx.coroutines.runBlocking
 object HttpClient {
     val client: io.ktor.client.HttpClient by lazy {
         HttpClient(CIO) {
+            engine {
+                endpoint {
+                    maxConnectionsPerRoute = Int.MAX_VALUE
+                }
+            }
             install(ContentNegotiation) {
                 json()
             }
-            install(HttpTimeout)
-//        install(Logging) {
-//            logger = Logger.EMPTY
-//            level = LogLevel.INFO
-//        }
+            install(HttpTimeout) {
+                requestTimeoutMillis = Long.MAX_VALUE
+            }
         }
     }
 
