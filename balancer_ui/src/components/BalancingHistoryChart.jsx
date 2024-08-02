@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Line } from 'recharts';
 import { useSelector } from 'react-redux';
 import LineChartWrapper from '../generic-components/LineChartWrapper';
-import { getBalancingAnalyticsData } from '../redux/actions';
+import { getBalancingAnalyticsData, getWorkflows } from '../redux/actions';
 import { defaultRange, GetLineColor } from '../constants';
 import useWidgetUtils from '../custom-hooks/useWidgetUtils';
 
 function BalancingHistoryChart({ classNames, workflowId, path }) {
-  const { apiWrapper, widgetProps } = useWidgetUtils({ withCancellation: true });
+  const { apiWrapper, widgetProps, actionWrapper } = useWidgetUtils({ withCancellation: true });
   const [range, setRange] = useState(defaultRange);
   const [now, setNow] = useState(0);
   const [data, setData] = useState({});
@@ -51,13 +51,17 @@ function BalancingHistoryChart({ classNames, workflowId, path }) {
   };
 
   useEffect(() => {
+    actionWrapper({ action: getWorkflows });
+  }, []);
+
+  useEffect(() => {
     fetchData();
   }, [range, workflowId, path]);
 
   return (
     <LineChartWrapper
       className={classNames}
-      title="Response time history"
+      title="Response time ms history"
       onRefresh={fetchData}
       onRangeChanged={setRange}
       now={now}
@@ -67,6 +71,7 @@ function BalancingHistoryChart({ classNames, workflowId, path }) {
       {Object.keys(data).map((key) => (
         <Line
           key={key}
+          data={data[key]}
           name={geLineName(key)}
           type="monotone"
           stroke={GetLineColor(key.substring(0, 36))}

@@ -12,9 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
-val NO_REQUESTS_IN_BATCH = Env.getInt("NO_REQUESTS_IN_BATCH", 1000)
-val NO_BATCHES = Env.getInt("NO_BATCHES", 10)
-val BASE_URL = Env.get("BASE_URL", "http://localhost:32778/test")
+val NO_REQUESTS_IN_BATCH = Env.getInt("NO_REQUESTS_IN_BATCH", 100)
+val NO_BATCHES = Env.getInt("NO_BATCHES", 2)
+//val BASE_URL = Env.get("BASE_URL", "http://192.168.56.102:32777/test")
+val BASE_URL = Env.get("BASE_URL", "http://localhost:9990/internal/test")
 val RESULTS_BASE_PATH = Env.get("RESULTS_PATH", ".")
 
 var TEST_COUNT = 0
@@ -22,8 +23,8 @@ var TEST_COUNT = 0
 fun main() {
     val time = measureTimeMillis {
         executeTest(100, 0)
-        executeTest(50, 5000)
-        executeTest(2000, 0)
+//        executeTest(50, 5000)
+//        executeTest(2000, 0)
     }
     println("Test done in $time ms")
 }

@@ -24,10 +24,10 @@ class Controller : KoinComponent {
     private val dockerService: DockerService by inject()
     private val scalingClient: ScalingClient by inject()
 
-    private val workerIdPath = Env.get("WORKER_ID_PATH", "/worker_id")
+    private val workerIdPath = Env.get("WORKER_ID_PATH", "/data/worker_id")
     private val id = loadWorkerId()
     private val alias = Env.get("WORKER_ALIAS", InetAddress.getLocalHost().hostName)
-    private val host = InetAddress.getLocalHost().hostAddress
+    private val host = Env.get("WORKER_ADDRESS", InetAddress.getLocalHost().hostAddress)
 
     init {
         LOG.info("Starting worker {} ({})", id, alias)

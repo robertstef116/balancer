@@ -29,7 +29,7 @@ function List({
           ? (
             <Accordion.Item key={item.id} eventKey={item.id} className="bg-light border-0">
               <Accordion.Header onClick={() => selectItem(item)}>
-                <span className={classNames('text-truncate ', { 'active-item': item.id === activeKey })}>
+                <span className={classNames('text-truncate p-1', { 'active-item': item.id === activeKey })}>
                   {item.name}
                 </span>
               </Accordion.Header>
@@ -46,7 +46,7 @@ function List({
           : (
             <div
               key={item.id}
-              className={classNames('p-1 simple-list-item user-select-none text-truncate', { 'active-item': item.id === activeKey })}
+              className={classNames('simple-list-item user-select-none text-truncate p-1', { 'active-item': item.id === activeKey })}
               onClick={() => selectItem(item)}
             >
               {item.name}

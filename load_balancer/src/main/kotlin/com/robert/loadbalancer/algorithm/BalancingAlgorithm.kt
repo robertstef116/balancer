@@ -12,14 +12,18 @@ interface BalancingAlgorithm {
             if (blacklistedTargets.isEmpty()) {
                 return allTargets
             }
-            return allTargets
+            return allTargets.filter { target ->
+                blacklistedTargets.find { it.host == target.host && it.port == target.port } == null
+            }
         }
 
         inline fun <reified T : BalancingAlgorithmData> getAvailableTargetsData(allTargets: List<T>, blacklistedTargets: Set<HostPortPair>): List<T> {
             if (blacklistedTargets.isEmpty()) {
                 return allTargets
             }
-            return allTargets
+            return allTargets.filter { target ->
+                blacklistedTargets.find { it == target.getHostInfo() } == null
+            }
         }
     }
 

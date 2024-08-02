@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Legend, Line } from 'recharts';
 import { useSelector } from 'react-redux';
 import useWidgetUtils from '../custom-hooks/useWidgetUtils';
-import { getAnalyticsData } from '../redux/actions';
+import { getAnalyticsData, getWorkflows } from '../redux/actions';
 import LineChartWrapper from '../generic-components/LineChartWrapper';
 import { defaultRange, GetLineColor } from '../constants';
 
 function ScalingDataChart({
   classname, title, metric, workflowId,
 }) {
-  const { apiWrapper, widgetProps } = useWidgetUtils({ withCancellation: true });
+  const { apiWrapper, widgetProps, actionWrapper } = useWidgetUtils({ withCancellation: true });
   const [range, setRange] = useState(defaultRange);
   const [now, setNow] = useState(0);
   const [data, setData] = useState({});
@@ -56,6 +56,10 @@ function ScalingDataChart({
   };
 
   useEffect(() => {
+    actionWrapper({ action: getWorkflows });
+  }, []);
+
+  useEffect(() => {
     fetchData();
   }, [range, workflowId]);
 
@@ -68,7 +72,6 @@ function ScalingDataChart({
       data={data}
       now={now}
       widgetProps={widgetProps}
-      allowYAxisDecimals={false}
       noData={Object.keys(data).length === 0}
     >
       {Object.keys(data).map((wid) => (

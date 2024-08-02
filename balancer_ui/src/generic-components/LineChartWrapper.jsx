@@ -38,7 +38,6 @@ function LineChartWrapper({
   children,
   title,
   className,
-  allowYAxisDecimals,
   now,
   onRefresh,
   onRangeChanged,
@@ -110,7 +109,7 @@ function LineChartWrapper({
             tick={tickStyle}
           />
           <Tooltip labelFormatter={tooltipLabelFormatter} />
-          <YAxis domain={[0, 'dataMax + 1']} tick={tickStyle} allowDecimals={allowYAxisDecimals} />
+          <YAxis domain={['auto', 'auto']} tick={tickStyle} allowDecimals="true" />
           {children}
         </LineChart>
       </ResponsiveContainer>

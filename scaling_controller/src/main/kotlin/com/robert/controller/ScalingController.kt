@@ -149,6 +149,7 @@ class ScalingController : KoinComponent {
 
                 val min = workflow.minDeployments ?: 1
                 val max = workflow.maxDeployments ?: Int.MAX_VALUE
+                LOG.trace("Workflow {} - avg_score={}, min={}, max={}, count={}", workflow.id, averageScore, min, max, containersCount)
                 if ((averageScore < SCALE_DOWN_THRESHOLD && containersCount - 1 in min..max) || containersCount > max) {
                     scaleDown(workflow.id, onlineWorkersStatus)
                 } else if ((averageScore > SCALE_UP_THRESHOLD && containersCount + 1 in min..max) || containersCount < min) {

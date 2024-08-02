@@ -1,10 +1,16 @@
 services:
   balancer-worker:
-    container_name: balancer-worker
+    container_name: balancer_worker
     image: r0bb3rt17/balancer-worker:${BALANCER_VERSION}
     restart: on-failure
     environment:
       - "SCALING_CONTROLLER_HOST=${SCALING_CONTROLLER_HOST}"
       - "SCALING_CONTROLLER_PORT=${SCALING_CONTROLLER_PORT}"
+      - "WORKER_ALIAS=${WORKER_ALIAS}"
+      - "WORKER_ADDRESS=${WORKER_ADDRESS}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - data:/data
+
+volumes:
+  data: { }

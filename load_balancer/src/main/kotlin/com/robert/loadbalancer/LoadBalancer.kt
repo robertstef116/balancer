@@ -56,12 +56,12 @@ class LoadBalancer : KoinComponent {
     private val requestHandlerProvider by inject<RequestHandlerProvider>()
     private val loadBalancerAnalyticRepository by inject<LoadBalancerAnalyticRepository>()
 
-    private val processingSocketBufferLength = Env.getInt("PROCESSING_SOCKET_BUFFER_LENGTH", 1000)
+    private val processingSocketBufferLength = Env.getInt("PROCESSING_SOCKET_BUFFER_LENGTH", 2000)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     fun start() {
         val port = Env.getInt("PORT", 8001)
-        val backlog = Env.getInt("INCOMING_QUEUE_BACKLOG", -1) // default 50
+        val backlog = Env.getInt("INCOMING_QUEUE_BACKLOG", 1000) // default 50
         LOG.info("Starting load balancer on port {}", port.toString())
 
         val serverSocket = ServerSocket(port, backlog)
@@ -114,8 +114,8 @@ class LoadBalancer : KoinComponent {
                                                         }
                                                         connected = true
                                                     } catch (e: ConnectException) {
-                                                        LOG.warn("Unable to connect to target {}, selecting different target", target)
                                                         unresponsiveTargets.add(it)
+                                                        LOG.warn("Unable to connect to target {}, selecting different target, retry count: {}", it, unresponsiveTargets.size)
                                                         assigner.addResponseTimeData(it, -1, LoadBalancerResponseType.SERVER_ERROR)
                                                     }
                                                 }

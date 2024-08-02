@@ -1,6 +1,6 @@
 services:
-  database:
-    container_name: balancer-database-svc
+  database-svc:
+    container_name: balancer_database
     image: "postgres:${POSTGRES_VERSION}"
     restart: always
     ports:
@@ -15,12 +15,12 @@ services:
       - balancer-network
 
   init-database: # https://stackoverflow.com/questions/70322031/does-docker-compose-support-init-container
-    container_name: balancer-database-init
+    container_name: balancer_database_init
     image: "postgres:${POSTGRES_VERSION}"
     command: /init-database.sh
     restart: on-failure
     environment:
-      - "DB_HOST=balancer-database-svc"
+      - "DB_HOST=database-svc"
       - "DB_PORT=5432"
       - "DB_NAME=${DB_NAME}"
       - "DB_USER=${DB_ADMIN}"
@@ -30,7 +30,7 @@ services:
       - ../../scripts/init-database.sh:/init-database.sh
       - ../../scripts/init-database.sql:/init-database.sql
     depends_on:
-      database:
+      database-svc:
         condition: service_started
     networks:
       - balancer-network
@@ -42,7 +42,7 @@ services:
     ports:
       - "${SCALING_CONTROLLER_PORT}:8000"
     environment:
-      - "DB_HOST=balancer-database-svc"
+      - "DB_HOST=database-svc"
       - "DB_PORT=5432"
       - "DB_NAME=${DB_NAME}"
       - "DB_USER=${DB_ADMIN}"
@@ -62,7 +62,7 @@ services:
     environment:
       - "SCALING_CONTROLLER_HOST=scaling-controller-svc"
       - "SCALING_CONTROLLER_PORT=8000"
-      - "DB_HOST=balancer-database-svc"
+      - "DB_HOST=database-svc"
       - "DB_PORT=5432"
       - "DB_NAME=${DB_NAME}"
       - "DB_USER=${DB_ADMIN}"
@@ -84,7 +84,7 @@ services:
     environment:
       - "SCALING_CONTROLLER_HOST=scaling-controller-svc"
       - "SCALING_CONTROLLER_PORT=8000"
-      - "DB_HOST=balancer-database-svc"
+      - "DB_HOST=database-svc"
       - "DB_PORT=5432"
       - "DB_NAME=${DB_NAME}"
       - "DB_USER=${DB_ADMIN}"

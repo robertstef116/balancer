@@ -198,18 +198,8 @@ export const deleteWorkflow = ({ id }, cb) => async (dispatch) => {
   }
 };
 
-const _getDeployments = async (dispatch) => {
-  const deployments = await api.getDeployments();
-  dispatch({
-    type: types.GET_DEPLOYMENTS,
-    payload: {
-      deployments,
-    },
-  });
-};
-
 export const getResources = ({ reload }, cb) => async (dispatch, getState) => {
-  const { workers, workflows, deployments } = getState();
+  const { workers, workflows } = getState();
 
   try {
     const promises = [];
@@ -219,48 +209,10 @@ export const getResources = ({ reload }, cb) => async (dispatch, getState) => {
     if (workflows === null || reload) {
       promises.push(_getWorkflows(dispatch));
     }
-    if (deployments === null || reload) {
-      promises.push(_getDeployments(dispatch));
-    }
     await Promise.all(promises);
     cb();
   } catch (e) {
     cb(errors.GET_RESOURCES);
-  }
-};
-
-export const getConfigs = ({ reload }, cb) => async (dispatch, getState) => {
-  const { configs } = getState();
-  try {
-    if (configs === null || reload) {
-      const newConfigs = await api.getConfigs();
-
-      dispatch({
-        type: types.GET_CONFIGS,
-        payload: {
-          configs: newConfigs,
-        },
-      });
-    }
-    cb();
-  } catch (e) {
-    cb(errors.GET_CONFIGS_ERROR);
-  }
-};
-
-export const saveConfigs = ({ configs }, cb) => async (dispatch) => {
-  try {
-    await api.saveConfigs({ configs });
-
-    dispatch({
-      type: types.SAVE_CONFIGS,
-      payload: {
-        configs,
-      },
-    });
-    cb();
-  } catch (e) {
-    cb(errors.SAVE_CONFIGS_ERROR);
   }
 };
 

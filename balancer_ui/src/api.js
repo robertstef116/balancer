@@ -115,14 +115,6 @@ export const deleteWorkflow = async ({ id }) => {
   throw new Error('Delete workflow failed!');
 };
 
-export const getDeployments = async () => {
-  const res = await axios.get(`${API_URL}/deployment`);
-  if (res.status === 200) {
-    return res.data;
-  }
-  throw new Error('Get deployments failed!');
-};
-
 export const getConfigs = async () => {
   const res = await axios.get(`${API_URL}/config`);
   if (res.status === 200) {

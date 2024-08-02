@@ -16,7 +16,7 @@ fun Application.configureRouting() {
                 val sleepTime = call.parameters["milliseconds"]?.toInt() ?: 0
                 val startTime = System.currentTimeMillis()
                 while ((System.currentTimeMillis() - startTime) < sleepTime) {
-                    delay(1)
+                    delay(100)
                 }
             }
 

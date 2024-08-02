@@ -28,7 +28,7 @@ class WorkerService : KoinComponent {
     }
 
     fun delete(id: UUID) {
-        if (scalingClient.deleteWorker(id)) {
+        if (!scalingClient.deleteWorker(id)) {
             throw ValidationException("Unable to delete worker")
         }
     }

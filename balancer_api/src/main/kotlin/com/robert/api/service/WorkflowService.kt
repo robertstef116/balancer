@@ -11,11 +11,11 @@ import java.util.*
 
 class WorkflowService : KoinComponent {
     companion object {
-        fun validateImage(image: String) = Regex("[a-z][a-z0-9-/]+:[a-z0-9.-]+").matches(image)
+        fun validateImage(image: String) = Regex("[a-z][a-z0-9-/.]+:[a-z0-9.-]+").matches(image)
         fun validatePath(path: String) = Regex("/[a-zA-Z0-9_-]+").matches(path)
         fun validatePort(port: Int) = port in 1..65535
         fun validateMemory(memory: Long) = memory > 6291455
-        fun validateCpu(cpu: Long) = cpu > 99
+        fun validateCpu(cpu: Long) = cpu > 999
         fun validatePathMapping(pathMapping: Map<String, Int>) = pathMapping.isNotEmpty()
         fun validateDeploymentLimits(minDeployments: Int?, maxDeployments: Int?): Boolean {
             val minD = minDeployments ?: 1

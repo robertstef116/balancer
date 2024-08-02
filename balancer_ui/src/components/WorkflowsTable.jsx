@@ -12,9 +12,9 @@ import { convertFormMapToMap } from '../utils';
 const defaultFormModalConfig = { title: '', fields: [], submit: null };
 
 const MEMORY_LIMIT = 6291455;
-const CPU_LIMIT = 99;
+const CPU_LIMIT = 999;
 
-const imageValidator = (data) => data.image && /^[a-z][a-z0-9\-/]+:[a-z0-9.\-$]+/.test(data.image);
+const imageValidator = (data) => data.image && /^[a-z][a-z0-9-/.]+:[a-z0-9.-]+$/.test(data.image);
 const memoryValidator = (data) => {
   if (!data.memoryLimit) {
     return false;
@@ -141,7 +141,7 @@ function WorkflowsTable({ className }) {
   };
 
   const onAddClick = () => {
-    setModalData({ memoryLimit: MEMORY_LIMIT, cpuLimit: CPU_LIMIT });
+    setModalData({ memoryLimit: `${MEMORY_LIMIT + 1}`, cpuLimit: `${CPU_LIMIT + 1}` });
     setValid(false);
     setModalFormMode(ModalFormModes.ADD);
   };

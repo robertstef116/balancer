@@ -4,8 +4,8 @@
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="trace">
+    <root level="error">
         <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="com.robert.test.image" level="INFO"/>
+    <logger name="com.robert.test.image" level="info"/>
 </configuration>

@@ -8,8 +8,6 @@ const INITIAL_STATE = {
 
   workers: null,
   workflows: null,
-  deployments: null,
-  configs: null,
 };
 
 const getWorkerNodeStateIcon = (status) => {
@@ -117,35 +115,13 @@ export default (state = INITIAL_STATE, { type, payload }) => {
         ...state,
         workers: newWorkers,
       };
-    case types.GET_DEPLOYMENTS:
-      const { deployments } = payload;
-      return {
-        ...state,
-        deployments: deployments.map((deployment) => ({
-          id: deployment.id,
-          workerId: deployment.workerId,
-          workflowId: deployment.workflowId,
-          containerId: deployment.containerId,
-          timestamp: deployment.timestamp,
-        })),
-      };
-    case types.SAVE_CONFIGS:
-      const { configs } = payload;
-      return {
-        ...state,
-        configs: {
-          ...state.configs,
-          ...configs,
-        },
-      };
-    case types.GET_CONFIGS:
     case types.SET_CREDENTIALS:
     case types.REMOVE_CREDENTIALS:
     case types.LOGOUT:
     case types.LOGIN:
     case types.SESSION_EXPIRED:
       return {
-        ...state,
+        ...INITIAL_STATE,
         ...payload,
       };
     default:
