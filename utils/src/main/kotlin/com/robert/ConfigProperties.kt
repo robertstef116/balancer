@@ -6,7 +6,7 @@ import io.ktor.util.logging.*
 import java.util.function.Function
 
 object ConfigProperties {
-    private val log = KtorSimpleLogger(this::class.java.name)
+    val LOG by logger()
     private val config: Config by lazy {
         ConfigFactory.load()
     }
@@ -14,14 +14,14 @@ object ConfigProperties {
     fun <T> get(key: String, fallback: T?, getter: Function<String, T>): T {
         return try {
             val value = getter.apply(key)
-            log.info("Key found in environment {} = {}", key, value)
+            LOG.info("Key found in environment {} = {}", key, value)
             value
         } catch (e: Exception) {
             if (fallback != null) {
-                log.info("Key {} not set, replacing with fallback {}", key, fallback)
+                LOG.info("Key {} not set, replacing with fallback {}", key, fallback)
                 fallback
             } else {
-                log.error("Key {} not set and no fallback available", key)
+                LOG.error("Key {} not set and no fallback available", key)
                 throw e
             }
         }

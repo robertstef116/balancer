@@ -5,27 +5,23 @@ import HomePage from '../pages/Home';
 import Login from '../pages/Login';
 import NotFound from '../pages/NotFound';
 import Header from '../generic-components/Header';
-import NodesPage from '../pages/Nodes';
+import ResourcesPage from '../pages/Resources';
 import Footer from '../generic-components/Footer';
-import About from '../pages/About';
 
 export const routesPath = {
   homePage: '/',
-  nodesPage: '/nodes',
+  resourcesPage: '/resources',
   loginPage: '/login',
-  aboutPage: '/about',
 };
 
 const routesWithHeader = [
   routesPath.homePage,
-  routesPath.nodesPage,
-  routesPath.aboutPage,
+  routesPath.resourcesPage,
 ];
 
 const headerMenus = [
-  { name: 'Home', path: routesPath.homePage },
-  { name: 'Nodes', path: routesPath.nodesPage },
-  { name: 'About', path: routesPath.aboutPage },
+  { name: 'Analytics', path: routesPath.homePage },
+  { name: 'Resources', path: routesPath.resourcesPage },
 ];
 
 export function AppRoutes() {
@@ -49,14 +45,13 @@ export function AppRoutes() {
           )}
         />
         <Route
-          path={routesPath.nodesPage}
+          path={routesPath.resourcesPage}
           element={(
             <PrivateRoute>
-              <NodesPage />
+              <ResourcesPage />
             </PrivateRoute>
           )}
         />
-        <Route path={routesPath.aboutPage} element={<About />} />
         <Route path={routesPath.loginPage} element={<Login />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

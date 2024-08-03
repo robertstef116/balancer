@@ -149,7 +149,7 @@ export const getAnalyticsData = async ({
 };
 
 export const getBalancingAnalyticsData = async ({
-  durationMs, workflowId, path, cancelToken,
+  durationMs, workflowId, path, metric, cancelToken,
 }) => {
   let qs = '';
   if (workflowId) {
@@ -159,7 +159,7 @@ export const getBalancingAnalyticsData = async ({
     qs += `&path=${path}`;
   }
 
-  const res = await axios.get(`${API_URL}/analytics/balancing?durationMs=${durationMs}${qs}`, {
+  const res = await axios.get(`${API_URL}/analytics/balancing?durationMs=${durationMs}&metric=${metric}${qs}`, {
     cancelToken,
   });
   if (res.status === 200) {

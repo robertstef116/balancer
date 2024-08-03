@@ -9,16 +9,14 @@ plugins {
 
 dependencies {
     implementation(project(":model"))
-    implementation(kotlin("stdlib"))
     implementation("com.typesafe:config:1.4.2")
     implementation("org.reflections:reflections:0.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("io.insert-koin:koin-core:$koinVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation(libs.logback)
-    runtimeOnly(libs.kotlin.reflect) //for logger
 
-    implementation(libs.bundles.exposed)
+    implementation(libs.koin.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.contentnegotiation)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.logback)
+
+    runtimeOnly(libs.kotlin.reflect) //for logger
 }

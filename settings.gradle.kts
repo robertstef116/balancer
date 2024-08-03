@@ -35,6 +35,9 @@ dependencyResolutionManagement {
             )
 
             library("ktor-client", "io.ktor", "ktor-client-core-jvm").versionRef("ktor")
+            library("ktor-client-cio", "io.ktor", "ktor-client-cio-jvm").versionRef("ktor")
+            library("ktor-client-contentnegotiation", "io.ktor", "ktor-client-content-negotiation").versionRef("ktor")
+            library("ktor-client-serialization", "io.ktor", "ktor-serialization-kotlinx-json").versionRef("ktor")
             library("ktor-statusPages", "io.ktor", "ktor-server-status-pages").versionRef("ktor")
             library("ktor-contentNegotiation", "io.ktor", "ktor-server-content-negotiation").versionRef("ktor")
             library("ktor-gson", "io.ktor", "ktor-serialization-gson").versionRef("ktor")

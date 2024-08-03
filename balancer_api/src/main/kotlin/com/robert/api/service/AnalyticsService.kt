@@ -18,8 +18,11 @@ class AnalyticsService : KoinComponent {
         return analyticsRepository.getScalingAnalyticsData(workflowId, metric, durationMs)
     }
 
-    fun getLoadBalancingAnalytics(workflowId: UUID?, path: String?, responseType: LoadBalancerResponseType, durationMs: Long): List<AnalyticsData> {
-        return analyticsRepository.getLoadBalancingAnalyticsData(workflowId, path, responseType, durationMs)
+    fun getLoadBalancingAnalytics(workflowId: UUID?, path: String?, responseType: LoadBalancerResponseType, metric: String, durationMs: Long): List<AnalyticsData> {
+        if (metric != "avg_response_time" && metric != "requests_count") {
+            throw ValidationException("Unknown metric")
+        }
+        return analyticsRepository.getLoadBalancingAnalyticsData(workflowId, path, responseType, metric, durationMs)
     }
 
 //    fun getAnalytics(from: String?, workerId: String?, workflowId: String?, deploymentId: String?): List<UsageAnalyticsEntry> {

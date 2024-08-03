@@ -23,25 +23,33 @@ function ScalingDataChart({
       cb: (res) => {
         setNow(nowTime);
         const newData = {};
+        const timeRangeData = new Set();
         for (const analytics of res) {
-          if (!newData[analytics.key]) {
-            newData[analytics.key] = [];
+          timeRangeData.add(analytics.timeMs);
+          if (analytics.key !== '') {
+            if (!newData[analytics.key]) {
+              newData[analytics.key] = {};
+            }
+            newData[analytics.key][analytics.timeMs] = analytics;
           }
-          newData[analytics.key].push(analytics);
         }
-        if (newData['']) {
-          for (const key of Object.keys(newData)) {
-            newData[key] = [...newData[''], ...newData[key]];
-            newData[key].sort((a, b) => a.timeMs - b.timeMs);
-            const { length } = newData[key];
-            // in case the data didn't arrive yet for the last time range slide
-            if (newData[key][length - 1].data === 0 && newData[key][length - 2].data !== 0) {
-              newData[key][length - 1].data = newData[key][length - 2].data;
+
+        const newDataArrays = {};
+        for (const key of Object.keys(newData)) {
+          newDataArrays[key] = [...Object.values(newData[key])];
+          for (const timeMs of timeRangeData) {
+            if (!newData[key][timeMs]) {
+              newDataArrays[key].push({ key: '', data: 0, timeMs });
             }
           }
-          delete newData[''];
+          newDataArrays[key].sort((a, b) => a.timeMs - b.timeMs);
+          const { length } = newDataArrays[key];
+          // in case the data didn't arrive yet for the last time range slide
+          if (newDataArrays[key][length - 1].data === 0 && newDataArrays[key][length - 2].data !== 0) {
+            newDataArrays[key][length - 1].data = newDataArrays[key][length - 2].data;
+          }
         }
-        setData(newData);
+        setData(newDataArrays);
       },
     });
   };

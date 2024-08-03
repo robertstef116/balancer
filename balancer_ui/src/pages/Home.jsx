@@ -6,7 +6,6 @@ import BalancingHistoryChart from '../components/BalancingHistoryChart';
 
 function HomePage() {
   const [workflowId, setWorkflowId] = useState(null);
-  // eslint-disable-next-line no-unused-vars
   const [path, setPath] = useState(null);
 
   const selectedResourcePathChanged = (selection) => {
@@ -27,21 +26,39 @@ function HomePage() {
       <div className="row m-0">
         <ResourcesList classname="widget-4 wh-2" onSelectionChanged={selectedResourcePathChanged} />
         <div className="widgets-container">
-          <BalancingHistoryChart classNames="wh-1" workflowId={workflowId} path={path} />
-          <ScalingDataChart classname="wh-1" title="Scaling cpu data" metric="avg_cpu" workflowId={workflowId} />
+          <BalancingHistoryChart
+            classNames="wh-1"
+            workflowId={workflowId}
+            path={path}
+            title="Average response time ms"
+            metric="avg_response_time"
+          />
+          <BalancingHistoryChart
+            classNames="wh-1"
+            workflowId={workflowId}
+            path={path}
+            title="Balanced requests count"
+            metric="requests_count"
+          />
         </div>
       </div>
-      <div className="row m-0 flex-xl-row-reverse">
+      <div className="row m-0">
         <ScalingDataChart
-          classname="widget-8 wh-1"
-          title="Scaling memory data"
-          metric="avg_memory"
+          classname="widget-4 wh-1"
+          title="Replicas"
+          metric="replicas"
           workflowId={workflowId}
         />
         <ScalingDataChart
           classname="widget-4 wh-1"
-          title="Scaling replicas data"
-          metric="replicas"
+          title="Average CPU usage"
+          metric="avg_cpu"
+          workflowId={workflowId}
+        />
+        <ScalingDataChart
+          classname="widget-4 wh-1"
+          title="Average memory usage"
+          metric="avg_memory"
           workflowId={workflowId}
         />
       </div>

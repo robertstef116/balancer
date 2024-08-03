@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Line } from 'recharts';
+import { Legend, Line } from 'recharts';
 import { useSelector } from 'react-redux';
 import LineChartWrapper from '../generic-components/LineChartWrapper';
 import { getBalancingAnalyticsData, getWorkflows } from '../redux/actions';
 import { defaultRange, GetLineColor } from '../constants';
 import useWidgetUtils from '../custom-hooks/useWidgetUtils';
 
-function BalancingHistoryChart({ classNames, workflowId, path }) {
+function BalancingHistoryChart({ classNames, workflowId, path, title, metric }) {
   const { apiWrapper, widgetProps, actionWrapper } = useWidgetUtils({ withCancellation: true });
   const [range, setRange] = useState(defaultRange);
   const [now, setNow] = useState(0);
@@ -17,24 +17,32 @@ function BalancingHistoryChart({ classNames, workflowId, path }) {
     const nowTime = Date.now();
     apiWrapper({
       action: getBalancingAnalyticsData,
-      params: { durationMs: range.value * 1000 * 60 - 1, workflowId, path },
+      params: { durationMs: range.value * 1000 * 60 - 1, workflowId, path, metric },
       cb: (res) => {
         setNow(nowTime);
         const newData = {};
+        const timeRangeData = new Set();
         for (const analytics of res) {
-          if (!newData[analytics.key]) {
-            newData[analytics.key] = [];
+          timeRangeData.add(analytics.timeMs);
+          if (analytics.key !== '') {
+            if (!newData[analytics.key]) {
+              newData[analytics.key] = {};
+            }
+            newData[analytics.key][analytics.timeMs] = analytics;
           }
-          newData[analytics.key].push(analytics);
         }
-        if (newData['']) {
-          for (const key of Object.keys(newData)) {
-            newData[key] = [...newData[''], ...newData[key]];
-            newData[key].sort((a, b) => a.timeMs - b.timeMs);
+
+        const newDataArrays = {};
+        for (const key of Object.keys(newData)) {
+          newDataArrays[key] = [...Object.values(newData[key])];
+          for (const timeMs of timeRangeData) {
+            if (!newData[key][timeMs]) {
+              newDataArrays[key].push({ key: '', data: 0, timeMs });
+            }
           }
-          delete newData[''];
+          newDataArrays[key].sort((a, b) => a.timeMs - b.timeMs);
         }
-        setData(newData);
+        setData(newDataArrays);
       },
     });
   };
@@ -44,7 +52,7 @@ function BalancingHistoryChart({ classNames, workflowId, path }) {
     const wPath = key.substring(37);
     for (const workflow of workflows) {
       if (workflow.id === wid) {
-        return `${workflow.image} - ${wPath}`;
+        return `${workflow.image} - /${wPath}`;
       }
     }
     return `${wid} - ${wPath}`;
@@ -61,7 +69,7 @@ function BalancingHistoryChart({ classNames, workflowId, path }) {
   return (
     <LineChartWrapper
       className={classNames}
-      title="Response time ms history"
+      title={title}
       onRefresh={fetchData}
       onRangeChanged={setRange}
       now={now}
@@ -79,6 +87,7 @@ function BalancingHistoryChart({ classNames, workflowId, path }) {
           dot={false}
         />
       ))}
+      <Legend />
     </LineChartWrapper>
   );
 }

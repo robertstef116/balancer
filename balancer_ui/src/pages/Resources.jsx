@@ -3,7 +3,7 @@ import WorkersTable from '../components/WorkersTable';
 import WorkflowsTable from '../components/WorkflowsTable';
 import PageWrapper from '../generic-components/PageWrapper';
 
-function NodesPage() {
+function ResourcesPage() {
   return (
     <PageWrapper>
       <div className="row m-0 justify-content-center">
@@ -14,4 +14,4 @@ function NodesPage() {
   );
 }
 
-export default NodesPage;
+export default ResourcesPage;

@@ -15,12 +15,3 @@ fun <T : Any> unwrapCompanionClass(ofClass: Class<T>): Class<*> {
         ofClass
     }
 }
-
-//fun <T : Any> unwrapCompanionClass(ofClass: Class<T>): Class<*> {
-//    return if (ofClass.enclosingClass != null &&
-//        ofClass.enclosingClass.kotlin.objectInstance?.javaClass == ofClass) {
-//        ofClass.enclosingClass
-//    } else {
-//        ofClass
-//    }
-//}

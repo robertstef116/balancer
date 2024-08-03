@@ -32,7 +32,7 @@ class AnalyticsRepositoryImpl : AnalyticsRepository {
             WITH CTS AS (
                 SELECT generate_series(?, ?, ?) AS Series
             )
-            SELECT l.workflow_id, l.path, COALESCE(CEIL(AVG(l.response_time_ms)), 0) AS data_value, CTS.Series AS data_time
+            SELECT l.workflow_id, l.path, COALESCE(%s, 0) AS data_value, CTS.Series AS data_time
             FROM CTS
             LEFT OUTER JOIN load_balancer_analytics l
             ON l.timestamp_ms >= CTS.Series AND l.timestamp_ms < CTS.Series + ? AND l.response_type = ?%s
@@ -82,7 +82,7 @@ class AnalyticsRepositoryImpl : AnalyticsRepository {
         data
     }
 
-    override fun getLoadBalancingAnalyticsData(workflowId: UUID?, path: String?, responseType: LoadBalancerResponseType, durationMs: Long): List<AnalyticsData> = transaction {
+    override fun getLoadBalancingAnalyticsData(workflowId: UUID?, path: String?, responseType: LoadBalancerResponseType, metric: String, durationMs: Long): List<AnalyticsData> = transaction {
         val (from, to, step) = getSeriesParametersFromDuration(durationMs)
 
         val params = mutableListOf<Pair<IColumnType, Any>>(
@@ -90,8 +90,13 @@ class AnalyticsRepositoryImpl : AnalyticsRepository {
             LongColumnType() to to + step,
             LongColumnType() to step,
             LongColumnType() to step,
-            VarCharColumnType() to responseType.toString()
+            VarCharColumnType() to responseType.toString(),
         )
+
+        val metricColumn = when (metric) {
+            "requests_count" -> "SUM(CASE WHEN l.path IS NOT NULL THEN 1 ELSE 0 END)"
+            else -> "CEIL(AVG(l.response_time_ms))"
+        }
 
         val queryConditions = StringBuilder("")
         if (workflowId != null) {
@@ -102,7 +107,7 @@ class AnalyticsRepositoryImpl : AnalyticsRepository {
             queryConditions.append(" AND l.path = ?")
             params.add(VarCharColumnType() to path)
         }
-        val query = String.format(GET_LOAD_BALANCING_ANALYTICS_DATA_TEMPL, queryConditions)
+        val query = String.format(GET_LOAD_BALANCING_ANALYTICS_DATA_TEMPL, metricColumn, queryConditions)
 
         val data = exec(query, params, StatementType.EXEC) {
             val data = mutableListOf<AnalyticsData>()

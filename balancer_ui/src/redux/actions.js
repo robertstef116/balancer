@@ -228,10 +228,11 @@ export const getBalancingAnalyticsData = async ({
   durationMs,
   workflowId,
   path,
+  metric,
   cancelToken,
 }, cb) => errorWrapper(async () => {
   const res = await api.getBalancingAnalyticsData({
-    durationMs, workflowId, path, cancelToken,
+    durationMs, workflowId, path, metric, cancelToken,
   });
 
   cb(null, res);

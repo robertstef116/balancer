@@ -23,8 +23,9 @@ fun Route.analytics(path: String, analyticsService: AnalyticsService) {
             val responseType = call.request.queryParameters["responseType"]?.let { LoadBalancerResponseType.valueOf(it) } ?: LoadBalancerResponseType.OK
             val balancingPath = call.request.queryParameters["path"]
             val durationMs = (call.request.queryParameters["durationMs"])?.toLong() ?: throw ValidationException("Invalid time")
+            val metric = (call.request.queryParameters["metric"]) ?: throw ValidationException("Metric not specified")
 
-            call.respond(analyticsService.getLoadBalancingAnalytics(workflowId, balancingPath, responseType, durationMs))
+            call.respond(analyticsService.getLoadBalancingAnalytics(workflowId, balancingPath, responseType, metric, durationMs))
         }
 //        get("/requests") {
 //            val from = call.request.queryParameters["from"]

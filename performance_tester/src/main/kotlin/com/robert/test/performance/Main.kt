@@ -14,8 +14,8 @@ import kotlin.system.measureTimeMillis
 
 val NO_REQUESTS_IN_BATCH = Env.getInt("NO_REQUESTS_IN_BATCH", 100)
 val NO_BATCHES = Env.getInt("NO_BATCHES", 2)
-//val BASE_URL = Env.get("BASE_URL", "http://192.168.56.102:32777/test")
-val BASE_URL = Env.get("BASE_URL", "http://localhost:9990/internal/test")
+val BASE_URL = Env.get("BASE_URL", "http://192.168.56.102:32783/test")
+//val BASE_URL = Env.get("BASE_URL", "http://localhost:9990/internal/test")
 val RESULTS_BASE_PATH = Env.get("RESULTS_PATH", ".")
 
 var TEST_COUNT = 0
@@ -48,11 +48,11 @@ fun executeTest(baseTime: Long, timeDelta: Long) {
                                 throw IOException("$idx - ${res.status}")
                             }
                         }
-                        data[idx] = ReqData(idx, expectedTime, actualTime, "")
+                        data[idx] = ReqData(idx, System.currentTimeMillis(), expectedTime, actualTime, "")
                     } catch (e: Exception) {
                         println("Error " + e.message)
                         failed.getAndIncrement()
-                        data[idx] = ReqData(idx, -1, -1, e.message ?: "")
+                        data[idx] = ReqData(idx, -1, -1, -1, e.message ?: "")
                     }
                 })
             }
@@ -69,10 +69,10 @@ fun executeTest(baseTime: Long, timeDelta: Long) {
     if (file.exists() && file.isFile) {
         file.delete()
     }
-    BufferedWriter(FileWriter(resultPath, true)).use {
-        it.write("idx,expectedTime,actualTime,overheadTime,err\n")
-        for (res in data) {
-            it.write("${res!!.idx},${res.expectedTime},${res.actualTime},${res.actualTime - res.expectedTime},${res.err}\n")
+    BufferedWriter(FileWriter(resultPath, true)).use { fileWriter ->
+        fileWriter.write("idx,expectedTime,actualTime,overheadTime,err\n")
+        for (res in data.filterNotNull().sortedBy { it.time }) {
+            fileWriter.write("${res.idx},${res.expectedTime},${res.actualTime},${res.actualTime - res.expectedTime},${res.err}\n")
         }
     }
 
@@ -82,6 +82,7 @@ fun executeTest(baseTime: Long, timeDelta: Long) {
 
 data class ReqData(
     val idx: Int,
+    val time: Long,
     val expectedTime: Long,
     val actualTime: Long,
     val err: String
