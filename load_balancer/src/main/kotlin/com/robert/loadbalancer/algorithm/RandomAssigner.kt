@@ -4,6 +4,7 @@ import com.robert.enums.LBAlgorithms
 import com.robert.exceptions.NotFoundException
 import com.robert.loadbalancer.model.HostPortPair
 import com.robert.scaling.client.model.WorkflowDeploymentData
+import kotlin.random.Random
 
 class RandomAssigner : BalancingAlgorithm {
     @Volatile
@@ -22,7 +23,7 @@ class RandomAssigner : BalancingAlgorithm {
             if (targets.isEmpty()) {
                 throw NotFoundException()
             }
-            return targets[(targets.indices).random()].let { HostPortPair(it.workflowId, it.host, it.port) }
+            return targets[Random.nextInt(targets.size)].let { HostPortPair(it.workflowId, it.host, it.port) }
         }
     }
 }

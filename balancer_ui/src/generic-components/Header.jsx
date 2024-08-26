@@ -37,7 +37,7 @@ function Header({ menus, activeMenuPath }) {
             ))}
           </Nav>
           <Nav className="username-header ms-auto">
-            <NavDropdown title={username} className="fw-bolder">
+            <NavDropdown align="end" title={username} className="fw-bolder">
               <NavDropdown.Item onClick={logout}>
                 Logout
               </NavDropdown.Item>

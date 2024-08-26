@@ -58,10 +58,9 @@ export const GetLineColor = (key) => {
   if (key.length === 0) return hash;
   for (let i = 0; i < key.length; i++) {
     // eslint-disable-next-line no-bitwise
-    hash = key.charCodeAt(i) + ((hash << 5) - hash);
+    hash += key.charCodeAt(i);
     // eslint-disable-next-line no-bitwise
-    hash &= hash;
   }
-  hash = ((hash % colors.length) + colors.length) % colors.length;
+  hash %= colors.length;
   return colors[hash];
 };

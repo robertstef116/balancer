@@ -14,7 +14,9 @@ import java.util.*
 
 class WorkerRepositoryImpl : WorkerRepository {
     override fun getAll(): Collection<Worker> = transaction {
-        Workers.selectAll().map { row ->
+        Workers.selectAll()
+            .orderBy(Workers.alias)
+            .map { row ->
             Worker(
                 id = row[Workers.id],
                 alias = row[Workers.alias],

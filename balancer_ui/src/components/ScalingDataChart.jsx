@@ -82,7 +82,7 @@ function ScalingDataChart({
       widgetProps={widgetProps}
       noData={Object.keys(data).length === 0}
     >
-      {Object.keys(data).map((wid) => (
+      {workflows && Object.keys(data).map((wid) => (
         <Line
           key={wid}
           data={data[wid]}

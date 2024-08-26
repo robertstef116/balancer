@@ -16,6 +16,8 @@ class WeightedScoreAssigner : BalancingAlgorithm {
 
     @Volatile
     private var targets = listOf<WeightedScoreWorkflowDeploymentData>()
+    @Volatile
+    private var totalWeight = 0.0
 
     override fun getAlgorithmType(): LBAlgorithms {
         return LBAlgorithms.WEIGHTED_SCORE
@@ -31,12 +33,13 @@ class WeightedScoreAssigner : BalancingAlgorithm {
             newTargets.add(target)
         }
         val overallResponseTimeAverage = newTargets.sumOf { it.average }
-        newTargets.forEach { it.weight = it.average / overallResponseTimeAverage }
+        newTargets.forEach { it.weight = (it.average / overallResponseTimeAverage).coerceAtLeast(0.2 / newTargets.size) }
+        totalWeight = newTargets.sumOf { it.weight }
         targets = newTargets
     }
 
     override fun getTarget(blacklistedTargets: Set<HostPortPair>): HostPortPair {
-        var rand = Random.nextDouble()
+        var rand = Random.nextDouble(totalWeight)
         val allTargets = BalancingAlgorithm.getAvailableTargetsData(targets, blacklistedTargets)
         if (allTargets.isEmpty()) {
             throw NotFoundException()

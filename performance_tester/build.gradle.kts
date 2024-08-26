@@ -10,6 +10,7 @@ application {
 
 dependencies {
     implementation(project(":utils"))
+    implementation(libs.logback)
     implementation(libs.kotlin.coroutines)
     implementation(libs.ktor.client)
 }

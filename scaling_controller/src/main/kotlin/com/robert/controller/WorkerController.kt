@@ -1,11 +1,11 @@
 package com.robert.controller
 
 import com.robert.Env
-import com.robert.resources.DockerContainer
+import com.robert.enums.WorkerState
 import com.robert.logger
 import com.robert.model.InternalWorkerStatus
+import com.robert.resources.DockerContainer
 import com.robert.resources.Worker
-import com.robert.enums.WorkerState
 import com.robert.storage.repository.WorkerRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -17,7 +17,7 @@ class WorkerController : KoinComponent {
     companion object {
         val LOG by logger()
 
-        private val WORKER_STATUS_MAX_AGE_SECONDS = Env.getInt("WORKER_STATUS_MAX_AGE_SECONDS", 120)
+        private val WORKER_STATUS_MAX_AGE_SECONDS = Env.getInt("WORKER_STATUS_MAX_AGE_SECONDS", 240)
     }
 
     private val workerRepository: WorkerRepository by inject()
@@ -67,8 +67,9 @@ class WorkerController : KoinComponent {
     fun updateWorkerState(id: UUID, state: WorkerState): Boolean {
         if (!workerStatus.containsKey(id)) {
             initWorkerState(id, state)
+        } else {
+            workerStatus[id]?.state = state
         }
-        workerStatus[id]?.state = state
         return true
     }
 
@@ -80,10 +81,11 @@ class WorkerController : KoinComponent {
     }
 
     @Synchronized
-    fun pruneWorkersByAge() {
+    fun pruneWorkersByAge(onPrune: (UUID) -> Unit) {
         val now = now()
         workerStatus.values.filter { it.state == WorkerState.ONLINE && now - it.lastUpdate > WORKER_STATUS_MAX_AGE_SECONDS }
             .forEach {
+                onPrune(it.id)
                 workerRepository.update(it.id, null, WorkerState.OFFLINE)
                 updateWorkerState(it.id, WorkerState.OFFLINE)
                 LOG.info("Updated status of worker {} to OFFLINE since age threshold was exceeded", it.id)

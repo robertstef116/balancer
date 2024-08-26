@@ -1,7 +1,7 @@
 # Docker login
 
 ```bash
-docker login docker.io -u r0bb3rt17 -p dckr_pat_A4yJICbN9onJLknrHIjEuQlspSs
+docker login docker.io -u rsof -p <docker_key>
 ```
 
 # Build images

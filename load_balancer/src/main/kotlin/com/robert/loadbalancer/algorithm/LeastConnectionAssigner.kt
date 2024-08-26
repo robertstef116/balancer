@@ -39,7 +39,7 @@ class LeastConnectionAssigner : BalancingAlgorithm {
     }
 
     override fun addResponseTimeData(target: HostPortPair, responseTime: Long, responseType: LoadBalancerResponseType) {
-        targets.find { it.workflowDeploymentData.host == target.host && it.workflowDeploymentData.port == it.workflowDeploymentData.port }
+        targets.find { it.workflowDeploymentData.host == target.host && it.workflowDeploymentData.port == target.port }
             ?.activeRequestsCounter
             ?.decrementAndGet()
     }

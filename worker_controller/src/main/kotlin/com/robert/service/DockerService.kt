@@ -130,5 +130,6 @@ class DockerService {
     fun removeContainer(id: String) {
         LOG.info("Removing container with id {}", id)
         dockerClient.killContainerCmd(id).exec();
+        dockerClient.removeContainerCmd(id).exec()
     }
 }

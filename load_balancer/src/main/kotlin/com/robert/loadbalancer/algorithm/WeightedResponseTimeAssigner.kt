@@ -17,6 +17,8 @@ class WeightedResponseTimeAssigner : BalancingAlgorithm {
 
     @Volatile
     private var targets = listOf<WeightedResponseTimeWorkflowDeploymentData>()
+    @Volatile
+    private var totalWeight = 0.0
 
     override fun getAlgorithmType(): LBAlgorithms {
         return LBAlgorithms.WEIGHTED_RESPONSE_TIME
@@ -31,13 +33,16 @@ class WeightedResponseTimeAssigner : BalancingAlgorithm {
             target.workflowDeploymentData = workflowDeploymentData
             newTargets.add(target)
         }
-        val overallResponseTimeAverage = newTargets.sumOf { it.average }
-        newTargets.forEach { it.weight = it.average / overallResponseTimeAverage }
+        val maxAverageResponseTime = newTargets.maxBy { it.average }.average
+        val overallAverageResponseTime = newTargets.sumOf { maxAverageResponseTime - it.average }.coerceAtLeast(1.0)
+        newTargets.forEach { it.weight = ((maxAverageResponseTime - it.average) / overallAverageResponseTime).coerceAtLeast(0.2 / newTargets.size) }
+        totalWeight = newTargets.sumOf { it.weight }
+
         targets = newTargets
     }
 
     override fun getTarget(blacklistedTargets: Set<HostPortPair>): HostPortPair {
-        var rand = Random.nextDouble()
+        var rand = Random.nextDouble(totalWeight)
         val allTargets = BalancingAlgorithm.getAvailableTargetsData(targets, blacklistedTargets)
         if (allTargets.isEmpty()) {
             throw NotFoundException()
@@ -56,7 +61,7 @@ class WeightedResponseTimeAssigner : BalancingAlgorithm {
 
     override fun addResponseTimeData(target: HostPortPair, responseTime: Long, responseType: LoadBalancerResponseType) {
         if (responseType == LoadBalancerResponseType.OK) {
-            targets.find { it.workflowDeploymentData.host == target.host && it.workflowDeploymentData.port == it.workflowDeploymentData.port }
+            targets.find { it.workflowDeploymentData.host == target.host && it.workflowDeploymentData.port == target.port }
                 ?.addResponseTime(responseTime)
         }
     }

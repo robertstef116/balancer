@@ -37,7 +37,7 @@ services:
 
   scaling-controller-svc:
     container_name: scaling_controller
-    image: "r0bb3rt17/balancer-scaling-controller:${BALANCER_VERSION}"
+    image: "rsof/balancer-scaling-controller:${BALANCER_VERSION}"
     restart: on-failure
     ports:
       - "${SCALING_CONTROLLER_PORT}:8000"
@@ -55,7 +55,7 @@ services:
 
   balancer-api:
     container_name: balancer_api
-    image: "r0bb3rt17/balancer-api:${BALANCER_VERSION}"
+    image: "rsof/balancer-api:${BALANCER_VERSION}"
     restart: on-failure
     ports:
       - "${MASTER_EXTERNAL_PORT}:${MASTER_PORT}"
@@ -77,7 +77,7 @@ services:
 
   load-balancer:
     container_name: load_balancer
-    image: "r0bb3rt17/load-balancer:${BALANCER_VERSION}"
+    image: "rsof/load-balancer:${BALANCER_VERSION}"
     restart: on-failure
     ports:
       - "${BALANCER_EXTERNAL_PORT}:8001"

@@ -124,5 +124,6 @@ enum WorkflowAlgorithm {
   LEAST_CONNECTION = 1;
   ROUND_ROBIN = 2;
   WEIGHTED_RESPONSE_TIME = 3;
-  ADAPTIVE = 4;
+  WEIGHTED_SCORE = 4;
+  ADAPTIVE = 5;
 }

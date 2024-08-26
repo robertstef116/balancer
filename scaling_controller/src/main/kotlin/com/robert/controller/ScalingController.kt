@@ -1,15 +1,15 @@
 package com.robert.controller
 
 import com.robert.Env
+import com.robert.analytics.ScalingAnalytic
 import com.robert.annotations.Scheduler
 import com.robert.annotations.SchedulerConsumer
+import com.robert.enums.WorkerState
 import com.robert.logger
+import com.robert.model.InternalWorkerStatus
+import com.robert.resources.Workflow
 import com.robert.scaling.client.model.DeploymentScalingRequest
 import com.robert.scaling.client.model.WorkflowDeploymentData
-import com.robert.model.InternalWorkerStatus
-import com.robert.analytics.ScalingAnalytic
-import com.robert.enums.WorkerState
-import com.robert.resources.Workflow
 import com.robert.storage.repository.ScalingAnalyticRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -119,7 +119,10 @@ class ScalingController : KoinComponent {
     @Synchronized
     @SchedulerConsumer(name = "ScalingManager", interval = "\${RESCALING_INTERVAL_SECONDS:30s}")
     fun scale() {
-        workerController.pruneWorkersByAge()
+        workerController.pruneWorkersByAge {
+            val scalingRequests = scalingRequestsQueue.remove(it)
+            LOG.debug("Removing {} scaling requests pending for worker {} since worker did not update his state for a long time", scalingRequests?.size ?: 0, it)
+        }
 
         val workflowDeploymentsMetadata = mutableMapOf<UUID, MutableList<WorkflowMetadata>>()
         val onlineWorkersStatus = workerController.getOnlineWorkersStatus()
@@ -147,12 +150,12 @@ class ScalingController : KoinComponent {
                     .average()
                 val containersCount = workflowMetadata.size
 
-                val min = workflow.minDeployments ?: 1
-                val max = workflow.maxDeployments ?: Int.MAX_VALUE
+                val min = workflow.minDeployments?.let { if (it == 0) 1 else it } ?: 1
+                val max = workflow.maxDeployments?.let { if (it == 0) Int.MAX_VALUE else it } ?: Int.MAX_VALUE
                 LOG.trace("Workflow {} - avg_score={}, min={}, max={}, count={}", workflow.id, averageScore, min, max, containersCount)
-                if ((averageScore < SCALE_DOWN_THRESHOLD && containersCount - 1 in min..max) || containersCount > max) {
+                if ((averageScore < SCALE_DOWN_THRESHOLD && containersCount > min) || containersCount > max) {
                     scaleDown(workflow.id, onlineWorkersStatus)
-                } else if ((averageScore > SCALE_UP_THRESHOLD && containersCount + 1 in min..max) || containersCount < min) {
+                } else if ((averageScore > SCALE_UP_THRESHOLD && containersCount < max) || containersCount < min) {
                     scaleUp(workflow, onlineWorkersStatus)
                 } else if (workflowScalingThresholdBreachCounts.remove(workflow.id) != null) {
                     LOG.info("Cleaning workflow breaches count")
@@ -195,10 +198,10 @@ class ScalingController : KoinComponent {
         }
 
         val availableWorkerStatuses = onlineWorkersStatus.filter { it.availableMemory > workflow.memoryLimit }
-        val weightSum = availableWorkerStatuses.sumOf { 5 - computeScore(it.cpuLoad, it.memoryLoad) }
+        val weightSum = availableWorkerStatuses.sumOf { computeScore(it.cpuLoad, it.memoryLoad) }
         var rndWeight = rnd.nextDouble() * weightSum
         availableWorkerStatuses.forEach {
-            val workerWeight = 5 - computeScore(it.cpuLoad, it.memoryLoad)
+            val workerWeight = computeScore(it.cpuLoad, it.memoryLoad)
             if (rndWeight < workerWeight) {
                 scaleUpDeployment(it.id, workflow)
                 if (!earlyScaleUp) {
@@ -237,10 +240,10 @@ class ScalingController : KoinComponent {
                 activeDeployment.workflowId == workflowId
             } != null
         }
-        val weightSum = availableWorkerStatuses.sumOf { 5 - computeScore(it.cpuLoad, it.memoryLoad) }
+        val weightSum = availableWorkerStatuses.sumOf { computeScore(it.cpuLoad, it.memoryLoad) }
         var rndWeight = rnd.nextDouble() * weightSum
         availableWorkerStatuses.forEach {
-            val workerWeight = 5 - computeScore(it.cpuLoad, it.memoryLoad)
+            val workerWeight = computeScore(it.cpuLoad, it.memoryLoad)
             if (rndWeight < workerWeight) {
                 scaleDownDeployment(it.id, workflowId, it.activeDeployments.first { activeDeployment ->
                     activeDeployment.workflowId == workflowId
@@ -315,6 +318,6 @@ class ScalingController : KoinComponent {
     }
 
     private fun computeScore(cpuUsage: Double, memoryUsage: Double): Double {
-        return cpuUsage * CPU_WEIGHT + memoryUsage * MEMORY_WEIGHT
+        return 1 - cpuUsage * CPU_WEIGHT + memoryUsage * MEMORY_WEIGHT
     }
 }

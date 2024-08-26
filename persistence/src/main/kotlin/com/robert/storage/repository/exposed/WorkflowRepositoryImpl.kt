@@ -20,6 +20,7 @@ class WorkflowRepositoryImpl : WorkflowRepository {
 
         (Workflows innerJoin WorkflowMappings)
             .selectAll()
+            .orderBy(Workflows.image)
             .map { row ->
                 val id = row[Workflows.id]
                 workflowsMapping.getOrPut(id) {

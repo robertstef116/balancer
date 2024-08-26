@@ -11,8 +11,7 @@ import com.robert.loadbalancer.model.HostPortPair
 import com.robert.logger
 import com.robert.storage.repository.LoadBalancerAnalyticRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -22,6 +21,7 @@ import java.net.ConnectException
 import java.net.ServerSocket
 import java.net.Socket
 import java.time.Instant
+import java.util.concurrent.Executors
 import kotlin.system.measureTimeMillis
 
 class LoadBalancer : KoinComponent {
@@ -57,7 +57,9 @@ class LoadBalancer : KoinComponent {
     private val loadBalancerAnalyticRepository by inject<LoadBalancerAnalyticRepository>()
 
     private val processingSocketBufferLength = Env.getInt("PROCESSING_SOCKET_BUFFER_LENGTH", 2000)
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    //    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val scope = CoroutineScope(Executors.newFixedThreadPool(250).asCoroutineDispatcher())
 
     fun start() {
         val port = Env.getInt("PORT", 8001)
@@ -90,8 +92,8 @@ class LoadBalancer : KoinComponent {
                                     val buffer = ByteArray(processingSocketBufferLength)
                                     val (requestHeaders, requestBody) = readFromStream(input, buffer)
                                     updateRequestLineHeader(requestHeaders).also {
-                                        lbUri += it.first
-                                        version += it.second
+                                        lbUri = it.first
+                                        version = it.second
                                     }
 
                                     assigner = requestHandlerProvider.getAssigner(lbUri).also { assigner ->
@@ -154,7 +156,7 @@ class LoadBalancer : KoinComponent {
             target?.also { targetData ->
                 assigner?.also { it.addResponseTimeData(targetData, responseTime - retryTime, responseType) }
                 if (lbUri.isNotEmpty()) {
-                    targetData.also { loadBalancerAnalyticRepository.create(LoadBalancerAnalytic(it.workflowId, lbUri, responseTime, Instant.now().toEpochMilli(), responseType)) }
+//                    targetData.also { loadBalancerAnalyticRepository.create(LoadBalancerAnalytic(it.workflowId, lbUri, responseTime, Instant.now().toEpochMilli(), responseType)) }
                 }
             }
         }
@@ -166,6 +168,7 @@ class LoadBalancer : KoinComponent {
         var line = ByteArray(0)
         var bodySize = 0
         val headers = mutableListOf<ByteArray>()
+        var chunked = false
 
         while (true) {
             val c = buffer[from]
@@ -190,6 +193,8 @@ class LoadBalancer : KoinComponent {
                     line.toString(Charsets.UTF_8).also {
                         if (it.startsWith("Content-Length:")) {
                             bodySize = it.split(':')[1].trim().toInt()
+                        } else if (it.startsWith("Transfer-Encoding: chunked")) {
+                            chunked = true
                         }
                     }
                 }
@@ -200,11 +205,37 @@ class LoadBalancer : KoinComponent {
         }
 
         var body = ByteArray(0)
-        body += buffer.copyOfRange(from, currentReadSize)
-        var remaining = bodySize - (currentReadSize - from)
-        while (remaining > 0) {
-            remaining -= readFromStreamRaw(input, buffer)
-            body += buffer
+        if (chunked) {
+            var charsInChunk = 0
+            while (true) {
+                val c = buffer[from]
+                from++
+                charsInChunk++
+                if (from >= currentReadSize) {
+                    currentReadSize = readFromStreamRaw(input, buffer)
+                    if (currentReadSize == -1) {
+                        body += c
+                        break
+                    }
+                    from = 0
+                }
+                if (c == CR && buffer[from] == LF) {
+                    if (charsInChunk == 1) {
+                        body += CR
+                        body += LF
+                        break
+                    }
+                    charsInChunk = 0
+                }
+                body += c
+            }
+        } else {
+            body += buffer.copyOfRange(from, currentReadSize)
+            var remaining = bodySize - (currentReadSize - from)
+            while (remaining > 0) {
+                remaining -= readFromStreamRaw(input, buffer)
+                body += buffer
+            }
         }
         return Pair(headers, body)
     }
@@ -231,20 +262,17 @@ class LoadBalancer : KoinComponent {
         val version = requestLineSplits[2]
 
         val uriSplitIdx = uri.indexOf('/', 1)
-        if (uriSplitIdx == -1) {
-            headers[0] = "%s / %s".format(requestLineSplits[0], version).toByteArray()
-            return Pair(uri, version)
+        return if (uriSplitIdx == -1) {
+            Pair(uri, version)
         } else {
-            val targetUri = uri.substring(uriSplitIdx)
-            headers[0] = "%s %s %s".format(requestLineSplits[0], targetUri, version).toByteArray()
-            return Pair(uri.substring(0, uriSplitIdx), version)
+            Pair(uri.substring(0, uriSplitIdx), version)
         }
     }
 
     private fun readFromStreamRaw(input: InputStream, buffer: ByteArray): Int {
         return input.read(buffer).also {
             if (it == -1) {
-                throw ConnectionClosedException()
+//                throw ConnectionClosedException()
             }
         }
     }

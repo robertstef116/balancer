@@ -76,7 +76,7 @@ function BalancingHistoryChart({ classNames, workflowId, path, title, metric }) 
       widgetProps={widgetProps}
       noData={Object.keys(data).length === 0}
     >
-      {Object.keys(data).map((key) => (
+      {workflows && Object.keys(data).map((key) => (
         <Line
           key={key}
           data={data[key]}
