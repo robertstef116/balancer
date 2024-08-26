@@ -156,7 +156,7 @@ class LoadBalancer : KoinComponent {
             target?.also { targetData ->
                 assigner?.also { it.addResponseTimeData(targetData, responseTime - retryTime, responseType) }
                 if (lbUri.isNotEmpty()) {
-//                    targetData.also { loadBalancerAnalyticRepository.create(LoadBalancerAnalytic(it.workflowId, lbUri, responseTime, Instant.now().toEpochMilli(), responseType)) }
+                    targetData.also { loadBalancerAnalyticRepository.create(LoadBalancerAnalytic(it.workflowId, lbUri, responseTime, Instant.now().toEpochMilli(), responseType)) }
                 }
             }
         }
@@ -272,7 +272,7 @@ class LoadBalancer : KoinComponent {
     private fun readFromStreamRaw(input: InputStream, buffer: ByteArray): Int {
         return input.read(buffer).also {
             if (it == -1) {
-//                throw ConnectionClosedException()
+                throw ConnectionClosedException()
             }
         }
     }

@@ -24,17 +24,15 @@ class LoadTest {
     private val WARMUP_REQUESTS_COUNT = Env.getInt("WARMUP_REQUESTS_COUNT", 2_000)
     private val DATA_PLOT_INTERVALS = Env.getInt("DATA_PLOT_INTERVALS", 250)
 
-    //    private val TEST_BASE_URL = Env.get("TEST_BASE_URL", "http://172.24.251.255:32770/internal/test")
     private val TEST_BASE_URL = Env.get("TEST_BASE_URL", "http://172.24.251.255:9990/internal/test")
     private val TEST_RESULTS_BASE_PATH = Env.get("TEST_RESULTS_BASE_PATH", ".")
     private val activeRequestCount = AtomicLong(0)
 
     fun execute() {
         val time = measureTimeMillis {
-//            executeTest(1, 500, 0)
-//            executeTest(2, 500, 4500)
+            executeTest(1, 500, 0)
+            executeTest(2, 500, 4500)
             executeTest(3, 2000, 500)
-            executeTest(30, 2000, 500)
         }
         LOG.info("Test done in $time ms")
     }

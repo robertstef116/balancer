@@ -22,9 +22,7 @@ dependencies {
     implementation(libs.kotlin.coroutines)
     implementation(libs.grpc.netty)
     implementation(libs.bundles.docker)
-    implementation(libs.oshi) {
-//        exclude("org.slf4j", "slf4j-api")
-    }
+    implementation(libs.oshi)
 }
 
 docker {
