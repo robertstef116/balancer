@@ -12,8 +12,8 @@ import kotlin.random.Random
 
 class LoadGenerator {
     private val GENERATOR_BASE_PATH = Env.get("GENERATOR_BASE_PATH", "http://172.24.251.255:9990")
-    private val GENERATOR_ROUTES = Env.get("GENERATOR_ROUTES", "/internal,/todos,/todos-api,/aws,/simple-app")
-    private val GENERATOR_SPEED = Env.getInt("GENERATOR_SPEED", 5)
+    private val GENERATOR_ROUTES = Env.get("GENERATOR_ROUTES", "/internal/test/1,/todos,/todos-api")
+    private val GENERATOR_SPEED = Env.getInt("GENERATOR_SPEED", 2)
 
     fun execute() {
         val routes = GENERATOR_ROUTES.split(",")
@@ -25,10 +25,14 @@ class LoadGenerator {
                 if (activeRequests.get() < 10) {
                     activeRequests.incrementAndGet()
                     launch(Dispatchers.IO) {
-                        val route = routes[Random.nextInt(routes.size)]
-                        val res = HttpClient.get(GENERATOR_BASE_PATH + route)
-                        if (res.status != HttpStatusCode.OK) {
-                            println("Unexpected status on route $route - ${res.status}")
+                        try {
+                            val route = routes[Random.nextInt(routes.size)]
+                            val res = HttpClient.get(GENERATOR_BASE_PATH + route)
+                            if (res.status != HttpStatusCode.OK) {
+                                println("Unexpected status on route $route - ${res.status}")
+                            }
+                        } catch (e: Exception) {
+                            println("error ${e.message}")
                         }
                         activeRequests.decrementAndGet()
                     }

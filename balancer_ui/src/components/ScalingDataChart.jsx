@@ -15,11 +15,12 @@ function ScalingDataChart({
   const [data, setData] = useState({});
   const workflows = useSelector((state) => state.workflows);
 
-  const fetchData = async () => {
+  const fetchData = ({ showLoadingIndicator = true } = {}) => new Promise((resolve) => {
     const nowTime = Date.now();
     apiWrapper({
       action: getAnalyticsData,
       params: { durationMs: range.value * 1000 * 60 - 1, metric, workflowId },
+      showLoadingIndicator,
       cb: (res) => {
         setNow(nowTime);
         const newData = {};
@@ -50,9 +51,10 @@ function ScalingDataChart({
           }
         }
         setData(newDataArrays);
+        resolve();
       },
     });
-  };
+  });
 
   const getWorkflowName = (wid) => {
     for (const workflow of workflows) {
@@ -68,7 +70,22 @@ function ScalingDataChart({
   }, []);
 
   useEffect(() => {
-    fetchData();
+    let refreshTimer;
+    const refresh = () => {
+      refreshTimer = setTimeout(() => {
+        fetchData({ showLoadingIndicator: false }).then(() => {
+          refresh();
+        });
+      }, 15000);
+    };
+
+    fetchData().then(() => {
+      refresh();
+    });
+
+    return () => {
+      clearTimeout(refreshTimer);
+    };
   }, [range, workflowId]);
 
   return (

@@ -25,7 +25,7 @@ object DatabaseInitializer {
             this.jdbcUrl = jdbcURL
             this.username = username
             this.password = password
-            maximumPoolSize = 3
+            maximumPoolSize = 30
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
             validate()

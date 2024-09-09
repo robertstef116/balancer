@@ -270,11 +270,7 @@ class LoadBalancer : KoinComponent {
     }
 
     private fun readFromStreamRaw(input: InputStream, buffer: ByteArray): Int {
-        return input.read(buffer).also {
-            if (it == -1) {
-                throw ConnectionClosedException()
-            }
-        }
+        return input.read(buffer)
     }
 
     private fun writeContentToStream(content: String, out: OutputStream) {

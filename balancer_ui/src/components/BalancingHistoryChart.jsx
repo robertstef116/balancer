@@ -13,11 +13,12 @@ function BalancingHistoryChart({ classNames, workflowId, path, title, metric }) 
   const [data, setData] = useState({});
   const workflows = useSelector((state) => state.workflows);
 
-  const fetchData = async () => {
+  const fetchData = ({ showLoadingIndicator = true } = {}) => new Promise((resolve) => {
     const nowTime = Date.now();
     apiWrapper({
       action: getBalancingAnalyticsData,
       params: { durationMs: range.value * 1000 * 60 - 1, workflowId, path, metric },
+      showLoadingIndicator,
       cb: (res) => {
         setNow(nowTime);
         const newData = {};
@@ -43,9 +44,10 @@ function BalancingHistoryChart({ classNames, workflowId, path, title, metric }) 
           newDataArrays[key].sort((a, b) => a.timeMs - b.timeMs);
         }
         setData(newDataArrays);
+        resolve();
       },
     });
-  };
+  });
 
   const geLineName = (key) => {
     const wid = key.substring(0, 36);
@@ -63,7 +65,22 @@ function BalancingHistoryChart({ classNames, workflowId, path, title, metric }) 
   }, []);
 
   useEffect(() => {
-    fetchData();
+    let refreshTimer;
+    const refresh = () => {
+      refreshTimer = setTimeout(() => {
+        fetchData({ showLoadingIndicator: false }).then(() => {
+          refresh();
+        });
+      }, 15000);
+    };
+
+    fetchData().then(() => {
+      refresh();
+    });
+
+    return () => {
+      clearTimeout(refreshTimer);
+    };
   }, [range, workflowId, path]);
 
   return (

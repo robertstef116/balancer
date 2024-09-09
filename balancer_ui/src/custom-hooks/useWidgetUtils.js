@@ -44,12 +44,16 @@ const useWidgetUtils = ({ withCancellation } = { withCancellation: false }) => {
     setError(null);
   };
 
-  const apiWrapper = ({ action, params = {}, cb = null }) => {
-    startLoading();
+  const apiWrapper = ({ action, params = {}, cb = null, showLoadingIndicator = true }) => {
+    if (showLoadingIndicator) {
+      startLoading();
+    }
     const actionParams = handleCancellation(params);
     action(actionParams, (err, data) => {
       if (isActive.current) {
-        stopLoading();
+        if (showLoadingIndicator) {
+          stopLoading();
+        }
         if (err) {
           if (!isCancel(err)) {
             setError(err);

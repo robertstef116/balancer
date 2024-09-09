@@ -17,7 +17,7 @@ class WorkerController : KoinComponent {
     companion object {
         val LOG by logger()
 
-        private val WORKER_STATUS_MAX_AGE_SECONDS = Env.getInt("WORKER_STATUS_MAX_AGE_SECONDS", 240)
+        private val WORKER_STATUS_MAX_AGE_SECONDS = Env.getInt("WORKER_STATUS_MAX_AGE_SECONDS", 36000)
     }
 
     private val workerRepository: WorkerRepository by inject()
@@ -70,6 +70,7 @@ class WorkerController : KoinComponent {
         } else {
             workerStatus[id]?.state = state
         }
+        workerRepository.update(id, null, state)
         return true
     }
 
@@ -86,7 +87,6 @@ class WorkerController : KoinComponent {
         workerStatus.values.filter { it.state == WorkerState.ONLINE && now - it.lastUpdate > WORKER_STATUS_MAX_AGE_SECONDS }
             .forEach {
                 onPrune(it.id)
-                workerRepository.update(it.id, null, WorkerState.OFFLINE)
                 updateWorkerState(it.id, WorkerState.OFFLINE)
                 LOG.info("Updated status of worker {} to OFFLINE since age threshold was exceeded", it.id)
             }
